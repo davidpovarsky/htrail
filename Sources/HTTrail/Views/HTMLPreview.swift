@@ -1,6 +1,7 @@
 import SwiftUI
 import WebKit
 import AppKit
+import HTTrailCore
 
 /// The single permitted use of HTML in HTTrail: rendering a captured response
 /// body as a live web preview (the "preview/renderer" requirement).
@@ -22,11 +23,16 @@ struct HTMLPreview: NSViewRepresentable {
     }
 }
 
-/// Renders an image response body, top-aligned and scrollable.
+/// Renders an image response body, top-aligned and scrollable. SVG is drawn by
+/// the web view (NSImage can't decode SVG); raster formats (PNG/JPEG/WebP/GIF/
+/// BMP/TIFF/HEIC) are decoded by `NSImage`.
 struct ImagePreview: View {
     let data: Data
+    var contentType: String? = nil
     var body: some View {
-        if let image = NSImage(data: data) {
+        if ImageSniffer.isSVG(data: data, contentType: contentType) {
+            HTMLPreview(html: ImageSniffer.svgPreviewHTML(data))
+        } else if let image = NSImage(data: data) {
             ScrollView {
                 Image(nsImage: image)
                     .resizable()

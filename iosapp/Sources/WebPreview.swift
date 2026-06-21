@@ -1,6 +1,7 @@
 import SwiftUI
 import WebKit
 import UIKit
+import HTTrailCore
 
 /// HTML response renderer — the only HTML in HTTrail, per design. JavaScript is
 /// disabled so previews are inert.
@@ -17,11 +18,16 @@ struct WebPreview: UIViewRepresentable {
     }
 }
 
-/// Renders an image response body, top-aligned and scrollable.
+/// Renders an image response body, top-aligned and scrollable. SVG is drawn by
+/// the web view (UIImage can't decode SVG); raster formats (PNG/JPEG/WebP/GIF/
+/// BMP/TIFF/HEIC) are decoded by `UIImage`.
 struct ImagePreview: View {
     let data: Data
+    var contentType: String? = nil
     var body: some View {
-        if let image = UIImage(data: data) {
+        if ImageSniffer.isSVG(data: data, contentType: contentType) {
+            WebPreview(html: ImageSniffer.svgPreviewHTML(data))
+        } else if let image = UIImage(data: data) {
             ScrollView {
                 Image(uiImage: image)
                     .resizable()

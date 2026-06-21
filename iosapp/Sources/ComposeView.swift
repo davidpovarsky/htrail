@@ -319,8 +319,8 @@ struct ResponseView: View {
                     if (contentType ?? "").lowercased().contains("html"),
                        let html = String(data: response.body, encoding: .utf8) {
                         WebPreview(html: html)
-                    } else if (contentType ?? "").lowercased().hasPrefix("image/") {
-                        ImagePreview(data: response.body)
+                    } else if ImageSniffer.isImage(data: response.body, contentType: contentType) {
+                        ImagePreview(data: response.body, contentType: contentType)
                     } else {
                         ContentUnavailableView("No preview", systemImage: "eye.slash")
                     }

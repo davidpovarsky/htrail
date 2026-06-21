@@ -25,6 +25,22 @@ final class ExportSupportTests: XCTestCase {
         XCTAssertTrue(dump.contains("truncated for display"), "should note truncation")
     }
 
+    func testHexDumpRowFormat() {
+        let data = Data("HTTP/1.1 200 OK".utf8)   // 15 bytes → 1 row
+        let row0 = HexDump.row(data, 0)
+        XCTAssertTrue(row0.hasPrefix("00000000  48 54 54 50 2f 31 2e 31"), "offset+hex wrong: \(row0)")
+        XCTAssertTrue(row0.hasSuffix("|HTTP/1.1 200 OK|"), "ascii column wrong: \(row0)")
+    }
+
+    func testHexDumpRowOffsetsAndCount() {
+        let data = Data((0..<20).map { UInt8($0) })   // 20 bytes → 2 rows
+        XCTAssertTrue(HexDump.row(data, 1).hasPrefix("00000010  10 11 12 13"), "second row offset wrong")
+        XCTAssertEqual(HexDump.rowCount(0), 0)
+        XCTAssertEqual(HexDump.rowCount(1), 1)
+        XCTAssertEqual(HexDump.rowCount(16), 1)
+        XCTAssertEqual(HexDump.rowCount(17), 2)
+    }
+
     func testFileExtensionMapping() {
         XCTAssertEqual(ExportSupport.fileExtension(forContentType: "application/json"), "json")
         XCTAssertEqual(ExportSupport.fileExtension(forContentType: "text/html; charset=utf-8"), "html")

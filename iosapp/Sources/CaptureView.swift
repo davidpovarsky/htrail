@@ -391,7 +391,7 @@ struct MessageView: View {
         var id: String { rawValue }
     }
     private var isHTML: Bool { (contentType ?? "").lowercased().contains("html") }
-    private var isImage: Bool { (contentType ?? "").lowercased().hasPrefix("image/") }
+    private var isImage: Bool { ImageSniffer.isImage(data: bodyData, contentType: contentType) }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -409,7 +409,7 @@ struct MessageView: View {
                     if isHTML, let html = String(data: bodyData, encoding: .utf8) {
                         WebPreview(html: html, baseURL: baseURL)
                     } else if isImage {
-                        ImagePreview(data: bodyData)
+                        ImagePreview(data: bodyData, contentType: contentType)
                     } else {
                         ContentUnavailableView("No preview", systemImage: "eye.slash",
                             description: Text("Preview supports HTML and images. Content-Type: \(contentType ?? "unknown")"))
