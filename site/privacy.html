@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Privacy Policy — HTTrail</title>
+<meta name="description" content="HTTrail's Privacy Policy. HTTrail is a native, on-device tool: it has no analytics, no accounts, and no backend, and the traffic it captures never leaves your device." />
+<meta name="theme-color" content="#0B091A" />
+<meta name="robots" content="index, follow" />
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+<link rel="apple-touch-icon" href="assets/icon-1024.png" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.html" aria-label="HTTrail home">
+      <img src="assets/logo.svg" alt="" width="34" height="34" />
+      <span>HT<b>Trail</b></span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="hide-sm" href="index.html#features">Features</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a class="btn btn-ghost" href="https://github.com/1moby/htrail" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="legal">
+  <div class="wrap">
+    <div class="legal-head">
+      <a class="back" href="index.html">← Back to HTTrail</a>
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated: June 21, 2026</p>
+    </div>
+
+    <div class="prose">
+
+      <div class="callout">
+        <p><strong>The short version.</strong> HTTrail runs entirely on your own device. It has no servers, no analytics, no accounts, and no telemetry. The network traffic it captures — including your most sensitive data — is stored only on your device, and we have no technical means to receive, see, or collect it.</p>
+      </div>
+
+      <div class="toc" aria-label="Table of contents">
+        <h4>Contents</h4>
+        <ol>
+          <li><a href="#scope">Scope &amp; who we are</a></li>
+          <li><a href="#no-collect">What we do not collect</a></li>
+          <li><a href="#on-device">Data HTTrail processes on your device</a></li>
+          <li><a href="#ca">Your certificate authority &amp; keys</a></li>
+          <li><a href="#connections">Network connections HTTrail makes</a></li>
+          <li><a href="#website">This website</a></li>
+          <li><a href="#third-party">Third-party services</a></li>
+          <li><a href="#security">Security</a></li>
+          <li><a href="#responsibilities">Your responsibilities</a></li>
+          <li><a href="#children">Children's privacy</a></li>
+          <li><a href="#international">International users</a></li>
+          <li><a href="#changes">Changes to this policy</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ol>
+      </div>
+
+      <h2 id="scope">1. Scope &amp; who we are</h2>
+      <p>This Privacy Policy explains how the HTTrail application ("HTTrail", the "App") and this website handle information. HTTrail is provided by <strong>1Moby</strong> ("we", "us", "our"). It applies to the macOS and iOS versions of the App and to the HTTrail website.</p>
+      <p>HTTrail is a developer tool that acts as an intercepting HTTPS proxy and API client. It is designed so that you remain in sole possession of everything it touches. This policy describes that design in detail so you can verify it.</p>
+
+      <h2 id="no-collect">2. What we do not collect</h2>
+      <p>We want to be unambiguous. The App does <strong>not</strong>:</p>
+      <ul>
+        <li>collect, transmit, or store any personal information on servers operated by us — we operate no such servers;</li>
+        <li>include analytics, tracking, advertising, crash reporting, or telemetry of any kind;</li>
+        <li>require an account, login, registration, or email address to function;</li>
+        <li>contain embedded third-party SDKs that profile you or report your activity;</li>
+        <li>sell, rent, or share any information with anyone — because we never receive any.</li>
+      </ul>
+      <p>There is no "phone home." The App functions fully offline except for the network requests <em>you</em> direct it to make (see <a href="#connections">Section 5</a>).</p>
+
+      <h2 id="on-device">3. Data HTTrail processes on your device</h2>
+      <p>To do its job, HTTrail processes network traffic that you choose to route through it. When you enable interception for a host, this can include highly sensitive material, such as:</p>
+      <ul>
+        <li>request and response URLs, methods, headers, and cookies;</li>
+        <li>authentication tokens, API keys, and session credentials;</li>
+        <li>request and response bodies (for example JSON, form data, HTML, and images);</li>
+        <li>timing, status codes, and connection metadata.</li>
+      </ul>
+      <p>All of this is processed and stored <strong>locally</strong>. Captured flows, request history, collections, environments, and saved settings are written to your device's own storage — your user Application Support directory on macOS, and the App's container (or shared App Group container) on iOS. None of it is transmitted to us or to any third party by the App.</p>
+      <p>Because this data lives on your device, you control it: you can delete captured flows, clear history, or remove the App and its data at any time using your operating system's normal tools.</p>
+
+      <h2 id="ca">4. Your certificate authority &amp; keys</h2>
+      <p>To decrypt TLS (HTTPS) traffic, HTTrail generates its own root <strong>Certificate Authority (CA)</strong> on your device and mints short-lived per-host leaf certificates signed by it. The CA's private key is created on your device and <strong>never leaves it</strong>. We never see it, receive it, or have a copy of it.</p>
+      <div class="callout">
+        <p><strong>Important security note.</strong> Installing and trusting the HTTrail root CA on a device allows software on that device — including HTTrail — to decrypt HTTPS traffic for that device. Only install the CA on devices you own or control, keep its private key protected, and remove the CA when you no longer need to capture traffic. See the <a href="terms.html">Terms of Use</a> for more.</p>
+      </div>
+
+      <h2 id="connections">5. Network connections HTTrail makes</h2>
+      <p>HTTrail makes outbound network connections only as a direct result of your actions:</p>
+      <ul>
+        <li><strong>Proxying.</strong> When you route traffic through the proxy, HTTrail forwards each request to the origin server <em>you</em> were already contacting (for example, an API you are testing). That data goes directly to that third party, not to us.</li>
+        <li><strong>Replaying &amp; composing.</strong> When you send a request from the composer or replay a captured flow, HTTrail contacts the destination you specify.</li>
+      </ul>
+      <p>Any data you send to a third-party server in this way is governed by <em>that</em> server's privacy practices, not ours. HTTrail is the messenger you operate; it does not add us as a recipient.</p>
+
+      <h2 id="website">6. This website</h2>
+      <p>This website is a set of static pages hosted on <strong>GitHub Pages</strong>. It sets no cookies, runs no analytics, and loads no third-party fonts, scripts, or trackers. As with any website, the host (GitHub, Inc.) may automatically log standard technical information such as your IP address and browser user-agent in order to serve the pages and protect the service. That processing is governed by the <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub Privacy Statement</a>. We do not have access to individualized analytics about your visit.</p>
+
+      <h2 id="third-party">7. Third-party services</h2>
+      <p>The App embeds no third-party advertising, analytics, or tracking services. It is built on open-source software libraries (such as SwiftNIO and Apple's swift-crypto and swift-certificates) that run locally as part of the App and do not transmit your data anywhere.</p>
+
+      <h2 id="security">8. Security</h2>
+      <p>Because your captured data and CA private key live only on your device, their security is tied to your device's security. We recommend you use full-disk encryption, a strong device passcode, and operating-system account protections. Remember that decrypted traffic and the trusted root CA are sensitive; treat exported files (for example HAR exports or an exported CA) accordingly, since they may contain credentials.</p>
+
+      <h2 id="responsibilities">9. Your responsibilities</h2>
+      <p>HTTrail is a powerful interception tool intended for debugging traffic that you are authorized to inspect — your own apps, your own devices, and systems you have permission to test. You are responsible for using it lawfully and only on traffic you have the right to access. Please see the <a href="terms.html">Terms of Use</a> for the full acceptable-use terms.</p>
+
+      <h2 id="children">10. Children's privacy</h2>
+      <p>HTTrail is a developer tool intended for software professionals and is not directed to children. We do not knowingly collect information from children — indeed, we do not knowingly collect information from anyone.</p>
+
+      <h2 id="international">11. International users</h2>
+      <p>Because the App processes data only on your own device and we collect nothing, no personal data is transferred across borders by us. When you use the App to contact third-party servers, you direct where that traffic goes.</p>
+
+      <h2 id="changes">12. Changes to this policy</h2>
+      <p>We may update this Privacy Policy from time to time — for example, to reflect new features. When we do, we will revise the "Last updated" date above. Material changes will be reflected on this page. Your continued use of the App after an update constitutes acceptance of the revised policy.</p>
+
+      <h2 id="contact">13. Contact</h2>
+      <p>Questions about this Privacy Policy? Contact us at <a href="mailto:contact@1moby.com">contact@1moby.com</a>.</p>
+
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="index.html" aria-label="HTTrail home">
+          <img src="assets/logo.svg" alt="" width="34" height="34" />
+          <span>HT<b>Trail</b></span>
+        </a>
+        <p>A native HTTPS debugging proxy &amp; API client for macOS and iOS.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Product</h4>
+          <a href="index.html#features">Features</a>
+          <a href="index.html#how">How it works</a>
+          <a href="https://github.com/1moby/htrail" target="_blank" rel="noopener">GitHub</a>
+        </div>
+        <div class="foot-col">
+          <h4>Legal</h4>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Use</a>
+          <a href="mailto:contact@1moby.com">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 1Moby. All rights reserved.</span>
+      <span>HTTrail is a tool for debugging traffic you are authorized to inspect.</span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

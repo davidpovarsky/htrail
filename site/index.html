@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HTTrail — Native HTTPS debugging proxy & API client for Mac and iOS</title>
+<meta name="description" content="HTTrail is a native Swift app that combines a Charles-style intercepting HTTPS proxy with a Hoppscotch-style API client. Decrypt your own TLS, capture every request, and replay it — 100% on-device, no telemetry." />
+<meta name="theme-color" content="#0B091A" />
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+<link rel="apple-touch-icon" href="assets/icon-1024.png" />
+
+<!-- Open Graph / social -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="HTTrail — Native HTTPS proxy & API client" />
+<meta property="og:description" content="Intercept, inspect & replay every request. A native HTTPS debugging proxy and API client in one — 100% on-device." />
+<meta property="og:image" content="assets/og-image.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="HTTrail — Native HTTPS proxy & API client" />
+<meta name="twitter:description" content="Intercept, inspect & replay every request. 100% on-device, no telemetry." />
+<meta name="twitter:image" content="assets/og-image.png" />
+
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.html" aria-label="HTTrail home">
+      <img src="assets/logo.svg" alt="" width="34" height="34" />
+      <span>HT<b>Trail</b></span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="hide-sm" href="#features">Features</a>
+      <a class="hide-sm" href="#how">How it works</a>
+      <a class="hide-sm" href="#platforms">Platforms</a>
+      <a href="privacy.html">Privacy</a>
+      <a class="btn btn-ghost" href="https://github.com/1moby/htrail" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.73 1.27 3.4.97.1-.76.41-1.27.74-1.56-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.1-.12-.3-.52-1.47.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.5 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.69 5.4-5.25 5.69.42.36.8 1.08.8 2.18v3.23c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        GitHub
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="dot"></span> Native macOS &amp; iOS · Swift + SwiftUI</span>
+        <h1 class="hero-title">Intercept, inspect &amp; replay <span class="grad">every request.</span></h1>
+        <p class="hero-sub">HTTrail is a native HTTPS debugging proxy and API client in one app. Decrypt your own TLS with an on-device certificate authority, capture every flow, then compose or replay — without a single byte leaving your machine.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="https://github.com/1moby/htrail" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.73 1.27 3.4.97.1-.76.41-1.27.74-1.56-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.1-.12-.3-.52-1.47.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.5 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.69 5.4-5.25 5.69.42.36.8 1.08.8 2.18v3.23c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+            View on GitHub
+          </a>
+          <a class="btn btn-ghost" href="#how">How it works</a>
+        </div>
+        <div class="hero-meta">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> 100% on-device</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> No accounts, no telemetry</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> macOS + iOS</span>
+        </div>
+      </div>
+
+      <!-- Product mock -->
+      <div class="mock reveal" aria-hidden="true">
+        <div class="mock-bar">
+          <span class="tl"></span><span class="tl"></span><span class="tl"></span>
+          <span class="label">HTTrail — Capture</span>
+        </div>
+        <div class="mock-tabs"><span class="on">Capture</span><span>Compose</span><span>Rules</span></div>
+        <div class="mock-body">
+          <div class="flow-row sel">
+            <span class="verb get">GET</span>
+            <span class="flow-host">api.github.com<span class="dim">/user</span></span>
+            <span class="lock">🔒</span>
+            <span><span class="code200">200</span> · <span class="flow-time">142ms</span></span>
+          </div>
+          <div class="flow-row">
+            <span class="verb post">POST</span>
+            <span class="flow-host">api.stripe.com<span class="dim">/v1/charges</span></span>
+            <span class="lock">🔒</span>
+            <span><span class="code200">200</span> · <span class="flow-time">88ms</span></span>
+          </div>
+          <div class="flow-row">
+            <span class="verb put">PUT</span>
+            <span class="flow-host">api.myapp.io<span class="dim">/users/42</span></span>
+            <span class="lock">🔒</span>
+            <span><span class="code200">200</span> · <span class="flow-time">64ms</span></span>
+          </div>
+          <div class="flow-row">
+            <span class="verb get">GET</span>
+            <span class="flow-host">cdn.assets.dev<span class="dim">/app.js</span></span>
+            <span class="lock">🔒</span>
+            <span><span class="code301">301</span> · <span class="flow-time">12ms</span></span>
+          </div>
+        </div>
+        <div class="mock-inspect">
+          <div class="row"><span class="k">authorization:</span> Bearer ••••••••</div>
+          <div class="row"><span class="k">content-type:</span> application/json</div>
+          <div class="row"><span class="k">x-ratelimit-remaining:</span> 4998</div>
+          <div class="row">&nbsp;</div>
+          <div class="row">{ <span class="k">"login"</span>: <span class="s">"octocat"</span>,</div>
+          <div class="row">&nbsp;&nbsp;<span class="k">"id"</span>: <span class="s">583231</span>,</div>
+          <div class="row">&nbsp;&nbsp;<span class="k">"plan"</span>: <span class="s">"pro"</span> }</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><hr class="trail-rule glow" /></div>
+
+  <!-- PILLARS -->
+  <section aria-label="Why HTTrail">
+    <div class="wrap">
+      <div class="pillars">
+        <div class="pillar reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></svg></div>
+          <h3>Native, not Electron</h3>
+          <p>Pure Swift + SwiftUI on a SwiftNIO core. It starts instantly, sips memory, and feels like a Mac app because it is one.</p>
+        </div>
+        <div class="pillar reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#67e8f9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div>
+          <h3>Local by design</h3>
+          <p>The proxy, the CA, your captured flows, and replay history all live on your machine. There is no HTTrail server to send anything to.</p>
+        </div>
+        <div class="pillar reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+          <h3>Yours to trust</h3>
+          <p>The root CA's private key is generated on-device and never leaves it. You install it, you trust it, you remove it — entirely under your control.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">// Capabilities</p>
+        <h2>A whole <span class="grad">debugging toolkit</span> in one window.</h2>
+        <p class="lead">Two products, fused: a Charles-style intercepting proxy and a Hoppscotch-style API client, sharing one capture engine.</p>
+      </div>
+      <div class="features">
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h6m8 0h6"/><circle cx="12" cy="12" r="4"/><path d="m4.9 4.9 2.8 2.8m8.6 8.6 2.8 2.8m0-14.2-2.8 2.8M7.7 16.3l-2.8 2.8"/></svg></div>
+          <h3>HTTPS MITM proxy</h3>
+          <p>Answers <code>CONNECT</code>, terminates TLS with a freshly minted leaf cert, forwards to the real origin, and captures both directions — live-tested against real hosts.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <h3>On-device certificate authority</h3>
+          <p>Generates a self-signed P-256 root (10-year, persisted) and mints per-host leaf certs on the fly. One-click install &amp; trust on macOS.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></div>
+          <h3>Charles-style rules engine</h3>
+          <p>Block, map local, map remote, rewrite request or response, throttle bandwidth, and set interactive breakpoints — pause a flow, edit the body, continue.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
+          <h3>Deep flow inspector</h3>
+          <p>Headers, raw and pretty-printed JSON bodies, live HTML preview, image preview, plus status, timing, and size for every captured flow.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18M3 12h12M3 19h18"/><path d="m17 16 4 3-4 3" transform="translate(0 -7)"/></svg></div>
+          <h3>Request composer</h3>
+          <p>Methods, query params, headers, every body mode, GraphQL, and <code>{{env}}</code> variables — with Bearer, Basic, and API-key auth helpers built in.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 14h6v6h-6z"/><path d="M14 4h6v6h-6zM4 14h6v6H4z" opacity=".5"/></svg></div>
+          <h3>Realtime clients</h3>
+          <p>WebSocket, Server-Sent Events, Socket.IO (Engine.IO v4 handshake), and an MQTT 3.1.1 client — all over the same NIO core.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13l-2 2 2 2M15 13l2 2-2 2"/></svg></div>
+          <h3>Import &amp; export</h3>
+          <p>Bring in cURL, OpenAPI 3, and Postman v2.1. Send out cURL, Swift, JavaScript, or Python — and export captured flows as HAR 1.2.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l6-6-6-6M12 19h8"/></svg></div>
+          <h3>Pre-request &amp; test scripts</h3>
+          <p>Run JavaScript before and after a request through JavaScriptCore, with a familiar <code>pm.*</code> API for assertions and dynamic values.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3 2 3l8 9v7l4 2v-9z"/></svg></div>
+          <h3>SSL-proxying allowlist</h3>
+          <p>Only decrypt the hosts you list. Everything else is blind-tunnelled untouched, so certificate-pinned apps keep working alongside your capture.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">// Four steps</p>
+        <h2>From zero to <span class="grad">decrypted traffic.</span></h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="num">1</div>
+          <h3>Start the proxy</h3>
+          <p>Hit the toolbar play button or <code>⌘P</code>. HTTrail listens on <code>127.0.0.1:9090</code>.</p>
+        </div>
+        <div class="step reveal">
+          <div class="num">2</div>
+          <h3>Trust the CA</h3>
+          <p>One click installs &amp; trusts the root CA on macOS — or install the <code>.mobileconfig</code> profile on iOS.</p>
+        </div>
+        <div class="step reveal">
+          <div class="num">3</div>
+          <h3>Capture</h3>
+          <p>Toggle the system proxy and every request &amp; response streams into the Capture tab in real time.</p>
+        </div>
+        <div class="step reveal">
+          <div class="num">4</div>
+          <h3>Compose &amp; replay</h3>
+          <p>Edit-and-resend any flow, copy it as cURL, or build a fresh request and hit Send (<code>⌘↵</code>).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORMS -->
+  <section id="platforms">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">// One core, two platforms</p>
+        <h2>Built for <span class="grad">Mac and iPhone.</span></h2>
+        <p class="lead">The capture engine, CA, and app model are shared in a single Swift core, so both apps stay in lockstep.</p>
+      </div>
+      <div class="platforms">
+        <div class="plat reveal">
+          <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9s-1.8-.9-3-.9c-1.5 0-2.9.9-3.7 2.3-1.6 2.7-.4 6.8 1.1 9 .7 1.1 1.6 2.3 2.8 2.3 1.1 0 1.5-.7 2.9-.7s1.7.7 2.9.7 2-1.1 2.7-2.1c.9-1.3 1.2-2.5 1.2-2.6-.1 0-2.3-.9-2.3-3.5zM14.1 5.1c.6-.8 1.1-1.9.9-3-1 0-2.1.7-2.8 1.5-.6.7-1.1 1.8-.9 2.9 1.1.1 2.2-.6 2.8-1.4z"/></svg> macOS</h3>
+          <p>The full debugger, with native system integration.</p>
+          <ul>
+            <li>System-proxy toggle via <code>networksetup</code></li>
+            <li>One-click CA install &amp; trust into the System keychain</li>
+            <li>Reveal &amp; export the root CA from Finder</li>
+            <li>Full inspector, composer, rules, and realtime clients</li>
+          </ul>
+        </div>
+        <div class="plat reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg> iOS</h3>
+          <p>Capture this iPhone, or another device through your Mac.</p>
+          <ul>
+            <li>On-device capture VPN via a Packet Tunnel extension</li>
+            <li>Capture keeps running while the app is backgrounded</li>
+            <li>Installs CA + proxy through a single <code>.mobileconfig</code></li>
+            <li>Or point any device's proxy at your Mac — no dev account needed</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY BAND -->
+  <section aria-labelledby="privacy-band-title">
+    <div class="wrap">
+      <div class="band reveal">
+        <div class="shield">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <div>
+          <h2 id="privacy-band-title">Your traffic never leaves your device.</h2>
+          <p>HTTrail has no analytics, no accounts, and no backend. The data it decrypts is the most sensitive you have — tokens, cookies, request bodies — so it stays entirely on your machine, and we built it so we can never receive it.</p>
+          <div class="actions">
+            <a class="btn btn-ghost" href="privacy.html">Read the Privacy Policy</a>
+            <a class="btn btn-ghost" href="terms.html">Terms of Use</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="index.html" aria-label="HTTrail home">
+          <img src="assets/logo.svg" alt="" width="34" height="34" />
+          <span>HT<b>Trail</b></span>
+        </a>
+        <p>A native HTTPS debugging proxy &amp; API client for macOS and iOS. Built on Swift, SwiftUI, and SwiftNIO.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#how">How it works</a>
+          <a href="#platforms">Platforms</a>
+          <a href="https://github.com/1moby/htrail" target="_blank" rel="noopener">GitHub</a>
+        </div>
+        <div class="foot-col">
+          <h4>Legal</h4>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Use</a>
+          <a href="mailto:contact@1moby.com">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 1Moby. All rights reserved.</span>
+      <span>HTTrail is a tool for debugging traffic you are authorized to inspect.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Progressive enhancement: reveal-on-scroll. Content is fully visible without JS.
+  (function () {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var els = document.querySelectorAll('.reveal');
+    if (reduce || !('IntersectionObserver' in window)) {
+      els.forEach(function (el) { el.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 });
+    els.forEach(function (el) { io.observe(el); });
+  })();
+</script>
+</body>
+</html>

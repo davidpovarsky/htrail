@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Terms of Use — HTTrail</title>
+<meta name="description" content="The Terms of Use for HTTrail, a native HTTPS debugging proxy and API client. HTTrail must only be used to intercept traffic you are authorized to inspect." />
+<meta name="theme-color" content="#0B091A" />
+<meta name="robots" content="index, follow" />
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+<link rel="apple-touch-icon" href="assets/icon-1024.png" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.html" aria-label="HTTrail home">
+      <img src="assets/logo.svg" alt="" width="34" height="34" />
+      <span>HT<b>Trail</b></span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="hide-sm" href="index.html#features">Features</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a class="btn btn-ghost" href="https://github.com/1moby/htrail" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="legal">
+  <div class="wrap">
+    <div class="legal-head">
+      <a class="back" href="index.html">← Back to HTTrail</a>
+      <h1>Terms of Use</h1>
+      <p class="updated">Last updated: June 21, 2026</p>
+    </div>
+
+    <div class="prose">
+
+      <div class="callout">
+        <p><strong>Read this first.</strong> HTTrail can decrypt HTTPS traffic. You may use it <strong>only</strong> on devices, networks, and traffic that you own or are explicitly authorized to inspect. Using it to intercept other people's communications without authorization may be illegal. By using HTTrail you accept full responsibility for how you use it.</p>
+      </div>
+
+      <div class="toc" aria-label="Table of contents">
+        <h4>Contents</h4>
+        <ol>
+          <li><a href="#acceptance">Acceptance of these terms</a></li>
+          <li><a href="#license">The App &amp; your license</a></li>
+          <li><a href="#acceptable">Acceptable use</a></li>
+          <li><a href="#ca">Certificate authority &amp; security risk</a></li>
+          <li><a href="#warranty">No warranty</a></li>
+          <li><a href="#liability">Limitation of liability</a></li>
+          <li><a href="#indemnity">Indemnification</a></li>
+          <li><a href="#ip">Intellectual property</a></li>
+          <li><a href="#third-party">Third-party services</a></li>
+          <li><a href="#privacy">Privacy</a></li>
+          <li><a href="#changes">Changes to these terms</a></li>
+          <li><a href="#law">Governing law</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ol>
+      </div>
+
+      <h2 id="acceptance">1. Acceptance of these terms</h2>
+      <p>These Terms of Use ("Terms") form an agreement between you and <strong>1Moby</strong> ("we", "us", "our") governing your use of the HTTrail application ("HTTrail", the "App") and this website. By downloading, installing, building, or using HTTrail, you agree to these Terms. If you do not agree, do not use the App.</p>
+
+      <h2 id="license">2. The App &amp; your license</h2>
+      <p>HTTrail is a native developer tool that combines an intercepting HTTPS debugging proxy with an API client. Subject to these Terms, we grant you a personal, non-exclusive, non-transferable, revocable license to install and use the App for lawful purposes.</p>
+      <p>Where HTTrail's source code is made available to you under a separate open-source license, that license governs your rights to the source code; these Terms govern your use of the App and website and apply in addition to it. Nothing here is intended to limit rights granted to you by an applicable open-source license.</p>
+
+      <h2 id="acceptable">3. Acceptable use</h2>
+      <p>HTTrail is intended for legitimate software development, testing, debugging, and security research on systems you are authorized to access. You agree that you will <strong>only</strong> use HTTrail to intercept, decrypt, inspect, modify, or replay network traffic where you have the lawful right to do so. In particular, you agree <strong>not</strong> to use HTTrail to:</p>
+      <ul>
+        <li>intercept, monitor, or decrypt the communications, accounts, or devices of any person without their knowledge and authorization, or in violation of any wiretapping, computer-misuse, privacy, or data-protection law;</li>
+        <li>access, alter, or interfere with systems, networks, or data you do not own or are not explicitly permitted to test;</li>
+        <li>capture, store, or misuse another party's credentials, personal data, or confidential information;</li>
+        <li>circumvent security controls for any unlawful purpose, or to facilitate fraud or unauthorized access;</li>
+        <li>violate any applicable law, regulation, contract, or third-party right.</li>
+      </ul>
+      <p>You are solely responsible for ensuring that your use of HTTrail — including installing a root certificate authority and routing traffic through the proxy — is lawful in your jurisdiction and authorized by every party whose traffic you inspect.</p>
+
+      <h2 id="ca">4. Certificate authority &amp; security risk</h2>
+      <p>HTTrail works by generating a root Certificate Authority (CA) on your device and asking you to install and trust it so that HTTPS traffic can be decrypted. You acknowledge and accept that:</p>
+      <ul>
+        <li>installing and trusting the HTTrail root CA reduces the normal TLS protections on that device and enables decryption of HTTPS traffic on it;</li>
+        <li>you should install the CA only on devices you own or control, and remove it when you no longer need to capture traffic;</li>
+        <li>you are responsible for safeguarding the CA's private key and any exported certificates or captured data, which may contain credentials and other sensitive information;</li>
+        <li>you assume all risk arising from installing the CA and from operating the proxy.</li>
+      </ul>
+
+      <h2 id="warranty">5. No warranty</h2>
+      <p>HTTrail and this website are provided <strong>"as is"</strong> and <strong>"as available"</strong>, without warranties of any kind, whether express, implied, or statutory, including any implied warranties of merchantability, fitness for a particular purpose, title, and non-infringement. We do not warrant that the App will be uninterrupted, error-free, secure, or that it will meet your requirements, nor that defects will be corrected. You use HTTrail at your own risk.</p>
+
+      <h2 id="liability">6. Limitation of liability</h2>
+      <p>To the maximum extent permitted by law, in no event will 1Moby or its contributors be liable for any indirect, incidental, special, consequential, exemplary, or punitive damages, or for any loss of profits, data, goodwill, or business, arising out of or related to your use of (or inability to use) HTTrail, even if advised of the possibility of such damages. To the maximum extent permitted by law, our total aggregate liability for all claims relating to HTTrail will not exceed the greater of the amount you paid us for the App (which, for a free app, is zero) or USD&nbsp;50.</p>
+
+      <h2 id="indemnity">7. Indemnification</h2>
+      <p>You agree to indemnify and hold harmless 1Moby and its contributors from and against any claims, liabilities, damages, losses, and expenses (including reasonable legal fees) arising out of or in any way connected with your use or misuse of HTTrail, your violation of these Terms, or your violation of any law or the rights of any third party.</p>
+
+      <h2 id="ip">8. Intellectual property</h2>
+      <p>The "HTTrail" name, logo, and branding are the property of 1Moby and may not be used without permission, except as needed to refer to the project. All rights not expressly granted to you are reserved. Any open-source components included in HTTrail remain the property of their respective owners and are licensed under their own terms.</p>
+
+      <h2 id="third-party">9. Third-party services</h2>
+      <p>When you use HTTrail to send or proxy requests, you connect to third-party servers of your choosing. We are not responsible for those services, their content, their availability, or their handling of your data. Your interactions with them are governed by their terms and policies.</p>
+
+      <h2 id="privacy">10. Privacy</h2>
+      <p>HTTrail processes data on your device and does not transmit it to us. For details, see our <a href="privacy.html">Privacy Policy</a>, which is incorporated into these Terms by reference.</p>
+
+      <h2 id="changes">11. Changes to these terms</h2>
+      <p>We may update these Terms from time to time. When we do, we will revise the "Last updated" date above. Your continued use of HTTrail after a change takes effect constitutes acceptance of the revised Terms.</p>
+
+      <h2 id="law">12. Governing law</h2>
+      <p>These Terms are governed by the laws of the jurisdiction in which 1Moby is established, without regard to its conflict-of-laws rules, and you agree to the exclusive jurisdiction of the courts located there for any dispute arising out of or relating to these Terms or HTTrail, except where applicable law grants you the right to bring proceedings elsewhere.</p>
+
+      <h2 id="contact">13. Contact</h2>
+      <p>Questions about these Terms? Contact us at <a href="mailto:contact@1moby.com">contact@1moby.com</a>.</p>
+
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="index.html" aria-label="HTTrail home">
+          <img src="assets/logo.svg" alt="" width="34" height="34" />
+          <span>HT<b>Trail</b></span>
+        </a>
+        <p>A native HTTPS debugging proxy &amp; API client for macOS and iOS.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Product</h4>
+          <a href="index.html#features">Features</a>
+          <a href="index.html#how">How it works</a>
+          <a href="https://github.com/1moby/htrail" target="_blank" rel="noopener">GitHub</a>
+        </div>
+        <div class="foot-col">
+          <h4>Legal</h4>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Use</a>
+          <a href="mailto:contact@1moby.com">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 1Moby. All rights reserved.</span>
+      <span>HTTrail is a tool for debugging traffic you are authorized to inspect.</span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

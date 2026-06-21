@@ -1,0 +1,87 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B091A"/>
+      <stop offset="50%" stop-color="#14193F"/>
+      <stop offset="100%" stop-color="#0F3346"/>
+    </linearGradient>
+
+    <linearGradient id="trailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="30%" stop-color="#3B82F6"/>
+      <stop offset="70%" stop-color="#06B6D4"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <linearGradient id="lockGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#bgGrad)"/>
+
+  <g opacity="0.04" stroke="#FFFFFF" stroke-width="2">
+    <line x1="128" y1="0" x2="128" y2="1024"/>
+    <line x1="256" y1="0" x2="256" y2="1024"/>
+    <line x1="384" y1="0" x2="384" y2="1024"/>
+    <line x1="512" y1="0" x2="512" y2="1024"/>
+    <line x1="640" y1="0" x2="640" y2="1024"/>
+    <line x1="768" y1="0" x2="768" y2="1024"/>
+    <line x1="896" y1="0" x2="896" y2="1024"/>
+    <line x1="0" y1="128" x2="1024" y2="128"/>
+    <line x1="0" y1="256" x2="1024" y2="256"/>
+    <line x1="0" y1="384" x2="1024" y2="384"/>
+    <line x1="0" y1="512" x2="1024" y2="512"/>
+    <line x1="0" y1="640" x2="1024" y2="640"/>
+    <line x1="0" y1="768" x2="1024" y2="768"/>
+    <line x1="0" y1="896" x2="1024" y2="896"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    
+    <rect x="320" y="240" width="80" height="544" rx="40" fill="#FFFFFF" opacity="0.05"/>
+    <rect x="624" y="240" width="80" height="544" rx="40" fill="#FFFFFF" opacity="0.05"/>
+    
+    <path d="M 180,320 
+             L 360,320 
+             A 40,40 0 0,1 400,360
+             L 400,640 
+             A 40,40 0 0,0 440,680
+             L 584,680
+             A 40,40 0 0,0 624,640
+             L 624,360
+             A 40,40 0 0,1 664,320
+             L 844,320" 
+          fill="none" 
+          stroke="url(#trailGrad)" 
+          stroke-width="48" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+
+    <circle cx="240" cy="320" r="36" fill="#8B5CF6" stroke="#FFFFFF" stroke-width="8" filter="url(#glow)"/>
+    
+    <circle cx="512" cy="680" r="56" fill="#06B6D4" stroke="#FFFFFF" stroke-width="10" filter="url(#glow)"/>
+    <circle cx="512" cy="680" r="24" fill="#FFFFFF"/>
+
+    <circle cx="784" cy="320" r="36" fill="#10B981" stroke="#FFFFFF" stroke-width="8" filter="url(#glow)"/>
+
+    <g transform="translate(580, 500)">
+      <path d="M 0,20 C 0,80 40,110 60,120 C 80,110 120,80 120,20 L 60,0 Z" fill="url(#lockGrad)" stroke="#14193F" stroke-width="8"/>
+      <path d="M 42,46 L 42,36 A 18,18 0 0,1 78,36 L 78,46" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"/>
+      <rect x="34" y="44" width="52" height="38" rx="8" fill="#FFFFFF"/>
+      <circle cx="60" cy="60" r="5" fill="#F59E0B"/>
+      <path d="M 60,63 L 60,74" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    
+  </g>
+</svg>
