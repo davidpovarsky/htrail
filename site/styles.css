@@ -144,6 +144,7 @@ h1.hero-title {
 .hero-title .grad { background: var(--trail); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hero-sub { font-size: clamp(1.05rem, 2.1vw, 1.32rem); color: var(--ink-dim); max-width: 38ch; margin: 22px 0 0; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+.hero-fine { margin: 16px 0 0; color: var(--ink-faint); font-size: 0.85rem; }
 .hero-meta { display: flex; flex-wrap: wrap; gap: 20px 28px; margin-top: 30px; color: var(--ink-faint); font-size: 0.9rem; }
 .hero-meta span { display: inline-flex; align-items: center; gap: 8px; }
 .hero-meta svg { width: 16px; height: 16px; color: var(--emerald); }
