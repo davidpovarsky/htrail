@@ -299,3 +299,10 @@ h2 .grad { background: var(--trail); -webkit-background-clip: text; background-c
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
 .reveal.in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
+
+/* ---------- Language switcher ---------- */
+.lang { display: inline-flex; align-items: center; gap: 7px; font-size: 0.9rem; }
+.lang a { color: var(--ink-faint); font-weight: 600; padding: 2px 3px; }
+.lang a:hover { color: var(--ink-dim); }
+.lang a[aria-current="page"] { color: var(--ink); }
+.lang .sep { color: var(--line-strong); }

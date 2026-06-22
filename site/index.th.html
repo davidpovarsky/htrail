@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HTTrail — พร็อกซีดักจับ HTTPS และเครื่องมือ API แบบเนทีฟสำหรับ Mac และ iOS</title>
+<meta name="description" content="HTTrail คือแอป Swift แบบเนทีฟที่รวมพร็อกซีดักจับ HTTPS สไตล์ Charles เข้ากับเครื่องมือ API สไตล์ Hoppscotch ถอดรหัส TLS ของคุณเอง ดักจับทุกคำขอ แล้วส่งซ้ำได้ — ทำงานบนอุปกรณ์ 100% ไม่มีการส่งข้อมูลการใช้งาน" />
+<meta name="theme-color" content="#0B091A" />
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+<link rel="apple-touch-icon" href="assets/icon-1024.png" />
+
+<!-- Open Graph / social -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="HTTrail — พร็อกซี HTTPS และเครื่องมือ API แบบเนทีฟ" />
+<meta property="og:description" content="ดักจับ ตรวจสอบ และส่งซ้ำทุกคำขอ พร็อกซีดักจับ HTTPS และเครื่องมือ API ในแอปเดียว — ทำงานบนอุปกรณ์ 100%" />
+<meta property="og:image" content="assets/og-image.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="HTTrail — พร็อกซี HTTPS และเครื่องมือ API แบบเนทีฟ" />
+<meta name="twitter:description" content="ดักจับ ตรวจสอบ และส่งซ้ำทุกคำขอ ทำงานบนอุปกรณ์ 100% ไม่มีการส่งข้อมูลการใช้งาน" />
+<meta name="twitter:image" content="assets/og-image.png" />
+
+<link rel="alternate" hreflang="en" href="https://anusoft.github.io/htrail/index.html" />
+<link rel="alternate" hreflang="th" href="https://anusoft.github.io/htrail/index.th.html" />
+<link rel="alternate" hreflang="x-default" href="https://anusoft.github.io/htrail/index.html" />
+
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<a class="skip" href="#main">ข้ามไปยังเนื้อหา</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.th.html" aria-label="HTTrail home">
+      <img src="assets/logo.svg" alt="" width="34" height="34" />
+      <span>HT<b>Trail</b></span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="hide-sm" href="index.th.html#features">คุณสมบัติ</a>
+      <a class="hide-sm" href="index.th.html#how">วิธีใช้งาน</a>
+      <a class="hide-sm" href="index.th.html#platforms">แพลตฟอร์ม</a>
+      <a href="privacy.th.html">ความเป็นส่วนตัว</a>
+      <span class="lang" aria-label="ภาษา">
+        <a href="index.html" lang="en">EN</a>
+        <span class="sep" aria-hidden="true">·</span>
+        <a href="index.th.html" aria-current="page">ไทย</a>
+      </span>
+      <a class="btn btn-ghost" href="https://github.com/anusoft/htrail" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.73 1.27 3.4.97.1-.76.41-1.27.74-1.56-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.1-.12-.3-.52-1.47.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.5 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.69 5.4-5.25 5.69.42.36.8 1.08.8 2.18v3.23c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        GitHub
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="dot"></span> macOS &amp; iOS แบบเนทีฟ · Swift + SwiftUI</span>
+        <h1 class="hero-title">ดักจับ ตรวจสอบ และส่งซ้ำ <span class="grad">ทุกคำขอ</span></h1>
+        <p class="hero-sub">HTTrail คือพร็อกซีดักจับ HTTPS และเครื่องมือ API ที่รวมไว้ในแอปเดียว ถอดรหัส TLS ของคุณเองด้วยผู้ออกใบรับรอง (CA) บนอุปกรณ์ ดักจับทุกทราฟฟิก แล้วเขียนคำขอใหม่หรือส่งซ้ำ — โดยไม่มีข้อมูลแม้แต่ไบต์เดียวออกจากเครื่องของคุณ</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="https://github.com/anusoft/htrail" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.73 1.27 3.4.97.1-.76.41-1.27.74-1.56-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.1-.12-.3-.52-1.47.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.5 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.69 5.4-5.25 5.69.42.36.8 1.08.8 2.18v3.23c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+            ดูบน GitHub
+          </a>
+          <a class="btn btn-ghost" href="index.th.html#how">วิธีใช้งาน</a>
+        </div>
+        <div class="hero-meta">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> ทำงานบนอุปกรณ์ 100%</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> ไม่ต้องมีบัญชี ไม่มีการส่งข้อมูลการใช้งาน</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> macOS + iOS</span>
+        </div>
+      </div>
+
+      <!-- Product mock -->
+      <div class="mock reveal" aria-hidden="true">
+        <div class="mock-bar">
+          <span class="tl"></span><span class="tl"></span><span class="tl"></span>
+          <span class="label">HTTrail — Capture</span>
+        </div>
+        <div class="mock-tabs"><span class="on">Capture</span><span>Compose</span><span>Rules</span></div>
+        <div class="mock-body">
+          <div class="flow-row sel">
+            <span class="verb get">GET</span>
+            <span class="flow-host">api.github.com<span class="dim">/user</span></span>
+            <span class="lock">🔒</span>
+            <span><span class="code200">200</span> · <span class="flow-time">142ms</span></span>
+          </div>
+          <div class="flow-row">
+            <span class="verb post">POST</span>
+            <span class="flow-host">api.stripe.com<span class="dim">/v1/charges</span></span>
+            <span class="lock">🔒</span>
+            <span><span class="code200">200</span> · <span class="flow-time">88ms</span></span>
+          </div>
+          <div class="flow-row">
+            <span class="verb put">PUT</span>
+            <span class="flow-host">api.myapp.io<span class="dim">/users/42</span></span>
+            <span class="lock">🔒</span>
+            <span><span class="code200">200</span> · <span class="flow-time">64ms</span></span>
+          </div>
+          <div class="flow-row">
+            <span class="verb get">GET</span>
+            <span class="flow-host">cdn.assets.dev<span class="dim">/app.js</span></span>
+            <span class="lock">🔒</span>
+            <span><span class="code301">301</span> · <span class="flow-time">12ms</span></span>
+          </div>
+        </div>
+        <div class="mock-inspect">
+          <div class="row"><span class="k">authorization:</span> Bearer ••••••••</div>
+          <div class="row"><span class="k">content-type:</span> application/json</div>
+          <div class="row"><span class="k">x-ratelimit-remaining:</span> 4998</div>
+          <div class="row">&nbsp;</div>
+          <div class="row">{ <span class="k">"login"</span>: <span class="s">"octocat"</span>,</div>
+          <div class="row">&nbsp;&nbsp;<span class="k">"id"</span>: <span class="s">583231</span>,</div>
+          <div class="row">&nbsp;&nbsp;<span class="k">"plan"</span>: <span class="s">"pro"</span> }</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><hr class="trail-rule glow" /></div>
+
+  <!-- PILLARS -->
+  <section aria-label="Why HTTrail">
+    <div class="wrap">
+      <div class="pillars">
+        <div class="pillar reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></svg></div>
+          <h3>เนทีฟ ไม่ใช่ Electron</h3>
+          <p>Swift + SwiftUI ล้วน บนแกน SwiftNIO เปิดได้ทันที ใช้หน่วยความจำน้อย และให้ความรู้สึกเหมือนแอป Mac เพราะมันเป็นแอป Mac จริง ๆ</p>
+        </div>
+        <div class="pillar reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#67e8f9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div>
+          <h3>เป็นเรื่องในเครื่องโดยการออกแบบ</h3>
+          <p>ทั้งพร็อกซี ผู้ออกใบรับรอง (CA) ทราฟฟิกที่ดักจับได้ และประวัติการส่งซ้ำ ล้วนอยู่บนเครื่องของคุณ ไม่มีเซิร์ฟเวอร์ HTTrail ให้ส่งข้อมูลใด ๆ ไปหา</p>
+        </div>
+        <div class="pillar reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+          <h3>เป็นของคุณที่จะวางใจได้</h3>
+          <p>กุญแจส่วนตัวของ root CA ถูกสร้างขึ้นบนอุปกรณ์และไม่เคยออกจากเครื่อง คุณติดตั้งเอง วางใจเอง และถอนออกเอง — อยู่ในความควบคุมของคุณทั้งหมด</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">// ความสามารถ</p>
+        <h2>ชุดเครื่องมือ <span class="grad">ดีบักครบครัน</span> ในหน้าต่างเดียว</h2>
+        <p class="lead">สองผลิตภัณฑ์หลอมรวมกัน: พร็อกซีดักจับสไตล์ Charles และเครื่องมือ API สไตล์ Hoppscotch ใช้เอนจินดักจับร่วมกันชุดเดียว</p>
+      </div>
+      <div class="features">
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h6m8 0h6"/><circle cx="12" cy="12" r="4"/><path d="m4.9 4.9 2.8 2.8m8.6 8.6 2.8 2.8m0-14.2-2.8 2.8M7.7 16.3l-2.8 2.8"/></svg></div>
+          <h3>พร็อกซี MITM สำหรับ HTTPS</h3>
+          <p>ตอบ <code>CONNECT</code> ปิดการเชื่อมต่อ TLS ด้วย leaf cert ที่เพิ่งสร้างใหม่ ส่งต่อไปยัง origin จริง และดักจับทั้งสองทิศทาง — ทดสอบใช้งานจริงกับโฮสต์จริง</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <h3>ผู้ออกใบรับรอง (CA) บนอุปกรณ์</h3>
+          <p>สร้าง root แบบ self-signed P-256 (อายุ 10 ปี เก็บถาวร) และสร้าง leaf cert ต่อโฮสต์แบบทันที ติดตั้งและวางใจได้ในคลิกเดียวบน macOS</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></div>
+          <h3>เอนจินกฎสไตล์ Charles</h3>
+          <p>บล็อก, map local, map remote, เขียนคำขอหรือการตอบกลับใหม่, จำกัดแบนด์วิดท์ และตั้ง breakpoint แบบโต้ตอบ — หยุดทราฟฟิกไว้ แก้ไขเนื้อหา แล้วเดินหน้าต่อ</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
+          <h3>ตัวตรวจสอบทราฟฟิกเชิงลึก</h3>
+          <p>เฮดเดอร์, เนื้อหา JSON ทั้งแบบดิบและจัดรูปสวยงาม, พรีวิว HTML สด, พรีวิวรูปภาพ พร้อมสถานะ เวลา และขนาดของทุกทราฟฟิกที่ดักจับได้</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18M3 12h12M3 19h18"/><path d="m17 16 4 3-4 3" transform="translate(0 -7)"/></svg></div>
+          <h3>เครื่องมือเขียนคำขอ</h3>
+          <p>เมท็อด, query params, เฮดเดอร์, ทุกโหมดของเนื้อหา, GraphQL และตัวแปร <code>{{env}}</code> — พร้อมตัวช่วยตรวจสอบสิทธิ์แบบ Bearer, Basic และ API-key ในตัว</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 14h6v6h-6z"/><path d="M14 4h6v6h-6zM4 14h6v6H4z" opacity=".5"/></svg></div>
+          <h3>ไคลเอนต์เรียลไทม์</h3>
+          <p>WebSocket, Server-Sent Events (SSE), Socket.IO (handshake แบบ Engine.IO v4) และไคลเอนต์ MQTT 3.1.1 — ทั้งหมดบนแกน NIO เดียวกัน</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13l-2 2 2 2M15 13l2 2-2 2"/></svg></div>
+          <h3>นำเข้าและส่งออก</h3>
+          <p>นำเข้าจาก cURL, OpenAPI 3 และ Postman v2.1 ส่งออกเป็น cURL, Swift, JavaScript หรือ Python — และส่งออกทราฟฟิกที่ดักจับได้เป็น HAR 1.2</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l6-6-6-6M12 19h8"/></svg></div>
+          <h3>สคริปต์ก่อนคำขอและสคริปต์ทดสอบ</h3>
+          <p>รัน JavaScript ทั้งก่อนและหลังคำขอผ่าน JavaScriptCore ด้วย API <code>pm.*</code> ที่คุ้นเคยสำหรับการตรวจสอบและค่าแบบไดนามิก</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3 2 3l8 9v7l4 2v-9z"/></svg></div>
+          <h3>รายการอนุญาตสำหรับ SSL-proxying</h3>
+          <p>ถอดรหัสเฉพาะโฮสต์ที่คุณระบุไว้ ส่วนที่เหลือจะถูกอุโมงค์แบบ blind โดยไม่แตะต้อง เพื่อให้แอปที่ใช้ certificate pinning ยังทำงานควบคู่ไปกับการดักจับของคุณได้</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">// สี่ขั้นตอน</p>
+        <h2>จากศูนย์สู่ <span class="grad">ทราฟฟิกที่ถอดรหัสแล้ว</span></h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="num">1</div>
+          <h3>เริ่มพร็อกซี</h3>
+          <p>กดปุ่มเล่นบนแถบเครื่องมือหรือ <code>⌘P</code> HTTrail จะรอรับการเชื่อมต่อที่ <code>127.0.0.1:9090</code></p>
+        </div>
+        <div class="step reveal">
+          <div class="num">2</div>
+          <h3>วางใจ CA</h3>
+          <p>คลิกเดียวเพื่อติดตั้งและวางใจ root CA บน macOS — หรือติดตั้งโปรไฟล์ <code>.mobileconfig</code> บน iOS</p>
+        </div>
+        <div class="step reveal">
+          <div class="num">3</div>
+          <h3>ดักจับ</h3>
+          <p>เปิดสวิตช์พร็อกซีของระบบ แล้วทุกคำขอและการตอบกลับจะไหลเข้าสู่แท็บ Capture แบบเรียลไทม์</p>
+        </div>
+        <div class="step reveal">
+          <div class="num">4</div>
+          <h3>เขียนคำขอและส่งซ้ำ</h3>
+          <p>แก้ไขแล้วส่งทราฟฟิกใด ๆ ซ้ำ คัดลอกเป็น cURL หรือสร้างคำขอใหม่แล้วกด Send (<code>⌘↵</code>)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORMS -->
+  <section id="platforms">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">// แกนเดียว สองแพลตฟอร์ม</p>
+        <h2>สร้างมาเพื่อ <span class="grad">Mac และ iPhone</span></h2>
+        <p class="lead">เอนจินดักจับ, CA และโมเดลแอปถูกแชร์ไว้ในแกน Swift เดียว ทำให้ทั้งสองแอปทำงานสอดคล้องกันเสมอ</p>
+      </div>
+      <div class="platforms">
+        <div class="plat reveal">
+          <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9s-1.8-.9-3-.9c-1.5 0-2.9.9-3.7 2.3-1.6 2.7-.4 6.8 1.1 9 .7 1.1 1.6 2.3 2.8 2.3 1.1 0 1.5-.7 2.9-.7s1.7.7 2.9.7 2-1.1 2.7-2.1c.9-1.3 1.2-2.5 1.2-2.6-.1 0-2.3-.9-2.3-3.5zM14.1 5.1c.6-.8 1.1-1.9.9-3-1 0-2.1.7-2.8 1.5-.6.7-1.1 1.8-.9 2.9 1.1.1 2.2-.6 2.8-1.4z"/></svg> macOS</h3>
+          <p>ดีบักเกอร์เต็มรูปแบบ พร้อมการผสานรวมกับระบบแบบเนทีฟ</p>
+          <ul>
+            <li>สลับพร็อกซีของระบบผ่าน <code>networksetup</code></li>
+            <li>ติดตั้งและวางใจ CA เข้าสู่ System keychain ได้ในคลิกเดียว</li>
+            <li>เปิดดูและส่งออก root CA จาก Finder</li>
+            <li>ตัวตรวจสอบ, เครื่องมือเขียนคำขอ, กฎ และไคลเอนต์เรียลไทม์ครบถ้วน</li>
+          </ul>
+        </div>
+        <div class="plat reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg> iOS</h3>
+          <p>ดักจับ iPhone เครื่องนี้ หรืออุปกรณ์อื่นผ่าน Mac ของคุณ</p>
+          <ul>
+            <li>VPN ดักจับบนอุปกรณ์ผ่านส่วนขยาย Packet Tunnel</li>
+            <li>การดักจับยังทำงานต่อแม้แอปอยู่เบื้องหลัง</li>
+            <li>ติดตั้ง CA + พร็อกซีผ่าน <code>.mobileconfig</code> ไฟล์เดียว</li>
+            <li>หรือชี้พร็อกซีของอุปกรณ์ใด ๆ มาที่ Mac ของคุณ — ไม่ต้องมีบัญชีนักพัฒนา</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY BAND -->
+  <section aria-labelledby="privacy-band-title">
+    <div class="wrap">
+      <div class="band reveal">
+        <div class="shield">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <div>
+          <h2 id="privacy-band-title">ทราฟฟิกของคุณไม่เคยออกจากอุปกรณ์ของคุณ</h2>
+          <p>HTTrail ไม่มีการวิเคราะห์ข้อมูล ไม่มีบัญชี และไม่มีแบ็กเอนด์ ข้อมูลที่มันถอดรหัสคือข้อมูลที่อ่อนไหวที่สุดที่คุณมี — โทเคน, คุกกี้, เนื้อหาคำขอ — จึงอยู่บนเครื่องของคุณทั้งหมด และเราออกแบบมาให้เราไม่มีทางได้รับมันเลย</p>
+          <div class="actions">
+            <a class="btn btn-ghost" href="privacy.th.html">อ่านนโยบายความเป็นส่วนตัว</a>
+            <a class="btn btn-ghost" href="terms.th.html">ข้อกำหนดการใช้งาน</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="index.th.html" aria-label="HTTrail home">
+          <img src="assets/logo.svg" alt="" width="34" height="34" />
+          <span>HT<b>Trail</b></span>
+        </a>
+        <p>พร็อกซีดักจับ HTTPS และเครื่องมือ API แบบเนทีฟสำหรับ macOS และ iOS สร้างบน Swift, SwiftUI และ SwiftNIO</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>ผลิตภัณฑ์</h4>
+          <a href="index.th.html#features">คุณสมบัติ</a>
+          <a href="index.th.html#how">วิธีใช้งาน</a>
+          <a href="index.th.html#platforms">แพลตฟอร์ม</a>
+          <a href="https://github.com/anusoft/htrail" target="_blank" rel="noopener">GitHub</a>
+        </div>
+        <div class="foot-col">
+          <h4>กฎหมาย</h4>
+          <a href="privacy.th.html">นโยบายความเป็นส่วนตัว</a>
+          <a href="terms.th.html">ข้อกำหนดการใช้งาน</a>
+          <a href="mailto:contact@anusoft.com">ติดต่อ</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Anusoft สงวนลิขสิทธิ์ทั้งหมด</span>
+      <span>HTTrail เป็นเครื่องมือสำหรับดีบักทราฟฟิกที่คุณได้รับอนุญาตให้ตรวจสอบ</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Progressive enhancement: reveal-on-scroll. Content is fully visible without JS.
+  (function () {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var els = document.querySelectorAll('.reveal');
+    if (reduce || !('IntersectionObserver' in window)) {
+      els.forEach(function (el) { el.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 });
+    els.forEach(function (el) { io.observe(el); });
+  })();
+</script>
+</body>
+</html>
