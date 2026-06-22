@@ -24,6 +24,15 @@ open dist/HTTrail.app
 - `swift test` opens a real outbound TLS connection — it needs network access and will fail offline.
 - iOS app: `cd iosapp && xcodegen generate` (regenerates `HTTrailiOS.xcodeproj` from `project.yml`), then build in Xcode. Running on a device needs a **paid** Apple Developer team (the `packet-tunnel-provider` Network Extension entitlement is unavailable to free personal teams). Signing team is `D62Y8JVXB9`. See the project memory for device-install commands.
 
+## Distribution & release
+
+Full procedure in **`docs/DEPLOY.md`**. Two paths:
+
+- **Direct download** — `make_app.sh release` (ad-hoc signed, un-sandboxed full-feature build), published as `HTTrail-macOS.zip` on the GitHub release; the site links the stable `releases/latest/download/` URL.
+- **App Store** (macOS + iOS) — build/sign locally (`make_mas.sh DISTRIBUTION=1` for the sandboxed MAS variant; xcodegen/xcodebuild for iOS), then the manual `.github/workflows/deploy.yml` ("Deploy to App Store") uploads + submits via repo secrets.
+
+The App Store **signing/submission tooling is private and git-ignored**: `scripts/appstore/` (`asc.py` — the App Store Connect API helper) and `docs/appstore/` (key IDs + the submission runbook). Never move these into the tracked tree or paste their key IDs into public files; CI runs `asc.py` from the encrypted `ASC_PY_B64` secret, not a checkout.
+
 ## Architecture
 
 Two SPM targets plus a separate iOS Xcode app, all built on one shared core:

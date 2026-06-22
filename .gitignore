@@ -21,8 +21,16 @@ xcuserdata/
 # ---- Signing material (never commit) ----
 *.p12
 *.mobileprovision
+*.provisionprofile
 *.cer
 *.certSigningRequest
+*.p8
+
+# ---- App Store tooling (private — keep out of the public repo) ----
+# API helper, key IDs, and the submission runbook. CI runs asc.py from an
+# encrypted secret (ASC_PY_B64), not from a checkout. See docs/DEPLOY.md.
+scripts/appstore/
+docs/appstore/
 
 # ---- macOS ----
 .DS_Store
