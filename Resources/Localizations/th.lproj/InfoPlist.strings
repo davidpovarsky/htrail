@@ -1,0 +1,6 @@
+/* Localized Info.plist strings. */
+
+"CFBundleDisplayName" = "HTTrail";
+"CFBundleName" = "HTTrail";
+"NSHumanReadableCopyright" = "HTTrail — Hoppscotch + Charles เป็นภาษา Swift";
+"NSLocalNetworkUsageDescription" = "HTTrail ใช้เครือข่ายท้องถิ่นเพื่อบันทึกการรับส่งข้อมูล HTTP/HTTPS บนอุปกรณ์นี้ และเพื่อค้นหา Mac ที่ใช้ HTTrail เพื่อให้สามารถบันทึกการรับส่งข้อมูลของอุปกรณ์นี้ได้ที่นั่น";

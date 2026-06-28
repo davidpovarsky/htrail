@@ -1,4 +1,5 @@
 import Foundation
+import Dispatch
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
@@ -15,13 +16,20 @@ public final class SocketIOClient: NSObject, @unchecked Sendable {
     }
 
     private var task: URLSessionWebSocketTask?
+    private var session: URLSession?
     private var continuation: AsyncStream<Event>.Continuation?
+    private var handshakeTimer: DispatchSourceTimer?
+    private var handshakeComplete = false
     private let lock = NSLock()
 
     public override init() { super.init() }
 
     /// `baseURL` may be http(s) or ws(s); the Socket.IO path/query is appended.
-    public func connect(to baseURL: URL, namespace: String = "/") -> AsyncStream<Event> {
+    public func connect(
+        to baseURL: URL,
+        namespace: String = "/",
+        handshakeTimeout: DispatchTimeInterval = .seconds(5)
+    ) -> AsyncStream<Event> {
         var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)
         switch components?.scheme {
         case "http": components?.scheme = "ws"
@@ -33,16 +41,25 @@ public final class SocketIOClient: NSObject, @unchecked Sendable {
         }
         components?.queryItems = [URLQueryItem(name: "EIO", value: "4"),
                                   URLQueryItem(name: "transport", value: "websocket")]
+        let url = components?.url ?? baseURL
 
-        let session = URLSession(configuration: .default)
-        let task = session.webSocketTask(with: components?.url ?? baseURL)
-        lock.lock(); self.task = task; lock.unlock()
+        let session = RealtimeURLSession.session(for: url)
+        let task = session.webSocketTask(with: url)
+        lock.lock()
+        self.session = session
+        self.task = task
+        self.handshakeComplete = false
+        lock.unlock()
 
         return AsyncStream { continuation in
             self.lock.lock(); self.continuation = continuation; self.lock.unlock()
+            self.startHandshakeTimer(interval: handshakeTimeout, task: task, continuation: continuation)
             task.resume()
             self.receiveLoop(task: task, namespace: namespace, continuation: continuation)
-            continuation.onTermination = { _ in task.cancel(with: .goingAway, reason: nil) }
+            continuation.onTermination = { _ in
+                task.cancel(with: .goingAway, reason: nil)
+                self.finishSession(for: task)
+            }
         }
     }
 
@@ -59,6 +76,7 @@ public final class SocketIOClient: NSObject, @unchecked Sendable {
             case .failure(let error):
                 continuation.yield(.error(error.localizedDescription))
                 continuation.finish()
+                self.finishSession(for: task)
             }
         }
     }
@@ -77,7 +95,9 @@ public final class SocketIOClient: NSObject, @unchecked Sendable {
             guard let sioType = rest.first else { return }
             let body = String(rest.dropFirst())
             switch sioType {
-            case "0": continuation.yield(.connected)
+            case "0":
+                markHandshakeComplete()
+                continuation.yield(.connected)
             case "1": continuation.yield(.disconnected)
             case "2": // EVENT — body is a JSON array (possibly prefixed by namespace,)
                 let json = body.drop { $0 != "[" }
@@ -95,16 +115,35 @@ public final class SocketIOClient: NSObject, @unchecked Sendable {
 
     public func emit(event: String, payload: String) {
         lock.lock(); let task = self.task; lock.unlock()
-        let inner = payload.isEmpty ? "" : ",\(payload)"
-        task?.send(.string("42[\"\(event)\"\(inner)]")) { _ in }
+        task?.send(.string(Self.encodeEventPacket(event: event, payload: payload))) { _ in }
+    }
+
+    static func encodeEventPacket(event: String, payload: String) -> String {
+        if let data = try? JSONSerialization.data(withJSONObject: [event, payload]),
+           let json = String(data: data, encoding: .utf8) {
+            return "42" + json
+        }
+        return "42[\"\(event)\",\"\(payload)\"]"
     }
 
     public func close() {
-        lock.lock(); let task = self.task; let cont = self.continuation; lock.unlock()
+        lock.lock()
+        let task = self.task
+        let cont = self.continuation
+        let session = self.session
+        let timer = self.handshakeTimer
+        self.task = nil
+        self.continuation = nil
+        self.session = nil
+        self.handshakeTimer = nil
+        self.handshakeComplete = false
+        lock.unlock()
+        timer?.cancel()
         task?.send(.string("41")) { _ in }            // Socket.IO disconnect
         task?.cancel(with: .normalClosure, reason: nil)
         cont?.yield(.disconnected)
         cont?.finish()
+        session?.invalidateAndCancel()
     }
 
     private static func stringify(_ value: Any) -> String {
@@ -112,5 +151,58 @@ public final class SocketIOClient: NSObject, @unchecked Sendable {
         if let data = try? JSONSerialization.data(withJSONObject: value),
            let string = String(data: data, encoding: .utf8) { return string }
         return "\(value)"
+    }
+
+    private func startHandshakeTimer(
+        interval: DispatchTimeInterval,
+        task: URLSessionWebSocketTask,
+        continuation: AsyncStream<Event>.Continuation
+    ) {
+        if case .never = interval {
+            return
+        }
+
+        let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.global(qos: .utility))
+        timer.schedule(deadline: .now() + interval)
+        timer.setEventHandler { [weak self] in
+            guard let self else { return }
+            self.lock.lock()
+            let active = self.task === task && !self.handshakeComplete
+            self.lock.unlock()
+            guard active else { return }
+            continuation.yield(.error("Socket.IO handshake timed out"))
+            continuation.finish()
+            task.cancel(with: .goingAway, reason: nil)
+            self.finishSession(for: task)
+        }
+        lock.lock()
+        handshakeTimer?.cancel()
+        handshakeTimer = timer
+        lock.unlock()
+        timer.resume()
+    }
+
+    private func markHandshakeComplete() {
+        lock.lock()
+        handshakeComplete = true
+        let timer = handshakeTimer
+        handshakeTimer = nil
+        lock.unlock()
+        timer?.cancel()
+    }
+
+    private func finishSession(for task: URLSessionWebSocketTask) {
+        lock.lock()
+        guard self.task === task else { lock.unlock(); return }
+        let session = self.session
+        let timer = self.handshakeTimer
+        self.task = nil
+        self.continuation = nil
+        self.session = nil
+        self.handshakeTimer = nil
+        self.handshakeComplete = false
+        lock.unlock()
+        timer?.cancel()
+        session?.invalidateAndCancel()
     }
 }

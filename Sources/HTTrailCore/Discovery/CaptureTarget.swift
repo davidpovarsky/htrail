@@ -17,7 +17,7 @@ public enum CaptureTarget: Hashable, Sendable {
 
     public var label: String {
         switch self {
-        case .thisDevice: return "This iPhone"
+        case .thisDevice: return "This Device"
         case .remote(let p): return p.name
         case .manual(let host, let port): return "Manual \(host):\(port)"
         }

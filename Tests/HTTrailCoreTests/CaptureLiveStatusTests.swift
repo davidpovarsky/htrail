@@ -30,4 +30,22 @@ final class CaptureLiveStatusTests: XCTestCase {
         // A stalled engine takes precedence over trust state.
         XCTAssertEqual(status(.connected, remote: false, .tlsUntrusted, engineLive: false), .extensionStalled)
     }
+
+    func testCaptureStartReadinessRequiresVPNProfileAndTrustedCA() {
+        XCTAssertEqual(
+            CaptureStartReadiness.evaluate(vpnConfigurationInstalled: false, certificateTrusted: false),
+            CaptureStartReadiness(blockers: [.vpnProfileMissing, .certificateUntrusted])
+        )
+        XCTAssertEqual(
+            CaptureStartReadiness.evaluate(vpnConfigurationInstalled: true, certificateTrusted: false),
+            CaptureStartReadiness(blockers: [.certificateUntrusted])
+        )
+        XCTAssertEqual(
+            CaptureStartReadiness.evaluate(vpnConfigurationInstalled: false, certificateTrusted: true),
+            CaptureStartReadiness(blockers: [.vpnProfileMissing])
+        )
+        XCTAssertTrue(
+            CaptureStartReadiness.evaluate(vpnConfigurationInstalled: true, certificateTrusted: true).canStart
+        )
+    }
 }

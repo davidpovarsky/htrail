@@ -15,6 +15,7 @@ final class VPNController: ObservableObject {
 
     @Published var status: NEVPNStatus = .invalid
     @Published var lastError: String?
+    @Published private(set) var hasConfiguration = false
 
     private var manager: NETunnelProviderManager?
     private var observer: NSObjectProtocol?
@@ -84,20 +85,23 @@ final class VPNController: ObservableObject {
         do {
             let managers = try await NETunnelProviderManager.loadAllFromPreferences()
             self.manager = managers.first
+            self.hasConfiguration = managers.first != nil
             self.status = managers.first?.connection.status ?? .invalid
         } catch {
-            self.lastError = error.localizedDescription
+            self.manager = nil
+            self.hasConfiguration = false
+            self.status = .invalid
         }
     }
 
-    /// Starts capture. Prefers a configuration the user installed via the
-    /// HTTrail profile (VPN + CA); if none exists, falls back to provisioning one
-    /// programmatically (which triggers the "Add VPN configurations" prompt).
-    func startCapture(port: Int) async {
+    /// Starts capture only from an existing user-approved tunnel configuration.
+    /// The UI installs that configuration through the profile flow before this runs.
+    @discardableResult
+    func startCapture(port: Int) async -> Bool {
         lastError = nil
-        startPolling()
         await reload()
         if let manager {
+            startPolling()
             do {
                 try await manager.loadFromPreferences()
                 // Keep the tunnel alive across app-switching / network blips: without
@@ -117,11 +121,16 @@ final class VPNController: ObservableObject {
                     }
                 }
                 try manager.connection.startVPNTunnel()
+                status = manager.connection.status
+                return true
             } catch {
                 lastError = error.localizedDescription
+                return false
             }
         } else {
-            await enable(port: port)
+            lastError = "Install the HTTrail VPN + CA profile before starting capture."
+            stopPolling()
+            return false
         }
     }
 
@@ -134,7 +143,8 @@ final class VPNController: ObservableObject {
 
     /// Saves (provisioning consent prompt) the tunnel config pointed at the
     /// on-device proxy port, then starts it.
-    func enable(port: Int) async {
+    @discardableResult
+    func enable(port: Int) async -> Bool {
         lastError = nil
         startPolling()
         let manager = self.manager ?? NETunnelProviderManager()
@@ -155,9 +165,13 @@ final class VPNController: ObservableObject {
             // Reload so the connection object is valid after the save round-trip.
             try await manager.loadFromPreferences()
             self.manager = manager
+            self.hasConfiguration = true
             try manager.connection.startVPNTunnel()
+            status = manager.connection.status
+            return true
         } catch {
             self.lastError = error.localizedDescription
+            return false
         }
     }
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Mac App Store DISTRIBUTION entitlements: same sandbox/network/file set as
+         the local-test entitlements, PLUS the application-identifier and
+         team-identifier that the App Store requires (must match the embedded
+         MAC_APP_STORE provisioning profile for com.1moby.httrail). -->
+    <key>com.apple.application-identifier</key>
+    <string>D62Y8JVXB9.com.1moby.httrail</string>
+    <key>com.apple.developer.team-identifier</key>
+    <string>D62Y8JVXB9</string>
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+    <key>com.apple.security.network.client</key>
+    <true/>
+    <key>com.apple.security.network.server</key>
+    <true/>
+    <key>com.apple.security.files.user-selected.read-write</key>
+    <true/>
+    <key>com.apple.security.files.downloads.read-write</key>
+    <true/>
+</dict>
+</plist>

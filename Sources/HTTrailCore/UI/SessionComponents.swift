@@ -7,31 +7,28 @@ public struct ResourceFilterBar: View {
 
     public var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 6) {
-                chip(label: "All", systemImage: "square.grid.2x2",
-                     active: selection.isEmpty) { selection.removeAll() }
+            HStack(spacing: 5) {
+                chip(label: "All", active: selection.isEmpty) { selection.removeAll() }
                 ForEach(ResourceType.allCases, id: \.self) { type in
-                    chip(label: type.label, systemImage: type.systemImage,
-                         active: selection.contains(type)) {
+                    chip(label: type.label, active: selection.contains(type)) {
                         if selection.contains(type) { selection.remove(type) } else { selection.insert(type) }
                     }
                 }
             }
-            .padding(.horizontal, 10)
+            .padding(.horizontal, 12)
         }
     }
 
-    private func chip(label: String, systemImage: String, active: Bool, action: @escaping () -> Void) -> some View {
+    private func chip(label: String, active: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            HStack(spacing: 4) {
-                Image(systemName: systemImage).font(.system(size: 10))
-                Text(label).font(.system(size: 11, weight: .medium))
-            }
-            .padding(.horizontal, 9).padding(.vertical, 5)
-            .background(active ? Theme.color.accent.opacity(0.22) : Theme.color.fill,
-                        in: Capsule())
-            .overlay(Capsule().stroke(active ? Theme.color.accent : Theme.color.hairline, lineWidth: 1))
-            .foregroundStyle(active ? Theme.color.accent : Theme.color.textMuted)
+            Text(label)
+                .font(.system(size: 10.5, weight: .bold))
+                .padding(.horizontal, 9).padding(.vertical, 4)
+                .background(active ? Theme.color.accent.opacity(0.22) : Theme.color.fill,
+                            in: RoundedRectangle(cornerRadius: Theme.radius.sm, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: Theme.radius.sm, style: .continuous)
+                    .stroke(active ? Theme.color.accent : Theme.color.hairline, lineWidth: 1))
+                .foregroundStyle(active ? Theme.color.accent : Theme.color.textMuted)
         }
         .buttonStyle(.plain)
     }

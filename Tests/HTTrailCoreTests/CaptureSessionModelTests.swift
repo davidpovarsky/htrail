@@ -84,9 +84,26 @@ final class CaptureSessionModelTests: XCTestCase {
         XCTAssertEqual(model.sessions.first?.recordCount, 1)
 
         let sessionID = model.activeSessionID!
+        model.endCaptureSession()           // finish recording, then delete it
         model.deleteSession(sessionID)
         XCTAssertTrue(model.sessions.isEmpty)
         XCTAssertNil(model.activeSessionID)
+    }
+
+    /// Deleting the session currently being recorded must not leave capture with
+    /// nowhere to write: a fresh session takes its place.
+    func testDeletingActiveSessionStartsAFreshOne() {
+        let model = makeModel()
+        model.beginCaptureSession()
+        model.ingestForTesting(flow(host: "a", contentType: "application/json"))
+        let original = model.activeSessionID!
+
+        model.deleteSession(original)
+
+        XCTAssertNotNil(model.activeSessionID, "a replacement recording session should exist")
+        XCTAssertNotEqual(model.activeSessionID, original)
+        XCTAssertEqual(model.sessions.count, 1)
+        XCTAssertFalse(model.sessions.contains { $0.id == original })
     }
 
     func testExportHARForViewedPastSession() throws {

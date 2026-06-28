@@ -83,14 +83,20 @@ public enum Theme {
         // Hairlines / borders (white overlays on dark)
         public static let border    = Color.white.opacity(0.08)
         public static let borderStrong = Color.white.opacity(0.12)
-        public static let hairline  = Color.white.opacity(0.06)
+        public static let hairline  = Color.white.opacity(0.07)
         public static let fill      = Color.white.opacity(0.05)
         public static let fillHover = Color.white.opacity(0.09)
+        /// Field / segmented-control border — design uses rgba(255,255,255,.10),
+        /// between `border` (.08) and `borderStrong` (.12).
+        public static let borderField = Color.white.opacity(0.10)
     }
 
     // MARK: Radii
     public enum radius {
         public static let sm: CGFloat = 6
+        /// Toolbar pills / input fields / segmented controls — design uses 8px
+        /// consistently (between `sm` 6 and `md` 9).
+        public static let field: CGFloat = 8
         public static let md: CGFloat = 9
         public static let lg: CGFloat = 12
         public static let xl: CGFloat = 16
@@ -129,6 +135,37 @@ public enum Theme {
         }
         .ignoresSafeArea()
     }
+
+    /// The v2 app background: the deep indigo wash plus a cyan glow off the
+    /// top-right and a violet glow off the bottom — the "signal in the dark"
+    /// motif from the v2 canvas.
+    public static var appBackgroundV2: some View {
+        ZStack {
+            RadialGradient(colors: [Color(hex: "#1A1D44"), Color(hex: "#0C0A24"), color.app],
+                           center: UnitPoint(x: 0.08, y: -0.12), startRadius: 0, endRadius: 1400)
+            RadialGradient(colors: [color.cyan.opacity(0.10), .clear],
+                           center: UnitPoint(x: 0.92, y: -0.06), startRadius: 0, endRadius: 560)
+            RadialGradient(colors: [color.violet.opacity(0.08), .clear],
+                           center: UnitPoint(x: 0.60, y: 1.08), startRadius: 0, endRadius: 520)
+        }
+        .ignoresSafeArea()
+    }
+
+    // MARK: Fonts
+
+    /// PostScript family of the bundled monospaced face (JetBrains Mono).
+    public static let monoFamily = "JetBrains Mono"
+
+    /// Monospaced font for every URL, header, payload and code surface.
+    /// Falls back to the system monospaced face if the bundled font is missing.
+    public static func mono(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font {
+        .custom(monoFamily, size: size).weight(weight)
+    }
+
+    // MARK: Chrome
+
+    /// Translucent titlebar / toolbar fill used by the v2 custom window chrome.
+    public static var titlebar: Color { color.base.opacity(0.72) }
 
     // MARK: Semantic helpers
 
@@ -200,7 +237,7 @@ public struct HTPrimaryButtonStyle: ButtonStyle {
         configuration.label
             .font(.system(size: 13, weight: .bold))
             .foregroundStyle(.white)
-            .padding(.horizontal, 20).padding(.vertical, 9)
+            .padding(.horizontal, 22).padding(.vertical, 10)
             .background(Theme.primary, in: RoundedRectangle(cornerRadius: Theme.radius.md, style: .continuous))
             .shadow(color: Theme.color.blue.opacity(0.5), radius: 9, y: 5)
             .opacity(configuration.isPressed ? 0.85 : 1)
@@ -253,29 +290,30 @@ public struct HTEyebrow: View {
 public struct StatusIndicator: View {
     public enum State { case code(Int), pending, error, none }
     let state: State
-    public init(state: State) { self.state = state }
+    let size: CGFloat
+    public init(state: State, size: CGFloat = 12) { self.state = state; self.size = size }
 
     public var body: some View {
         switch state {
         case .code(let c):
             Text("\(c)")
-                .font(.system(size: 12, weight: .bold, design: .monospaced))
+                .font(.system(size: size, weight: .bold, design: .monospaced))
                 .foregroundStyle(Theme.statusColor(c))
         case .pending:
             Text("···")
-                .font(.system(size: 12, weight: .bold, design: .monospaced))
+                .font(.system(size: size, weight: .bold, design: .monospaced))
                 .tracking(1)
                 .foregroundStyle(Theme.color.textDim)
                 .modifier(BlinkModifier())
         case .error:
             Text("ERR")
-                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                .font(.system(size: size - 1, weight: .bold, design: .monospaced))
                 .foregroundStyle(.white)
                 .padding(.horizontal, 7).padding(.vertical, 2)
                 .background(Theme.color.red, in: RoundedRectangle(cornerRadius: 5))
         case .none:
             Text("—")
-                .font(.system(size: 12, weight: .bold, design: .monospaced))
+                .font(.system(size: size, weight: .bold, design: .monospaced))
                 .foregroundStyle(Theme.color.textDim)
         }
     }

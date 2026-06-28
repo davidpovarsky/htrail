@@ -8,6 +8,8 @@ import NIOWebSocket
 /// protocols on localhost and implements two behaviours everywhere:
 ///
 /// - **echo** — sends back whatever you send.
+/// - **commands** — `ping` replies `pong`; `date` / `datetime` / `time` / `now`
+///   reply with the current timestamp; `uptime` replies with elapsed server time.
 /// - **datetime** — when you send `datetime` / `time` / `now`, replies with the
 ///   current timestamp. (`stream` / `stop` toggle a 1 s datetime ticker on
 ///   WebSocket; SSE streams the datetime continuously since it's receive-only.)
@@ -17,6 +19,7 @@ import NIOWebSocket
 /// `/socket.io/` and `/sse`; a second TCP listener is a minimal MQTT broker.
 public final class RealtimeTestServer: @unchecked Sendable {
     private let group = MultiThreadedEventLoopGroup(numberOfThreads: 2)
+    private let commands = RealtimeCommandResponder(startedAt: Date())
     private var httpChannel: Channel?
     private var mqttChannel: Channel?
 
@@ -52,7 +55,8 @@ public final class RealtimeTestServer: @unchecked Sendable {
                     upgradePipelineHandler: { ch, head in
                         // Route by path: Socket.IO (Engine.IO v4) vs plain echo.
                         let handler: ChannelHandler = head.uri.hasPrefix("/socket.io")
-                            ? SocketIOTestHandler() : EchoWebSocketHandler()
+                            ? SocketIOTestHandler(commands: self.commands)
+                            : EchoWebSocketHandler(commands: self.commands)
                         // The plain-HTTP handler must be removed once we've upgraded,
                         // otherwise it tries to decode WebSocket frames as HTTP.
                         return ch.pipeline.removeHandler(name: "sse-http")
@@ -93,6 +97,24 @@ private func nowTimestamp() -> String {
     return formatter.string(from: Date())
 }
 
+fileprivate struct RealtimeCommandResponder {
+    let startedAt: Date
+
+    func response(for text: String) -> String? {
+        switch text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
+        case "ping":
+            return "pong"
+        case "date", "datetime", "time", "now":
+            return nowTimestamp()
+        case "uptime":
+            let seconds = max(0, Date().timeIntervalSince(startedAt))
+            return "uptime \(seconds.formatted(.number.precision(.fractionLength(1))))s"
+        default:
+            return nil
+        }
+    }
+}
+
 // MARK: - WebSocket echo
 
 /// Echoes text frames; replies with the time for `datetime`/`time`/`now`, and
@@ -100,10 +122,15 @@ private func nowTimestamp() -> String {
 final class EchoWebSocketHandler: ChannelInboundHandler {
     typealias InboundIn = WebSocketFrame
     typealias OutboundOut = WebSocketFrame
+    private let commands: RealtimeCommandResponder
     private var ticker: RepeatedTask?
 
+    fileprivate init(commands: RealtimeCommandResponder) {
+        self.commands = commands
+    }
+
     func channelActive(context: ChannelHandlerContext) {
-        sendText("HTTrail test server ready — send any text to echo, or 'datetime' / 'stream'.",
+        sendText("HTTrail test server ready — send any text to echo, or 'ping' / 'date' / 'uptime' / 'stream'.",
                  context: context)
     }
 
@@ -133,8 +160,6 @@ final class EchoWebSocketHandler: ChannelInboundHandler {
 
     private func handle(_ text: String, context: ChannelHandlerContext) {
         switch text.lowercased() {
-        case "datetime", "time", "now":
-            sendText(nowTimestamp(), context: context)
         case "stream", "time stream", "datetime stream":
             ticker?.cancel()
             ticker = context.eventLoop.scheduleRepeatedTask(initialDelay: .zero, delay: .seconds(1)) { [weak self] _ in
@@ -144,7 +169,7 @@ final class EchoWebSocketHandler: ChannelInboundHandler {
             ticker?.cancel(); ticker = nil
             sendText("stream stopped", context: context)
         default:
-            sendText(text, context: context)
+            sendText(commands.response(for: text) ?? text, context: context)
         }
     }
 
@@ -163,11 +188,19 @@ final class EchoWebSocketHandler: ChannelInboundHandler {
 final class SocketIOTestHandler: ChannelInboundHandler {
     typealias InboundIn = WebSocketFrame
     typealias OutboundOut = WebSocketFrame
+    private let commands: RealtimeCommandResponder
+    private var sentOpen = false
+
+    fileprivate init(commands: RealtimeCommandResponder) {
+        self.commands = commands
+    }
+
+    func handlerAdded(context: ChannelHandlerContext) {
+        sendOpen(context)
+    }
 
     func channelActive(context: ChannelHandlerContext) {
-        // Engine.IO OPEN packet (the client only checks the leading "0").
-        send("0{\"sid\":\"httrail-test\",\"upgrades\":[],\"pingInterval\":25000,\"pingTimeout\":20000,\"maxPayload\":1000000}",
-             context)
+        sendOpen(context)
     }
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
@@ -192,9 +225,12 @@ final class SocketIOTestHandler: ChannelInboundHandler {
                 context.close(promise: nil)
             case "2":                          // Socket.IO EVENT
                 let (name, payload) = Self.parseEvent(String(rest.dropFirst()))
-                let responsePayload = ["datetime", "time", "now"].contains(name.lowercased())
-                    ? nowTimestamp() : payload
-                send(encodeEvent(name, responsePayload), context)
+                // The UI sends the typed text as payload with a fixed event name,
+                // but direct clients may also use the event name as the command.
+                let response = commands.response(for: payload)
+                    ?? commands.response(for: name)
+                    ?? payload
+                send(encodeEvent(name, response), context)
             default:
                 break
             }
@@ -212,11 +248,27 @@ final class SocketIOTestHandler: ChannelInboundHandler {
         return "42[\"\(name)\"]"
     }
 
+    private func sendOpen(_ context: ChannelHandlerContext) {
+        guard !sentOpen else { return }
+        sentOpen = true
+        // Engine.IO OPEN packet (the client only checks the leading "0").
+        send("0{\"sid\":\"httrail-test\",\"upgrades\":[],\"pingInterval\":25000,\"pingTimeout\":20000,\"maxPayload\":1000000}",
+             context)
+    }
+
     /// Tolerantly extract `(name, payload)` from an EVENT body such as
     /// `["echo","hi"]`, `/ns,["echo",hi]` or `["datetime"]`. The client emits
     /// the payload verbatim (sometimes not JSON-quoted), so be lenient.
     static func parseEvent(_ body: String) -> (String, String) {
         let arrayText = String(body.drop { $0 != "[" })
+        if let data = arrayText.data(using: .utf8),
+           let array = try? JSONSerialization.jsonObject(with: data) as? [Any],
+           !array.isEmpty {
+            let name = array.first as? String ?? "message"
+            let payload = array.count > 1 ? stringify(array[1]) : ""
+            return (name, payload)
+        }
+
         var name = "message"
         if let range = arrayText.range(of: #""((?:\\.|[^"\\])*)""#, options: .regularExpression) {
             name = String(arrayText[range]).trimmingCharacters(in: CharacterSet(charactersIn: "\""))
@@ -232,6 +284,13 @@ final class SocketIOTestHandler: ChannelInboundHandler {
             payload = tail
         }
         return (name, payload)
+    }
+
+    private static func stringify(_ value: Any) -> String {
+        if let string = value as? String { return string }
+        if let data = try? JSONSerialization.data(withJSONObject: value),
+           let string = String(data: data, encoding: .utf8) { return string }
+        return "\(value)"
     }
 
     private func send(_ text: String, _ context: ChannelHandlerContext) {

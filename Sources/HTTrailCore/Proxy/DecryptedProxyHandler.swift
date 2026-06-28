@@ -9,7 +9,7 @@ import NIOSSL
 /// ``InterceptEngine`` (block / map / rewrite / throttle / breakpoint), forwards
 /// the (possibly modified) request to the origin, runs the engine over the
 /// response, relays it, and records a ``Flow``.
-final class DecryptedProxyHandler: ChannelInboundHandler {
+final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandler {
     typealias InboundIn = HTTPServerRequestPart
     typealias OutboundOut = HTTPServerResponsePart
 
@@ -83,6 +83,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler {
         let sink = self.sink
         let channel = context.channel
         let allocator = context.channel.allocator
+        let isWebSocket = isWebSocketUpgrade(head)
 
         Task {
             let outcome = await engine.processRequest(request, target: target)
@@ -93,6 +94,17 @@ final class DecryptedProxyHandler: ChannelInboundHandler {
                 await self.relay(channel: channel, allocator: allocator, response: response, keepAlive: keepAlive)
 
             case .forward(let finalRequest, let finalTarget, let throttle):
+                // A WebSocket upgrade leaves the HTTP request/response model behind:
+                // hand both channels to the frame-capturing tunnel and stop here.
+                if isWebSocket {
+                    WebSocketTunnel.start(
+                        clientChannel: channel, clientProxyHandler: self,
+                        request: finalRequest, target: finalTarget, flowID: flowID,
+                        startedAt: started, secure: secure, sink: sink, group: self.group,
+                        verifyUpstream: self.verifyUpstream, connectTimeout: self.connectTimeout,
+                        perMessageCap: min(self.captureBodyCap, WebSocketTunnel.defaultPerMessageCap))
+                    return
+                }
                 if throttle.delayMS > 0 {
                     try? await Task.sleep(nanoseconds: UInt64(throttle.delayMS) * 1_000_000)
                 }
@@ -294,6 +306,15 @@ final class DecryptedProxyHandler: ChannelInboundHandler {
             body: Data(message.utf8), timestamp: Date()
         )
         Task { await relay(channel: channel, allocator: channel.allocator, response: response, keepAlive: false) }
+    }
+
+    /// True for an RFC 6455 upgrade handshake (`GET` + `Upgrade: websocket` +
+    /// `Connection: upgrade`). `canonicalForm` splits comma-separated list headers.
+    private func isWebSocketUpgrade(_ head: HTTPRequestHead) -> Bool {
+        guard head.method == .GET else { return false }
+        let upgrade = head.headers[canonicalForm: "upgrade"].map { $0.lowercased() }
+        let connection = head.headers[canonicalForm: "connection"].map { $0.lowercased() }
+        return upgrade.contains("websocket") && connection.contains { $0.contains("upgrade") }
     }
 
     // MARK: Target resolution

@@ -27,11 +27,18 @@ final class FlowBridge: FlowSink, @unchecked Sendable {
 /// reveal) are conditionally compiled.
 @MainActor
 public final class AppModel: ObservableObject {
+    nonisolated public static let defaultComposeURL = APIRequest.defaultURL
+    nonisolated public static let defaultWebSocketURL = "wss://echo.websocket.org"
+    nonisolated private static let legacyDefaultWebSocketURLs: Set<String> = [
+        "wss://echo.websocket.events"
+    ]
+
     public enum Mode: String, CaseIterable, Identifiable, Sendable {
         case capture = "Capture"
         case compose = "Compose"
         case rules = "Rules"
         case realtime = "Realtime"
+        case setup = "Setup"
         public var id: String { rawValue }
         public var systemImage: String {
             switch self {
@@ -39,8 +46,12 @@ public final class AppModel: ObservableObject {
             case .compose: return "paperplane"
             case .rules: return "slider.horizontal.3"
             case .realtime: return "bolt.horizontal"
+            case .setup: return "gearshape"
             }
         }
+        /// The four primary modes shown in the rail's main cluster; `setup` is
+        /// pinned separately at the bottom of the rail.
+        public static var primary: [Mode] { [.capture, .compose, .rules, .realtime] }
     }
 
     @Published public var mode: Mode = .capture {
@@ -54,6 +65,7 @@ public final class AppModel: ObservableObject {
             case .compose: selectedTab = 1
             case .rules: selectedTab = 2
             case .realtime: selectedTab = 3
+            case .setup: selectedTab = 4
             }
             #endif
         }
@@ -67,6 +79,9 @@ public final class AppModel: ObservableObject {
     // Proxy / capture
     @Published public var flows: [Flow] = []
     @Published public var selectedFlowIDs: Set<Flow.ID> = []
+    /// Navigation path for the iOS Capture tab (drilling into a session's flows).
+    /// Empty in normal use; the demo seam can push a session for screenshots.
+    @Published public var capturePath: [CaptureSession] = []
     @Published public var isProxyRunning = false
     @Published public var proxyPort: Int = 9090
     @Published public var systemProxyEnabled = false
@@ -152,6 +167,8 @@ public final class AppModel: ObservableObject {
     @Published public var codeTarget: CodeGenerator.Target = .curl
     @Published public var importCurlText: String = ""
     @Published public var showImportSheet = false
+    /// The v2 ⌘K command palette overlay (macOS).
+    @Published public var showCommandPalette = false
 
     // Scripting
     @Published public var scriptOutputs: [UUID: ScriptOutput] = [:]
@@ -177,9 +194,16 @@ public final class AppModel: ObservableObject {
     }
     @Published public var rtProtocol: RealtimeProtocol = .webSocket {
         // Keep the endpoint fields pointed at the local test server when it's on.
-        didSet { if testServerRunning { applyLocalTestEndpoints() } }
+        didSet {
+            guard oldValue != rtProtocol else { return }
+            if testServerRunning {
+                applyLocalTestEndpoints()
+            } else {
+                applyDefaultRealtimeEndpoint(afterSwitchingFrom: oldValue)
+            }
+        }
     }
-    @Published public var wsURL: String = "wss://echo.websocket.events"
+    @Published public var wsURL: String = AppModel.defaultWebSocketURL
     @Published public var wsConnected = false
     @Published public var wsMessages: [RealtimeMessage] = []
     @Published public var wsOutgoing: String = ""
@@ -189,6 +213,8 @@ public final class AppModel: ObservableObject {
     @Published public var mqttTopic: String = "httrail/test"
     /// Whether the in-process realtime test server (echo + datetime) is running.
     @Published public var testServerRunning = false
+    /// True while the local realtime server is starting or stopping on a background task.
+    @Published public var testServerBusy = false
 
     // Breakpoints
     @Published public var pendingBreakpoint: BreakpointEvent?
@@ -211,7 +237,7 @@ public final class AppModel: ObservableObject {
     private let bridge = FlowBridge()
     private var proxy: ProxyServer?
     private let runner = RequestRunner()
-    private let workspace = Workspace()
+    private let workspace: Workspace
     private let sessionStore: CaptureSessionStore
     private let scriptRunner = ScriptRunner()
     private var webSocket: WebSocketClient?
@@ -256,8 +282,10 @@ public final class AppModel: ObservableObject {
             || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
 
-    public init(sessionStore: CaptureSessionStore = CaptureSessionStore()) {
+    public init(sessionStore: CaptureSessionStore = CaptureSessionStore(),
+                workspace: Workspace = Workspace()) {
         self.sessionStore = sessionStore
+        self.workspace = workspace
         if let ca = try? CertificateAuthority.loadOrCreate(in: AppPaths.certificatesDirectory) {
             self.ca = ca
         } else {
@@ -474,11 +502,22 @@ public final class AppModel: ObservableObject {
     }
 
     public func deleteSession(_ id: UUID) {
+        // Deleting the session we're actively recording into would leave newly
+        // captured flows with nowhere to go. Detect that and immediately open a
+        // fresh session so capture continues uninterrupted.
+        let wasRecording = (activeSessionID == id)
         sessionStore.deleteSession(id)
         sessions.removeAll { $0.id == id }
         if activeSessionID == id { activeSessionID = nil; flows.removeAll() }
         if viewingSessionID == id { viewingSessionID = nil; viewingFlows = [] }
         selectedFlowIDs.removeAll()
+        if wasRecording { beginCaptureSession() }
+    }
+
+    /// Select every currently-visible (filtered) flow — backs a "Select All"
+    /// affordance in the capture flow list.
+    public func selectAllVisibleFlows() {
+        selectedFlowIDs = Set(filteredFlows.map { $0.id })
     }
 
     /// Delete the currently-selected rows from the session being viewed/recorded.
@@ -740,6 +779,11 @@ public final class AppModel: ObservableObject {
 
     #if os(macOS)
     public func toggleSystemProxy() {
+        guard SystemProxyController.canManageSystem else {
+            statusMessage = "Sandboxed build: set the system proxy to 127.0.0.1:\(proxyPort) "
+                + "manually in System Settings → Network → Proxies (Web + Secure Web)."
+            return
+        }
         guard let service = systemProxy.primaryNetworkService() else {
             statusMessage = "No active network service found"; return
         }
@@ -773,6 +817,16 @@ public final class AppModel: ObservableObject {
             statusMessage = "Could not write CA: \(error.localizedDescription)"; return
         }
         caFileURL = url
+        guard SystemProxyController.canManageSystem else {
+            // Sandboxed Mac App Store build can't touch the System keychain. Reveal
+            // the exported .pem so the user can trust it in Keychain Access.
+            #if os(macOS)
+            NSWorkspace.shared.activateFileViewerSelecting([url])
+            #endif
+            statusMessage = "Sandboxed build: open the revealed HTTrailCA.pem in Keychain Access "
+                + "and set it to Always Trust to enable HTTPS capture."
+            return
+        }
         statusMessage = "Requesting admin to trust the HTTrail root CA…"
         if systemProxy.installTrustedRootCA(pemPath: url.path) {
             caTrusted = true
@@ -958,7 +1012,88 @@ public final class AppModel: ObservableObject {
         return url
     }
 
+    /// Export an explicit set of flows (e.g. the multi-selected rows) to a HAR
+    /// file. Used by the capture list's batch "Export selected" action.
+    public func exportHAR(flowIDs: Set<Flow.ID>) -> URL? {
+        let source = displayedFlows.filter { flowIDs.contains($0.id) }
+        guard !source.isEmpty, let data = try? HARExporter().export(source.reversed()) else {
+            statusMessage = "Nothing to export"; return nil
+        }
+        let label = sessions.first { $0.id == (viewingSessionID ?? activeSessionID) }?.name ?? "selection"
+        let safe = label.replacingOccurrences(of: "[^A-Za-z0-9-]", with: "-", options: .regularExpression)
+        let url = AppPaths.supportDirectory
+            .appendingPathComponent("HTTrail-\(safe)-\(source.count)flows-\(Int(Date().timeIntervalSince1970)).har")
+        try? data.write(to: url)
+        #if os(macOS)
+        NSWorkspace.shared.activateFileViewerSelecting([url])
+        #endif
+        statusMessage = "Exported \(source.count) flows to HAR"
+        return url
+    }
+
     // MARK: - API client
+
+    nonisolated public static func composeRequestTitle(for request: APIRequest) -> String {
+        let name = request.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !name.isEmpty, name != "New Request" {
+            return name
+        }
+        if let host = composeHostname(from: request.url) {
+            return host
+        }
+        let url = request.url.trimmingCharacters(in: .whitespacesAndNewlines)
+        return url.isEmpty || url == "https://" ? "New Request" : url
+    }
+
+    nonisolated public static func composeHistoryTitle(for entry: HistoryEntry) -> String {
+        composeHistoryTitle(for: entry, timestampText: composeHistoryTimestamp(for: entry.timestamp))
+    }
+
+    nonisolated public static func composeHistoryTitle(for entry: HistoryEntry, timestampText: String) -> String {
+        let host = composeHostname(from: entry.request.url) ?? composeRequestTitle(for: entry.request)
+        let timestamp = timestampText.trimmingCharacters(in: .whitespacesAndNewlines)
+        return timestamp.isEmpty ? host : "\(host) · \(timestamp)"
+    }
+
+    nonisolated public static func composeHistoryTimestamp(for date: Date) -> String {
+        date.formatted(date: .abbreviated, time: .shortened)
+    }
+
+    nonisolated public static func composeHostname(from urlString: String) -> String? {
+        let trimmed = urlString.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        if let host = hostFromComponents(trimmed) {
+            return host
+        }
+        if !trimmed.contains("://"), let host = hostFromComponents("https://\(trimmed)") {
+            return host
+        }
+        return hostFromAuthorityFallback(trimmed)
+    }
+
+    nonisolated private static func hostFromComponents(_ string: String) -> String? {
+        guard let host = URLComponents(string: string)?.host, !host.isEmpty else { return nil }
+        return host
+    }
+
+    nonisolated private static func hostFromAuthorityFallback(_ string: String) -> String? {
+        let afterScheme: Substring
+        if let scheme = string.range(of: "://") {
+            afterScheme = string[scheme.upperBound...]
+        } else {
+            afterScheme = string[...]
+        }
+        guard let authority = afterScheme.split(whereSeparator: { "/?#".contains($0) }).first else {
+            return nil
+        }
+        let userless = authority.split(separator: "@", omittingEmptySubsequences: false).last ?? authority
+        guard !userless.isEmpty else { return nil }
+        if userless.hasPrefix("[") {
+            guard let end = userless.firstIndex(of: "]") else { return nil }
+            return String(userless[userless.startIndex...end])
+        }
+        return String(userless.split(separator: ":", maxSplits: 1).first ?? userless)
+    }
 
     public var selectedRequestIndex: Int? { requests.firstIndex { $0.id == selectedRequestID } }
 
@@ -966,6 +1101,33 @@ public final class AppModel: ObservableObject {
         let req = APIRequest()
         requests.append(req)
         selectedRequestID = req.id
+    }
+
+    public func prepareComposeURLFieldForEditing(at index: Int) {
+        guard requests.indices.contains(index) else { return }
+        if requests[index].url.trimmingCharacters(in: .whitespacesAndNewlines) == Self.defaultComposeURL {
+            requests[index].url = ""
+        }
+    }
+
+    @discardableResult
+    public func normalizeComposeURLIfNeeded(_ text: String, at index: Int) -> Bool {
+        guard requests.indices.contains(index),
+              let normalized = Self.normalizedComposeURL(from: text),
+              normalized != requests[index].url else { return false }
+        requests[index].url = normalized
+        return true
+    }
+
+    nonisolated static func normalizedComposeURL(from text: String) -> String? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let firstSchemeEnd = trimmed.range(of: "://")?.upperBound else { return nil }
+        let afterFirstScheme = trimmed[firstSchemeEnd...]
+        guard let secondSchemeSeparator = afterFirstScheme.range(of: "://") else { return nil }
+
+        let pastedScheme = String(afterFirstScheme[..<secondSchemeSeparator.lowerBound]).lowercased()
+        guard ["http", "https", "ws", "wss"].contains(pastedScheme) else { return nil }
+        return String(afterFirstScheme)
     }
 
     public func sendSelectedRequest() {
@@ -1011,7 +1173,8 @@ public final class AppModel: ObservableObject {
                 ?? "\(response.statusCode) · \(response.durationMS) ms · \(response.body.count) bytes\(testSummary)"
 
             let entry = HistoryEntry(request: request, statusCode: response.statusCode,
-                                     durationMS: response.durationMS, timestamp: Date())
+                                     durationMS: response.durationMS, timestamp: Date(),
+                                     response: response)
             self.workspace.addHistory(entry)
             self.history = self.workspace.history
         }
@@ -1035,12 +1198,62 @@ public final class AppModel: ObservableObject {
         let needsScope = url.startAccessingSecurityScopedResource()
         defer { if needsScope { url.stopAccessingSecurityScopedResource() } }
         guard let data = try? Data(contentsOf: url) else { statusMessage = "Could not read file"; return }
-        let imported = OpenAPIImporter().importDocument(data) ?? PostmanImporter().importDocument(data)
-        guard let collection = imported else { statusMessage = "Unrecognized OpenAPI/Postman file"; return }
+        if let imported = OpenAPIImporter().importDocument(data) ?? PostmanImporter().importDocument(data) {
+            applyImportedCollection(imported)
+            return
+        }
+        do {
+            let backup = try PostmanBackupImporter().importBackup(data)
+            applyPostmanBackupImport(backup, sourceName: url.lastPathComponent)
+        } catch {
+            statusMessage = "Unrecognized OpenAPI/Postman file"
+        }
+    }
+
+    public func importLatestPostmanBackup() {
+        guard let url = PostmanBackupLocator().latestBackupFile() else {
+            statusMessage = "No Postman backup found in ~/Library/Application Support/Postman"
+            return
+        }
+        importPostmanBackup(from: url)
+    }
+
+    public func importPostmanBackup(from url: URL) {
+        let needsScope = url.startAccessingSecurityScopedResource()
+        defer { if needsScope { url.stopAccessingSecurityScopedResource() } }
+        do {
+            let data = try Data(contentsOf: url)
+            let backup = try PostmanBackupImporter().importBackup(data)
+            applyPostmanBackupImport(backup, sourceName: url.lastPathComponent)
+        } catch {
+            statusMessage = "Could not import Postman backup: \(error.localizedDescription)"
+        }
+    }
+
+    private func applyImportedCollection(_ collection: RequestCollection) {
         collections.append(collection)
         workspace.setCollections(collections)
         mode = .compose
         statusMessage = "Imported “\(collection.name)” (\(collection.requests.count) requests)"
+    }
+
+    private func applyPostmanBackupImport(_ imported: PostmanBackupImport, sourceName: String) {
+        collections.append(contentsOf: imported.collections)
+        workspace.setCollections(collections)
+        if !imported.environments.isEmpty {
+            environments.append(contentsOf: imported.environments)
+            activeEnvironmentID = imported.environments.first?.id
+            persistEnvironments()
+        }
+        mode = .compose
+        let requestCount = imported.collections.reduce(0) { $0 + Self.requestCount(in: $1) }
+        let environmentPart = imported.environments.isEmpty ? "" : " · \(imported.environments.count) environments"
+        statusMessage = "Imported Postman backup “\(sourceName)” "
+            + "(\(imported.collections.count) collections, \(requestCount) requests\(environmentPart))"
+    }
+
+    nonisolated private static func requestCount(in collection: RequestCollection) -> Int {
+        collection.requests.count + collection.folders.reduce(0) { $0 + requestCount(in: $1) }
     }
 
     public func generatedCode() -> String {
@@ -1062,19 +1275,51 @@ public final class AppModel: ObservableObject {
 
     /// Detects a pasted cURL command (e.g. into the URL field) and, if found,
     /// parses it into the request at `index` in place. Returns true if applied.
+    ///
+    /// Works even when the command isn't at the very front of the field — pasting
+    /// into a field that already has text, or with the cursor mid-string, yields a
+    /// value like `…oldcurl …`; we locate the embedded `curl …` and import it,
+    /// discarding the surrounding junk.
     @discardableResult
     public func applyCurlIfDetected(_ text: String, at index: Int) -> Bool {
         guard requests.indices.contains(index) else { return false }
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        let lower = trimmed.lowercased()
-        guard lower == "curl" || lower.hasPrefix("curl ") || lower.hasPrefix("curl\t") || lower.hasPrefix("curl\n"),
-              let parsed = CurlConverter().importCommand(trimmed) else { return false }
+        guard let command = Self.extractCurlCommand(from: text),
+              let parsed = CurlConverter().importCommand(command),
+              !parsed.url.isEmpty else { return false }
         var updated = parsed
         updated.id = requests[index].id          // keep list identity/selection
         if !requests[index].name.isEmpty { updated.name = requests[index].name }
         requests[index] = updated
         statusMessage = "Imported cURL"
         return true
+    }
+
+    /// Extracts a `curl …` invocation from arbitrary text. Returns the command
+    /// substring (from the `curl` token to the end) or nil if none looks real.
+    ///
+    /// A bare URL that merely contains the letters "curl" must NOT match, so we
+    /// require `curl` to be followed by whitespace and the remainder to carry a
+    /// flag (` -…`) or a URL scheme (`://`) — the unmistakable shape of a command.
+    nonisolated static func extractCurlCommand(from text: String) -> String? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let lowerTrimmed = trimmed.lowercased()
+        // Fast path: the whole field is the command (the common, cursor-at-front case).
+        if lowerTrimmed == "curl" { return nil }   // "curl" alone has no URL — ignore
+        if lowerTrimmed.hasPrefix("curl ") || lowerTrimmed.hasPrefix("curl\t") || lowerTrimmed.hasPrefix("curl\n") {
+            return trimmed
+        }
+        // Otherwise scan for an embedded `curl` token followed by whitespace.
+        let lower = text.lowercased()
+        var searchStart = lower.startIndex
+        while let r = lower.range(of: "curl", range: searchStart..<lower.endIndex) {
+            searchStart = r.upperBound
+            guard r.upperBound < lower.endIndex, lower[r.upperBound].isWhitespace else { continue }
+            let candidate = String(text[r.lowerBound...]).trimmingCharacters(in: .whitespacesAndNewlines)
+            let candLower = candidate.lowercased()
+            guard candLower.contains(" -") || candLower.contains("://") else { continue }
+            return candidate
+        }
+        return nil
     }
 
     // MARK: - Collections / environments
@@ -1096,6 +1341,22 @@ public final class AppModel: ObservableObject {
         copy.id = UUID()
         requests.append(copy)
         selectedRequestID = copy.id
+        mode = .compose
+    }
+
+    /// Reopen a past send from history: restore the exact request *and* its
+    /// response so the response pane shows the old result. Reuses the request's
+    /// original id so repeat clicks reselect the open request instead of piling
+    /// up duplicate copies.
+    public func loadHistory(_ entry: HistoryEntry) {
+        let request = entry.request
+        if !requests.contains(where: { $0.id == request.id }) {
+            requests.append(request)
+        }
+        selectedRequestID = request.id
+        if let response = entry.response {
+            responsesByRequest[request.id] = response
+        }
         mode = .compose
     }
 
@@ -1412,33 +1673,50 @@ public final class AppModel: ObservableObject {
     public var testServerHint: String {
         guard testServerRunning else { return "" }
         switch rtProtocol {
-        case .mqtt: return "echo + datetime · 127.0.0.1:\(testServerMQTTPort)"
-        default: return "echo + datetime · \(wsURL)"
+        case .mqtt: return "echo + ping/date/uptime · 127.0.0.1:\(testServerMQTTPort)"
+        default: return "echo + ping/date/uptime · \(wsURL)"
         }
     }
 
     public func toggleTestServer() {
+        guard !testServerBusy else { return }
         testServerRunning ? stopTestServer() : startTestServer()
     }
 
     private func startTestServer() {
-        do {
+        testServerBusy = true
+        savedRealtimeEndpoints = (wsURL, mqttHost, mqttPort)
+        statusMessage = "Starting local realtime test server..."
+
+        Task { [weak self] in
             let server = RealtimeTestServer()
-            let ports = try server.start()
-            testServer = server
-            testServerHTTPPort = ports.httpPort
-            testServerMQTTPort = ports.mqttPort
-            savedRealtimeEndpoints = (wsURL, mqttHost, mqttPort)
-            testServerRunning = true
-            applyLocalTestEndpoints()
-            statusMessage = "Local realtime test server started on 127.0.0.1"
-        } catch {
-            statusMessage = "Test server failed: \(error.localizedDescription)"
+            do {
+                let ports = try await Task.detached(priority: .userInitiated) {
+                    try server.start()
+                }.value
+                guard let self else {
+                    Task.detached(priority: .utility) { server.stop() }
+                    return
+                }
+                self.testServer = server
+                self.testServerHTTPPort = ports.httpPort
+                self.testServerMQTTPort = ports.mqttPort
+                self.testServerRunning = true
+                self.testServerBusy = false
+                self.applyLocalTestEndpoints()
+                self.statusMessage = "Local realtime test server started on 127.0.0.1"
+            } catch {
+                self?.testServerBusy = false
+                self?.savedRealtimeEndpoints = nil
+                self?.statusMessage = "Test server failed: \(error.localizedDescription)"
+            }
         }
     }
 
     private func stopTestServer() {
-        testServer?.stop()
+        let server = testServer
+        disconnectRealtime()
+        testServerBusy = true
         testServer = nil
         testServerRunning = false
         if let saved = savedRealtimeEndpoints {
@@ -1447,7 +1725,15 @@ public final class AppModel: ObservableObject {
             mqttPort = saved.mqttPort
             savedRealtimeEndpoints = nil
         }
-        statusMessage = "Local realtime test server stopped"
+        statusMessage = "Stopping local realtime test server..."
+
+        Task { [weak self] in
+            await Task.detached(priority: .userInitiated) {
+                server?.stop()
+            }.value
+            self?.testServerBusy = false
+            self?.statusMessage = "Local realtime test server stopped"
+        }
     }
 
     /// Point the current protocol's endpoint field(s) at the local test server.
@@ -1458,6 +1744,23 @@ public final class AppModel: ObservableObject {
         case .socketIO:  wsURL = "http://127.0.0.1:\(testServerHTTPPort)"
         case .sse:       wsURL = "http://127.0.0.1:\(testServerHTTPPort)/sse"
         case .mqtt:      mqttHost = "127.0.0.1"; mqttPort = testServerMQTTPort
+        }
+    }
+
+    private func applyDefaultRealtimeEndpoint(afterSwitchingFrom oldProtocol: RealtimeProtocol) {
+        switch rtProtocol {
+        case .webSocket:
+            if wsURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                wsURL = Self.defaultWebSocketURL
+            }
+        case .socketIO:
+            let trimmed = wsURL.trimmingCharacters(in: .whitespacesAndNewlines)
+            if oldProtocol == .webSocket,
+               trimmed == Self.defaultWebSocketURL || Self.legacyDefaultWebSocketURLs.contains(trimmed) {
+                wsURL = ""
+            }
+        case .sse, .mqtt:
+            break
         }
     }
 }
@@ -1479,3 +1782,145 @@ public struct RealtimeMessage: Identifiable {
         self.text = text
     }
 }
+
+#if DEBUG
+public extension AppModel {
+    /// Populate the model with rich, realistic sample data so the App Store
+    /// screenshots show a working app. Invoked only behind the `-htDemo 1`
+    /// launch argument (see the iOS `RootTabView`); never runs in normal use.
+    func seedDemoData() {
+        let now = Date()
+        func ago(_ s: TimeInterval) -> Date { now.addingTimeInterval(-s) }
+
+        // MARK: Capture — a session of decrypted HTTPS flows
+        func flow(_ method: String, _ urlString: String, status: Int, type: String,
+                  reqBody: String = "", respBody: String, ms: Int,
+                  secure: Bool = true, t: TimeInterval, sid: UUID) -> Flow {
+            let url = URL(string: urlString)!
+            let host = url.host ?? ""
+            let path = (url.path.isEmpty ? "/" : url.path) + (url.query.map { "?\($0)" } ?? "")
+            var reqHeaders = [
+                HeaderPair(name: "Host", value: host),
+                HeaderPair(name: "Accept", value: "application/json"),
+                HeaderPair(name: "User-Agent", value: "MyApp/2.4 (iPhone; iOS 18.5)"),
+            ]
+            if !reqBody.isEmpty {
+                reqHeaders.append(HeaderPair(name: "Content-Type", value: "application/json"))
+                reqHeaders.append(HeaderPair(name: "Authorization", value: "Bearer eyJhbGci••••••"))
+            }
+            let req = CapturedRequest(
+                method: method, url: urlString, scheme: url.scheme ?? "https",
+                host: host, port: url.port ?? (secure ? 443 : 80), path: path,
+                httpVersion: "HTTP/2", headers: reqHeaders,
+                body: Data(reqBody.utf8), timestamp: ago(t))
+            let resp = CapturedResponse(
+                statusCode: status, reasonPhrase: "", httpVersion: "HTTP/2",
+                headers: [
+                    HeaderPair(name: "Content-Type", value: type),
+                    HeaderPair(name: "Content-Length", value: "\(respBody.utf8.count)"),
+                    HeaderPair(name: "Server", value: "cloudflare"),
+                    HeaderPair(name: "Cache-Control", value: "no-store"),
+                ],
+                body: Data(respBody.utf8), timestamp: ago(t - Double(ms) / 1000))
+            return Flow(request: req, response: resp, state: .completed,
+                        startedAt: ago(t), endedAt: ago(t - Double(ms) / 1000),
+                        secure: secure, sessionID: sid)
+        }
+
+        let sid = UUID()
+        let demoFlows: [Flow] = [
+            flow("POST", "https://api.stripe.com/v1/payment_intents", status: 200,
+                 type: "application/json", reqBody: "amount=4200&currency=usd",
+                 respBody: #"{"id":"pi_3Pk2","status":"succeeded","amount":4200}"#, ms: 312, t: 2, sid: sid),
+            flow("GET", "https://api.github.com/user/repos?per_page=30", status: 200,
+                 type: "application/json",
+                 respBody: #"[{"name":"htrail","stars":214},{"name":"core","stars":88}]"#, ms: 142, t: 6, sid: sid),
+            flow("POST", "https://api.openai.com/v1/chat/completions", status: 200,
+                 type: "application/json", reqBody: #"{"model":"gpt-5.5"}"#,
+                 respBody: #"{"id":"chatcmpl-9","choices":[{"message":{"role":"assistant"}}]}"#, ms: 884, t: 11, sid: sid),
+            flow("GET", "https://api.spotify.com/v1/me/player", status: 401,
+                 type: "application/json",
+                 respBody: #"{"error":{"status":401,"message":"The access token expired"}}"#, ms: 73, t: 17, sid: sid),
+            flow("PUT", "https://graph.facebook.com/v19.0/me/photos", status: 200,
+                 type: "application/json", respBody: #"{"id":"10239","post_id":"10239_55"}"#, ms: 421, t: 23, sid: sid),
+            flow("GET", "https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.js", status: 200,
+                 type: "application/javascript", respBody: "/*! Chart.js v4.4 */ ...", ms: 58, t: 29, sid: sid),
+            flow("GET", "https://api.weather.gov/points/37.77,-122.41", status: 404,
+                 type: "application/json", respBody: #"{"status":404,"detail":"Not found"}"#, ms: 96, t: 34, sid: sid),
+            flow("POST", "https://www.googleapis.com/oauth2/v4/token", status: 200,
+                 type: "application/json", reqBody: "grant_type=refresh_token",
+                 respBody: #"{"access_token":"ya29.a0","expires_in":3599}"#, ms: 188, t: 41, sid: sid),
+        ]
+        let session = CaptureSession(id: sid, name: "Capture 2026-06-22 10:55:58",
+                                     startedAt: ago(120), endedAt: nil, recordCount: demoFlows.count)
+        sessions = [session]
+        activeSessionID = sid
+        viewingSessionID = sid
+        flows = demoFlows
+        deviceIP = "192.168.1.24"
+        proxyPort = 9090
+        capturePath = [session]
+        #if os(iOS)
+        // Suppress the Local Network disclosure sheet so it never overlays shots.
+        bonjourDisclosureShown = true
+        #endif
+
+        // MARK: Compose — a worked API request + response + history
+        var req = APIRequest(
+            name: "Create payment", method: "POST",
+            url: "https://api.stripe.com/v1/payment_intents",
+            queryParams: [],
+            headers: [KeyValueItem(name: "Idempotency-Key", value: "a1b2c3d4")],
+            bodyMode: .json,
+            rawBody: "{\n  \"amount\": 4200,\n  \"currency\": \"usd\",\n  \"description\": \"Order #1042\"\n}",
+            contentType: "application/json")
+        req.auth = AuthConfig(); req.auth.type = .bearer; req.auth.token = "sk_live_51H••••••"
+        requests = [req]
+        selectedRequestID = req.id
+        responsesByRequest[req.id] = APIResponse(
+            statusCode: 200,
+            headers: [HeaderPair(name: "Content-Type", value: "application/json"),
+                      HeaderPair(name: "Request-Id", value: "req_3Pk2N9")],
+            body: Data(#"{"id":"pi_3Pk2N9","object":"payment_intent","amount":4200,"currency":"usd","status":"succeeded","created":1718000000}"#.utf8),
+            durationMS: 312)
+        history = [
+            HistoryEntry(request: req, statusCode: 200, durationMS: 312, timestamp: ago(40)),
+            HistoryEntry(request: APIRequest(name: "List repos", method: "GET",
+                url: "https://api.github.com/user/repos"), statusCode: 200, durationMS: 142, timestamp: ago(220)),
+            HistoryEntry(request: APIRequest(name: "Refresh token", method: "POST",
+                url: "https://www.googleapis.com/oauth2/v4/token"), statusCode: 200, durationMS: 188, timestamp: ago(600)),
+        ]
+
+        // MARK: Realtime — a live WebSocket session
+        rtProtocol = .webSocket
+        wsURL = "wss://stream.example.com/v1/ticker"
+        wsConnected = true
+        wsMessages = [
+            RealtimeMessage(direction: .system, text: "Connected to wss://stream.example.com/v1/ticker"),
+            RealtimeMessage(direction: .outgoing, text: #"{"action":"subscribe","channel":"BTC-USD"}"#),
+            RealtimeMessage(direction: .incoming, text: #"{"type":"ack","channel":"BTC-USD"}"#),
+            RealtimeMessage(direction: .incoming, text: #"{"price":"67421.50","ts":1718000041}"#),
+            RealtimeMessage(direction: .incoming, text: #"{"price":"67430.10","ts":1718000043}"#),
+            RealtimeMessage(direction: .outgoing, text: #"{"action":"ping"}"#),
+            RealtimeMessage(direction: .incoming, text: #"{"type":"pong"}"#),
+        ]
+
+        // MARK: Rules — a representative intercept rule set
+        func rule(_ name: String, _ kind: RuleKind, _ pattern: String,
+                  enabled: Bool = true) -> InterceptRule {
+            var r = InterceptRule(); r.name = name; r.kind = kind
+            r.urlPattern = pattern; r.enabled = enabled; return r
+        }
+        var blockRule = rule("Block analytics", .block, "*://*.google-analytics.com/*")
+        blockRule.blockStatus = 403
+        var mapRule = rule("Staging API", .mapRemote, "*://api.example.com/*")
+        mapRule.remoteHost = "staging.example.com"
+        var throttleRule = rule("Slow 3G", .throttle, "*", enabled: false)
+        throttleRule.throttleMS = 400; throttleRule.bytesPerSecond = 50_000
+        rules = [blockRule, mapRule,
+                 rule("Mock /me", .mapLocal, "*://api.example.com/me"),
+                 throttleRule]
+        sslAllowlist = ["api.stripe.com", "api.github.com", "*.openai.com"]
+    }
+}
+#endif

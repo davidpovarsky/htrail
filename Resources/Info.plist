@@ -11,7 +11,9 @@
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.1.0</string>
+    <string>1.0</string>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
     <key>CFBundleExecutable</key>
     <string>HTTrail</string>
     <key>CFBundleIconFile</key>
@@ -26,6 +28,8 @@
     <string>NSApplication</string>
     <key>NSHighResolutionCapable</key>
     <true/>
+    <key>ATSApplicationFontsPath</key>
+    <string>Fonts</string>
     <key>LSUIElement</key>
     <false/>
     <key>NSHumanReadableCopyright</key>
@@ -36,5 +40,14 @@
     <array>
         <string>_httrail._tcp</string>
     </array>
+    <!-- The realtime "Local test server" (WebSocket / Socket.IO / SSE) listens on
+         127.0.0.1 over plain ws://, which default App Transport Security blocks in
+         a packaged app. Allow loopback / local networking without weakening ATS
+         for the rest of the app. -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+    </dict>
 </dict>
 </plist>

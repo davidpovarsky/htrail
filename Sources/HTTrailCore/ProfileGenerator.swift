@@ -1,11 +1,25 @@
+import Crypto
 import Foundation
+#if canImport(Darwin)
+import Darwin
+#elseif canImport(Glibc)
+import Glibc
+#endif
 
 /// Builds an Apple `.mobileconfig` configuration profile that (a) installs the
 /// HTTrail root CA as a trusted root and (b) points the device's HTTP/HTTPS
 /// proxy at this Mac. AirDrop / email it to an iPhone, install, then trust the
 /// CA under Settings → General → About → Certificate Trust Settings.
 public struct ProfileGenerator: Sendable {
-    public init() {}
+    private let hostIdentifier: String
+
+    public init() {
+        self.hostIdentifier = Self.localHostIdentifier()
+    }
+
+    init(hostIdentifier: String) {
+        self.hostIdentifier = hostIdentifier
+    }
 
     /// Returns the `.mobileconfig` XML plist bytes.
     public func makeProfile(caCertificateDER: Data, proxyHost: String, proxyPort: Int,
@@ -114,14 +128,31 @@ public struct ProfileGenerator: Sendable {
     /// Deterministic per-machine UUIDs so re-issuing the profile updates rather
     /// than stacking duplicates on the device.
     private func stableUUID(_ seed: String) -> String {
-        let host = ProcessInfo.processInfo.hostName
-        var hasher = Hasher()
-        hasher.combine(seed)
-        hasher.combine(host)
-        let h = UInt64(bitPattern: Int64(hasher.finalize()))
-        let hex = String(format: "%016llX", h)
-        // Format as a UUID-ish string.
-        let p = Array(hex)
-        return "\(String(p[0..<8]))-\(String(p[8..<12]))-\(String(p[12..<16]))-HTTR-AILPROXY000".prefix(36).description
+        var bytes = Array(SHA256.hash(data: Data("\(hostIdentifier):\(seed)".utf8)).prefix(16))
+        bytes[6] = (bytes[6] & 0x0F) | 0x50
+        bytes[8] = (bytes[8] & 0x3F) | 0x80
+        return String(
+            format: "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+            bytes[0], bytes[1], bytes[2], bytes[3],
+            bytes[4], bytes[5],
+            bytes[6], bytes[7],
+            bytes[8], bytes[9],
+            bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]
+        )
+    }
+
+    private static func localHostIdentifier() -> String {
+        #if canImport(Darwin) || canImport(Glibc)
+        var buffer = [CChar](repeating: 0, count: 256)
+        let result = buffer.withUnsafeMutableBufferPointer { pointer in
+            gethostname(pointer.baseAddress, pointer.count)
+        }
+        buffer[buffer.count - 1] = 0
+        if result == 0 {
+            let host = String(cString: buffer).trimmingCharacters(in: .whitespacesAndNewlines)
+            if !host.isEmpty { return host }
+        }
+        #endif
+        return "HTTrail"
     }
 }

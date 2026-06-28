@@ -23,8 +23,10 @@ public struct SSEClient: Sendable {
 
         return AsyncThrowingStream { continuation in
             let task = Task {
+                let session = RealtimeURLSession.session(for: url)
+                defer { session.invalidateAndCancel() }
                 do {
-                    let (bytes, _) = try await URLSession.shared.bytes(for: request)
+                    let (bytes, _) = try await session.bytes(for: request)
                     var eventType = "message"
                     var dataLines: [String] = []
                     var lastID: String?

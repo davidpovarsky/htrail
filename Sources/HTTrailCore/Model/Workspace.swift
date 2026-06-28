@@ -40,11 +40,16 @@ public struct HistoryEntry: Codable, Identifiable, Sendable {
     public var statusCode: Int
     public var durationMS: Int
     public var timestamp: Date
+    /// The response that came back, so reopening a history entry restores the
+    /// full result (status/headers/body), not just the request. Optional for
+    /// backward compatibility with history persisted before this field existed.
+    public var response: APIResponse?
 
     public init(id: UUID = UUID(), request: APIRequest, statusCode: Int,
-                durationMS: Int, timestamp: Date) {
+                durationMS: Int, timestamp: Date, response: APIResponse? = nil) {
         self.id = id; self.request = request; self.statusCode = statusCode
         self.durationMS = durationMS; self.timestamp = timestamp
+        self.response = response
     }
 }
 

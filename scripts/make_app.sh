@@ -18,6 +18,17 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/HTTrail"
 cp "$ROOT/Resources/Info.plist" "$APP/Contents/Info.plist"
 
+# Bundled fonts (JetBrains Mono) — registered via ATSApplicationFontsPath in Info.plist.
+if [ -d "$ROOT/Resources/Fonts" ]; then
+  mkdir -p "$APP/Contents/Resources/Fonts"
+  cp "$ROOT/Resources/Fonts/"*.ttf "$APP/Contents/Resources/Fonts/" 2>/dev/null || true
+fi
+
+# Localized UI and Info.plist strings.
+if [ -d "$ROOT/Resources/Localizations" ]; then
+  find "$ROOT/Resources/Localizations" -maxdepth 1 -type d -name "*.lproj" -exec cp -R {} "$APP/Contents/Resources/" \;
+fi
+
 # App icon (generate from branding/logo.svg if missing).
 if [ ! -f "$ROOT/Resources/AppIcon.icns" ]; then
   "$ROOT/scripts/make_icons.sh" || true

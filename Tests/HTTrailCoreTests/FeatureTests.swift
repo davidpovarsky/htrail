@@ -22,6 +22,33 @@ final class ProfileGeneratorTests: XCTestCase {
         XCTAssertEqual(proxy["HTTPProxy"] as? String, "192.168.1.50")
         XCTAssertEqual(proxy["HTTPSPort"] as? Int, 9090)
     }
+
+    func testProfileUUIDsAreStableForHostIdentifier() throws {
+        let certData = Data("test-cert".utf8)
+        let first = try ProfileGenerator(hostIdentifier: "review-device").makeProfile(
+            caCertificateDER: certData, proxyHost: "192.168.1.50", proxyPort: 9090
+        )
+        let second = try ProfileGenerator(hostIdentifier: "review-device").makeProfile(
+            caCertificateDER: certData, proxyHost: "192.168.1.50", proxyPort: 9090
+        )
+        let third = try ProfileGenerator(hostIdentifier: "other-device").makeProfile(
+            caCertificateDER: certData, proxyHost: "192.168.1.50", proxyPort: 9090
+        )
+
+        let firstUUIDs = try profileUUIDs(from: first)
+        XCTAssertEqual(firstUUIDs, try profileUUIDs(from: second))
+        XCTAssertNotEqual(firstUUIDs, try profileUUIDs(from: third))
+        XCTAssertTrue(firstUUIDs.allSatisfy { $0.count == 36 })
+    }
+
+    private func profileUUIDs(from data: Data) throws -> [String] {
+        let plist = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any]
+        let root = try XCTUnwrap(plist)
+        let rootUUID = try XCTUnwrap(root["PayloadUUID"] as? String)
+        let payloads = try XCTUnwrap(root["PayloadContent"] as? [[String: Any]])
+        let payloadUUIDs = try payloads.map { try XCTUnwrap($0["PayloadUUID"] as? String) }
+        return [rootUUID] + payloadUUIDs
+    }
 }
 
 final class RequestRunnerTests: XCTestCase {
@@ -41,6 +68,45 @@ final class RequestRunnerTests: XCTestCase {
         XCTAssertEqual(urlRequest.value(forHTTPHeaderField: "Content-Type"), "application/json")
         XCTAssertEqual(String(data: urlRequest.httpBody ?? Data(), encoding: .utf8), #"{"name":"Ada"}"#)
     }
+
+    func testSendCapturesRawRequestTextOnResponse() async throws {
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [URLProtocolStub.self]
+        let session = URLSession(configuration: config)
+        var request = APIRequest(method: "POST", url: "https://api.example.com/widgets?limit=10")
+        request.headers = [KeyValueItem(name: "X-Token", value: "abc")]
+        request.bodyMode = .json
+        request.rawBody = #"{"ok":true}"#
+
+        let response = await RequestRunner(session: session).send(request)
+        let rawRequest = try XCTUnwrap(response.rawRequestHeader)
+
+        XCTAssertTrue(rawRequest.hasPrefix("POST /widgets?limit=10 HTTP/1.1\r\n"), rawRequest)
+        XCTAssertTrue(rawRequest.contains("\r\nHost: api.example.com\r\n"), rawRequest)
+        XCTAssertTrue(rawRequest.contains("\r\nContent-Type: application/json\r\n"), rawRequest)
+        XCTAssertTrue(rawRequest.contains("\r\nContent-Length: 11\r\n"), rawRequest)
+        XCTAssertTrue(rawRequest.contains("\r\nX-Token: abc\r\n"), rawRequest)
+        XCTAssertTrue(rawRequest.hasSuffix("\r\n\r\n{\"ok\":true}"), rawRequest)
+    }
+}
+
+private final class URLProtocolStub: URLProtocol {
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        let response = HTTPURLResponse(
+            url: request.url!,
+            statusCode: 200,
+            httpVersion: "HTTP/1.1",
+            headerFields: ["Content-Type": "text/plain"]
+        )!
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: Data("ok".utf8))
+        client?.urlProtocolDidFinishLoading(self)
+    }
+
+    override func stopLoading() {}
 }
 
 final class SharedFlowStoreTests: XCTestCase {

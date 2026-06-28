@@ -42,6 +42,8 @@ public struct AuthConfig: Codable, Sendable, Hashable {
 /// A composable API request — the Hoppscotch "request builder" document.
 /// Tolerant decoding lets saved collections survive new fields being added.
 public struct APIRequest: Codable, Sendable, Identifiable {
+    public static let defaultURL = "https://1.1.1.1/cdn-cgi/trace"
+
     public var id: UUID
     public var name: String
     public var method: String
@@ -50,6 +52,9 @@ public struct APIRequest: Codable, Sendable, Identifiable {
     public var headers: [KeyValueItem]
     public var bodyMode: RequestBodyMode
     public var rawBody: String
+    /// Structured fields for form-urlencoded + multipart bodies (key/value, plus
+    /// file attachments in multipart). `rawBody` stays the source for json/raw.
+    public var bodyForm: [BodyField]
     public var contentType: String
     public var auth: AuthConfig
     public var graphqlQuery: String
@@ -58,14 +63,15 @@ public struct APIRequest: Codable, Sendable, Identifiable {
     public var testScript: String
 
     public init(id: UUID = UUID(), name: String = "New Request", method: String = "GET",
-                url: String = "https://", queryParams: [KeyValueItem] = [],
+                url: String = Self.defaultURL, queryParams: [KeyValueItem] = [],
                 headers: [KeyValueItem] = [], bodyMode: RequestBodyMode = .none,
-                rawBody: String = "", contentType: String = "application/json",
+                rawBody: String = "", bodyForm: [BodyField] = [],
+                contentType: String = "application/json",
                 auth: AuthConfig = AuthConfig(), graphqlQuery: String = "",
                 graphqlVariables: String = "", preRequestScript: String = "", testScript: String = "") {
         self.id = id; self.name = name; self.method = method; self.url = url
         self.queryParams = queryParams; self.headers = headers; self.bodyMode = bodyMode
-        self.rawBody = rawBody; self.contentType = contentType; self.auth = auth
+        self.rawBody = rawBody; self.bodyForm = bodyForm; self.contentType = contentType; self.auth = auth
         self.graphqlQuery = graphqlQuery; self.graphqlVariables = graphqlVariables
         self.preRequestScript = preRequestScript; self.testScript = testScript
     }
@@ -75,11 +81,12 @@ public struct APIRequest: Codable, Sendable, Identifiable {
         id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
         name = try c.decodeIfPresent(String.self, forKey: .name) ?? "New Request"
         method = try c.decodeIfPresent(String.self, forKey: .method) ?? "GET"
-        url = try c.decodeIfPresent(String.self, forKey: .url) ?? "https://"
+        url = try c.decodeIfPresent(String.self, forKey: .url) ?? Self.defaultURL
         queryParams = try c.decodeIfPresent([KeyValueItem].self, forKey: .queryParams) ?? []
         headers = try c.decodeIfPresent([KeyValueItem].self, forKey: .headers) ?? []
         bodyMode = try c.decodeIfPresent(RequestBodyMode.self, forKey: .bodyMode) ?? .none
         rawBody = try c.decodeIfPresent(String.self, forKey: .rawBody) ?? ""
+        bodyForm = try c.decodeIfPresent([BodyField].self, forKey: .bodyForm) ?? []
         contentType = try c.decodeIfPresent(String.self, forKey: .contentType) ?? "application/json"
         auth = try c.decodeIfPresent(AuthConfig.self, forKey: .auth) ?? AuthConfig()
         graphqlQuery = try c.decodeIfPresent(String.self, forKey: .graphqlQuery) ?? ""
@@ -89,14 +96,25 @@ public struct APIRequest: Codable, Sendable, Identifiable {
     }
 }
 
-public struct APIResponse: Sendable {
+public struct APIResponse: Sendable, Codable {
     public var statusCode: Int
     public var headers: [HeaderPair]
     public var body: Data
     public var durationMS: Int
     public var error: String?
+    public var rawRequestHeader: String?
 
     public var bodyString: String { String(data: body, encoding: .utf8) ?? "" }
+
+    public init(statusCode: Int, headers: [HeaderPair], body: Data, durationMS: Int,
+                error: String? = nil, rawRequestHeader: String? = nil) {
+        self.statusCode = statusCode
+        self.headers = headers
+        self.body = body
+        self.durationMS = durationMS
+        self.error = error
+        self.rawRequestHeader = rawRequestHeader
+    }
 }
 
 /// Executes an ``APIRequest`` directly (Hoppscotch-style), independent of the
@@ -114,6 +132,7 @@ public struct RequestRunner: Sendable {
             return APIResponse(statusCode: 0, headers: [], body: Data(), durationMS: 0,
                                error: "Invalid URL")
         }
+        let rawRequestHeader = Self.rawRequestHeader(for: urlRequest)
         do {
             let (data, response) = try await session.data(for: urlRequest)
             let duration = Int(Date().timeIntervalSince(start) * 1000)
@@ -123,11 +142,69 @@ public struct RequestRunner: Sendable {
                 return HeaderPair(name: name, value: "\(value)")
             }
             return APIResponse(statusCode: http?.statusCode ?? 0, headers: headers,
-                               body: data, durationMS: duration, error: nil)
+                               body: data, durationMS: duration, error: nil,
+                               rawRequestHeader: rawRequestHeader)
         } catch {
             let duration = Int(Date().timeIntervalSince(start) * 1000)
             return APIResponse(statusCode: 0, headers: [], body: Data(),
-                               durationMS: duration, error: error.localizedDescription)
+                               durationMS: duration, error: error.localizedDescription,
+                               rawRequestHeader: rawRequestHeader)
+        }
+    }
+
+    public static func rawRequestHeader(for request: URLRequest) -> String {
+        let method = request.httpMethod?.isEmpty == false ? request.httpMethod! : "GET"
+        let target = requestTarget(for: request.url)
+        var lines = ["\(method) \(target) HTTP/1.1"]
+        let headers = request.allHTTPHeaderFields ?? [:]
+        if !headers.keys.contains(where: { $0.caseInsensitiveCompare("Host") == .orderedSame }),
+           let host = hostHeaderValue(for: request.url) {
+            lines.append("Host: \(host)")
+        }
+        if let body = request.httpBody, !body.isEmpty,
+           !headers.keys.contains(where: { $0.caseInsensitiveCompare("Content-Length") == .orderedSame }) {
+            lines.append("Content-Length: \(body.count)")
+        }
+        for key in headers.keys.sorted(by: { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }) {
+            guard let value = headers[key] else { continue }
+            lines.append("\(key): \(value)")
+        }
+        var raw = lines.joined(separator: "\r\n") + "\r\n\r\n"
+        if let body = request.httpBody, !body.isEmpty {
+            if let text = String(data: body, encoding: .utf8) {
+                raw += text
+            } else {
+                raw += "[binary body: \(body.count) bytes]"
+            }
+        }
+        return raw
+    }
+
+    private static func requestTarget(for url: URL?) -> String {
+        guard let url else { return "/" }
+        var target = url.path.isEmpty ? "/" : url.path
+        if let query = url.query, !query.isEmpty {
+            target += "?\(query)"
+        }
+        return target
+    }
+
+    private static func hostHeaderValue(for url: URL?) -> String? {
+        guard let url, var host = url.host, !host.isEmpty else { return nil }
+        if host.contains(":"), !host.hasPrefix("[") {
+            host = "[\(host)]"
+        }
+        if let port = url.port, port != defaultPort(for: url.scheme) {
+            return "\(host):\(port)"
+        }
+        return host
+    }
+
+    private static func defaultPort(for scheme: String?) -> Int? {
+        switch scheme?.lowercased() {
+        case "http": return 80
+        case "https": return 443
+        default: return nil
         }
     }
 
@@ -165,13 +242,25 @@ public struct RequestRunner: Sendable {
                 urlRequest.setValue(ct, forHTTPHeaderField: "Content-Type")
             }
         case .formURLEncoded:
-            let body = substitute(request.rawBody, environment)
-            urlRequest.httpBody = body.data(using: .utf8)
+            if BodyEncoder.hasFields(request.bodyForm) {
+                let fields = substitutedFields(request.bodyForm, environment)
+                urlRequest.httpBody = BodyEncoder.urlEncoded(fields).data(using: .utf8)
+            } else {
+                urlRequest.httpBody = substitute(request.rawBody, environment).data(using: .utf8)
+            }
             if urlRequest.value(forHTTPHeaderField: "Content-Type") == nil {
                 urlRequest.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
             }
         case .multipart:
-            urlRequest.httpBody = substitute(request.rawBody, environment).data(using: .utf8)
+            if BodyEncoder.hasFields(request.bodyForm) {
+                let fields = substitutedFields(request.bodyForm, environment)
+                urlRequest.httpBody = BodyEncoder.multipart(fields)
+                if urlRequest.value(forHTTPHeaderField: "Content-Type") == nil {
+                    urlRequest.setValue(BodyEncoder.multipartContentType, forHTTPHeaderField: "Content-Type")
+                }
+            } else {
+                urlRequest.httpBody = substitute(request.rawBody, environment).data(using: .utf8)
+            }
         case .graphql:
             let payload = graphqlPayload(request, environment: environment)
             urlRequest.httpBody = payload
@@ -220,6 +309,17 @@ public struct RequestRunner: Sendable {
                 components.queryItems = items
                 if let url = components.url { urlRequest.url = url }
             }
+        }
+    }
+
+    /// Applies `{{var}}` substitution to each field's name (and text value); file
+    /// data is left untouched.
+    private func substitutedFields(_ fields: [BodyField], _ environment: [String: String]) -> [BodyField] {
+        fields.map { field in
+            var copy = field
+            copy.name = substitute(field.name, environment)
+            if !field.isFile { copy.value = substitute(field.value, environment) }
+            return copy
         }
     }
 

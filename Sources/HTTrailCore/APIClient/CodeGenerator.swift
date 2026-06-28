@@ -22,6 +22,23 @@ public struct CodeGenerator: Sendable {
         }
     }
 
+    /// The request body as a single string for the script targets. Form bodies
+    /// are serialized the same way the runner sends them; multipart (which can
+    /// carry binary files) returns nil and is represented per-target instead.
+    private func bodyString(_ request: APIRequest) -> String? {
+        switch request.bodyMode {
+        case .none:
+            return nil
+        case .formURLEncoded:
+            if BodyEncoder.hasFields(request.bodyForm) { return BodyEncoder.urlEncoded(request.bodyForm) }
+            return request.rawBody.isEmpty ? nil : request.rawBody
+        case .multipart:
+            return nil
+        case .json, .raw, .graphql:
+            return request.rawBody.isEmpty ? nil : request.rawBody
+        }
+    }
+
     private func headerLines(_ request: APIRequest) -> [(String, String)] {
         var result = request.headers.filter { $0.enabled && !$0.name.isEmpty }.map { ($0.name, $0.value) }
         switch request.auth.type {
@@ -40,8 +57,8 @@ public struct CodeGenerator: Sendable {
         for (name, value) in headerLines(request) {
             lines.append("request.setValue(\"\(value)\", forHTTPHeaderField: \"\(name)\")")
         }
-        if request.bodyMode != .none, !request.rawBody.isEmpty {
-            lines.append("request.httpBody = #\"\(request.rawBody)\"#.data(using: .utf8)")
+        if let body = bodyString(request) {
+            lines.append("request.httpBody = #\"\(body)\"#.data(using: .utf8)")
         }
         lines.append("let (data, response) = try await URLSession.shared.data(for: request)")
         return lines.joined(separator: "\n")
@@ -52,8 +69,8 @@ public struct CodeGenerator: Sendable {
             .map { "    \"\($0.0)\": \"\($0.1)\"" }.joined(separator: ",\n")
         var options = ["  method: \"\(request.method)\""]
         if !headers.isEmpty { options.append("  headers: {\n\(headers)\n  }") }
-        if request.bodyMode != .none, !request.rawBody.isEmpty {
-            options.append("  body: `\(request.rawBody)`")
+        if let body = bodyString(request) {
+            options.append("  body: `\(body)`")
         }
         return "fetch(\"\(request.url)\", {\n\(options.joined(separator: ",\n"))\n})\n  .then(r => r.json())\n  .then(console.log)"
     }
@@ -63,12 +80,11 @@ public struct CodeGenerator: Sendable {
             .map { "    \"\($0.0)\": \"\($0.1)\"" }.joined(separator: ",\n")
         var lines = ["import requests", ""]
         if !headers.isEmpty { lines.append("headers = {\n\(headers)\n}") }
-        if request.bodyMode != .none, !request.rawBody.isEmpty {
-            lines.append("data = r'''\(request.rawBody)'''")
-        }
+        let body = bodyString(request)
+        if let body { lines.append("data = r'''\(body)'''") }
         var call = "response = requests.request(\"\(request.method)\", \"\(request.url)\""
         if !headers.isEmpty { call += ", headers=headers" }
-        if request.bodyMode != .none, !request.rawBody.isEmpty { call += ", data=data" }
+        if body != nil { call += ", data=data" }
         call += ")"
         lines.append(call)
         lines.append("print(response.text)")

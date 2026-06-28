@@ -15,16 +15,20 @@ public final class WebSocketClient: NSObject, @unchecked Sendable {
     }
 
     private var task: URLSessionWebSocketTask?
+    private var session: URLSession?
     private var continuation: AsyncStream<Event>.Continuation?
     private let lock = NSLock()
 
     public override init() { super.init() }
 
     public func connect(to url: URL, protocols: [String] = []) -> AsyncStream<Event> {
-        let session = URLSession(configuration: .default)
+        let session = RealtimeURLSession.session(for: url)
         let task = protocols.isEmpty ? session.webSocketTask(with: url)
                                      : session.webSocketTask(with: url, protocols: protocols)
-        lock.lock(); self.task = task; lock.unlock()
+        lock.lock()
+        self.session = session
+        self.task = task
+        lock.unlock()
 
         return AsyncStream { continuation in
             self.lock.lock(); self.continuation = continuation; self.lock.unlock()
@@ -33,6 +37,7 @@ public final class WebSocketClient: NSObject, @unchecked Sendable {
             self.receiveLoop(task: task, continuation: continuation)
             continuation.onTermination = { _ in
                 task.cancel(with: .goingAway, reason: nil)
+                self.finishSession(for: task)
             }
         }
     }
@@ -50,6 +55,7 @@ public final class WebSocketClient: NSObject, @unchecked Sendable {
             case .failure(let error):
                 continuation.yield(.error(error.localizedDescription))
                 continuation.finish()
+                self?.finishSession(for: task)
             }
         }
     }
@@ -65,9 +71,28 @@ public final class WebSocketClient: NSObject, @unchecked Sendable {
     }
 
     public func close() {
-        lock.lock(); let task = self.task; let cont = self.continuation; lock.unlock()
+        lock.lock()
+        let task = self.task
+        let cont = self.continuation
+        let session = self.session
+        self.task = nil
+        self.continuation = nil
+        self.session = nil
+        lock.unlock()
         task?.cancel(with: .normalClosure, reason: nil)
         cont?.yield(.disconnected(nil))
         cont?.finish()
+        session?.invalidateAndCancel()
+    }
+
+    private func finishSession(for task: URLSessionWebSocketTask) {
+        lock.lock()
+        guard self.task === task else { lock.unlock(); return }
+        let session = self.session
+        self.task = nil
+        self.continuation = nil
+        self.session = nil
+        lock.unlock()
+        session?.invalidateAndCancel()
     }
 }

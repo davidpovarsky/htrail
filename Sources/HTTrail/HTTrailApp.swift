@@ -13,10 +13,15 @@ struct HTTrailApp: App {
                 .environmentObject(model)
                 .frame(minWidth: 1040, minHeight: 640)
         }
+        .windowStyle(.hiddenTitleBar)
         .commands {
             CommandGroup(replacing: .newItem) {
                 Button("New Request") { model.mode = .compose; model.newRequest() }
                     .keyboardShortcut("n")
+            }
+            CommandGroup(after: .toolbar) {
+                Button("Command Palette") { model.showCommandPalette.toggle() }
+                    .keyboardShortcut("k")
             }
             CommandMenu("Proxy") {
                 Button(model.isProxyRunning ? "Stop Proxy" : "Start Proxy") { model.toggleProxy() }

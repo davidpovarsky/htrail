@@ -59,4 +59,116 @@ final class ImporterTests: XCTestCase {
         XCTAssertEqual(collection.requests.first?.url, "https://api.example.com/login")
         XCTAssertEqual(collection.requests.first?.bodyMode, .json)
     }
+
+    func testPostmanBackupImportPreservesCollectionsFoldersRequestsAndEnvironments() throws {
+        let doc = """
+        {
+          "version": 1,
+          "collections": [{
+            "id": "col-1",
+            "name": "Legacy API",
+            "order": ["root-req"],
+            "folders_order": ["folder-1"],
+            "folders": [
+              {"id": "folder-1", "name": "Auth", "folder": null, "order": ["login-req"], "folders_order": ["folder-2"]},
+              {"id": "folder-2", "name": "Nested", "folder": "folder-1", "order": ["form-req"], "folders_order": []}
+            ],
+            "requests": [
+              {
+                "id": "root-req",
+                "name": "Root Ping",
+                "method": "GET",
+                "url": "https://api.example.com/ping?debug=1",
+                "queryParams": [{"key": "debug", "value": "1", "enabled": true}],
+                "headerData": [{"key": "Accept", "value": "application/json", "enabled": true}],
+                "events": [{"listen": "test", "script": {"exec": ["pm.test(\\\"ok\\\", function () {});"]}}]
+              },
+              {
+                "id": "login-req",
+                "folder": "folder-1",
+                "name": "Login",
+                "method": "POST",
+                "url": "https://api.example.com/login",
+                "headerData": [{"key": "Content-Type", "value": "application/json", "enabled": true}],
+                "dataMode": "raw",
+                "rawModeData": "{\\"u\\":1}",
+                "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}"}]}
+              },
+              {
+                "id": "form-req",
+                "folder": "folder-2",
+                "name": "Submit Form",
+                "method": "POST",
+                "url": "https://api.example.com/form",
+                "dataMode": "urlencoded",
+                "data": [{"key": "email", "value": "ada@example.com", "enabled": true, "type": "text"}],
+                "events": [{"listen": "prerequest", "script": {"exec": "pm.environment.set('x', 'y');"}}]
+              }
+            ]
+          }],
+          "environments": [{
+            "id": "env-1",
+            "name": "Dev",
+            "values": [
+              {"key": "baseUrl", "value": "https://dev.example.com", "enabled": true},
+              {"key": "disabled", "value": "nope", "enabled": false}
+            ]
+          }]
+        }
+        """
+
+        let imported = try PostmanBackupImporter().importBackup(Data(doc.utf8))
+
+        XCTAssertEqual(imported.collections.count, 1)
+        let collection = try XCTUnwrap(imported.collections.first)
+        XCTAssertEqual(collection.name, "Legacy API")
+        XCTAssertEqual(collection.requests.map(\.name), ["Root Ping"])
+        XCTAssertEqual(collection.folders.map(\.name), ["Auth"])
+
+        let root = try XCTUnwrap(collection.requests.first)
+        XCTAssertEqual(root.url, "https://api.example.com/ping")
+        XCTAssertEqual(root.queryParams.map(\.name), ["debug"])
+        XCTAssertEqual(root.headers.first?.name, "Accept")
+        XCTAssertEqual(root.testScript, "pm.test(\"ok\", function () {});")
+
+        let authFolder = try XCTUnwrap(collection.folders.first)
+        let login = try XCTUnwrap(authFolder.requests.first)
+        XCTAssertEqual(login.name, "Login")
+        XCTAssertEqual(login.method, "POST")
+        XCTAssertEqual(login.bodyMode, .json)
+        XCTAssertEqual(login.rawBody, #"{"u":1}"#)
+        XCTAssertEqual(login.auth.type, .bearer)
+        XCTAssertEqual(login.auth.token, "{{token}}")
+
+        let nested = try XCTUnwrap(authFolder.folders.first)
+        let form = try XCTUnwrap(nested.requests.first)
+        XCTAssertEqual(form.bodyMode, .formURLEncoded)
+        XCTAssertEqual(form.bodyForm.first?.name, "email")
+        XCTAssertEqual(form.bodyForm.first?.value, "ada@example.com")
+        XCTAssertEqual(form.preRequestScript, "pm.environment.set('x', 'y');")
+
+        XCTAssertEqual(imported.environments.count, 1)
+        let environment = try XCTUnwrap(imported.environments.first)
+        XCTAssertEqual(environment.name, "Dev")
+        XCTAssertEqual(environment.variables.map(\.name), ["baseUrl", "disabled"])
+        XCTAssertFalse(environment.variables[1].enabled)
+    }
+
+    func testPostmanBackupLocatorSelectsNewestDatedBackup() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("PostmanBackups-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let older = directory.appendingPathComponent("backup-2026-01-01T00-00-00.000Z.json")
+        let newest = directory.appendingPathComponent("backup-2026-06-25T13-20-56.301Z.json")
+        let unrelated = directory.appendingPathComponent("settings.json")
+        try Data("{}".utf8).write(to: older)
+        try Data("{}".utf8).write(to: newest)
+        try Data("{}".utf8).write(to: unrelated)
+
+        let locator = PostmanBackupLocator(postmanDirectory: directory)
+
+        XCTAssertEqual(locator.latestBackupFile()?.lastPathComponent, newest.lastPathComponent)
+    }
 }

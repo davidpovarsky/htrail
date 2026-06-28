@@ -1,0 +1,6 @@
+/* Localized Info.plist strings. */
+
+"CFBundleDisplayName" = "HTTrail";
+"CFBundleName" = "HTTrail";
+"NSHumanReadableCopyright" = "HTTrail: Hoppscotch + Charles, de forma nativa en Swift.";
+"NSLocalNetworkUsageDescription" = "HTTrail utiliza la red local para capturar el tráfico HTTP/HTTPS en este dispositivo y para descubrir una Mac que ejecuta HTTrail para que el tráfico de este dispositivo pueda capturarse allí.";

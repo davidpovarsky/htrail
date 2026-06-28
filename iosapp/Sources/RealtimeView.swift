@@ -16,67 +16,146 @@ struct RealtimeView: View {
                     composer
                 }
             }
-            .navigationTitle("Realtime")
+            .htScreenChrome("Realtime") { LiveStatusPill(active: model.wsConnected) }
             .keyboardDismissButton()
         }
     }
 
     private var connectionForm: some View {
-        VStack(spacing: 8) {
-            Picker("Protocol", selection: $model.rtProtocol) {
-                ForEach(AppModel.RealtimeProtocol.allCases) { Text($0.rawValue).tag($0) }
-            }
-            .pickerStyle(.segmented).disabled(model.wsConnected)
+        VStack(alignment: .leading, spacing: 14) {
+            protocolPicker
 
             switch model.rtProtocol {
             case .webSocket, .socketIO, .sse:
-                TextField(urlPlaceholder, text: $model.wsURL)
-                    .textFieldStyle(.roundedBorder).font(.system(.footnote, design: .monospaced))
-                    .autocorrectionDisabled().textInputAutocapitalization(.never)
-                if model.rtProtocol == .socketIO {
-                    TextField("Event name", text: $model.sioEvent).textFieldStyle(.roundedBorder)
+                fieldCard("Endpoint") {
+                    TextField(urlPlaceholder, text: $model.wsURL)
+                        .textFieldStyle(.plain)
+                        .font(Theme.mono(13))
+                        .foregroundStyle(Theme.color.textBright)
                         .autocorrectionDisabled().textInputAutocapitalization(.never)
                 }
-            case .mqtt:
-                TextField("Broker host", text: $model.mqttHost).textFieldStyle(.roundedBorder)
-                    .autocorrectionDisabled().textInputAutocapitalization(.never)
-                HStack {
-                    Text("Port").font(.caption)
-                    TextField("Port", value: $model.mqttPort, format: .number).textFieldStyle(.roundedBorder)
+                if model.rtProtocol == .socketIO {
+                    fieldCard("Event") {
+                        TextField("Event name", text: $model.sioEvent)
+                            .textFieldStyle(.plain)
+                            .font(Theme.mono(13))
+                            .foregroundStyle(Theme.color.textBright)
+                            .autocorrectionDisabled().textInputAutocapitalization(.never)
+                    }
                 }
-                TextField("Topic", text: $model.mqttTopic).textFieldStyle(.roundedBorder)
-                    .autocorrectionDisabled().textInputAutocapitalization(.never)
+            case .mqtt:
+                HStack(alignment: .top, spacing: 10) {
+                    fieldCard("Broker host") {
+                        TextField("Broker host", text: $model.mqttHost)
+                            .textFieldStyle(.plain)
+                            .font(Theme.mono(13))
+                            .foregroundStyle(Theme.color.textBright)
+                            .autocorrectionDisabled().textInputAutocapitalization(.never)
+                    }
+                    fieldCard("Port") {
+                        TextField("Port", value: $model.mqttPort, format: .number)
+                            .textFieldStyle(.plain)
+                            .font(Theme.mono(13))
+                            .foregroundStyle(Theme.color.textBright)
+                    }
+                    .frame(width: 96)
+                }
+                fieldCard("Topic") {
+                    TextField("Topic", text: $model.mqttTopic)
+                        .textFieldStyle(.plain)
+                        .font(Theme.mono(13))
+                        .foregroundStyle(Theme.color.textBright)
+                        .autocorrectionDisabled().textInputAutocapitalization(.never)
+                }
             }
 
-            HStack {
-                if model.wsConnected {
-                    Button(role: .destructive) { model.disconnectRealtime() } label: {
-                        Label("Disconnect", systemImage: "bolt.slash")
-                    }
-                    .buttonStyle(.htGhost)
-                } else {
-                    Button { model.connectRealtime() } label: {
-                        Label("Connect", systemImage: "bolt.horizontal")
-                    }
-                    .buttonStyle(.htPrimary)
+            if model.wsConnected {
+                Button(role: .destructive) { model.disconnectRealtime() } label: {
+                    connectLabel("Disconnect", dot: .live)
                 }
-                Spacer()
-                ConnectionDot(status: model.wsConnected ? .live : .off)
+                .buttonStyle(.plain)
+                .background(Theme.color.red.opacity(0.14),
+                            in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous)
+                    .strokeBorder(Theme.color.red.opacity(0.40), lineWidth: 1))
+                .foregroundStyle(Color(hex: "#FCA5A5"))
+            } else {
+                Button { model.connectRealtime() } label: {
+                    connectLabel("Connect", dot: .off)
+                }
+                .buttonStyle(.plain)
+                .background(Theme.color.green.opacity(0.16),
+                            in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous)
+                    .strokeBorder(Theme.color.green.opacity(0.42), lineWidth: 1))
+                .foregroundStyle(Color(hex: "#6EE7B7"))
             }
 
             Toggle(isOn: Binding(get: { model.testServerRunning },
                                  set: { _ in model.toggleTestServer() })) {
-                Label("Local test server", systemImage: "ladybug").font(.system(size: 12))
+                Label("Local test server", systemImage: "ladybug")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.color.textDim)
             }
             .tint(Theme.color.accent)
+            .disabled(model.testServerBusy)
             if model.testServerRunning {
                 Text(model.testServerHint)
-                    .font(.system(size: 10, design: .monospaced))
+                    .font(Theme.mono(10))
                     .foregroundStyle(Theme.color.textFaint)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding()
+    }
+
+    /// Custom protocol segmented control matching the v2 design: a `panelBG`
+    /// track with a solid-blue active pill (white label) and dim inactive labels.
+    private var protocolPicker: some View {
+        HStack(spacing: 5) {
+            ForEach(AppModel.RealtimeProtocol.allCases) { proto in
+                let on = model.rtProtocol == proto
+                Button { model.rtProtocol = proto } label: {
+                    Text(proto.rawValue)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(on ? .white : Theme.color.textDim)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(on ? Theme.color.accent : .clear,
+                                    in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(3)
+        .background(Theme.color.panelBG, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous)
+            .strokeBorder(Color.white.opacity(0.1), lineWidth: 1))
+        .disabled(model.wsConnected)
+    }
+
+    /// Shared Connect / Disconnect button content: a status dot + bold label,
+    /// full-width with the design's 13px vertical padding.
+    private func connectLabel(_ title: String, dot: ConnectionDot.Status) -> some View {
+        HStack(spacing: 8) {
+            ConnectionDot(status: dot)
+            Text(title).font(.system(size: 14, weight: .bold))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 13)
+        .contentShape(Rectangle())
+    }
+
+    /// A labeled mono input card: an `HTEyebrow` above a `.htField()` surface.
+    private func fieldCard<Content: View>(_ label: String,
+                                          @ViewBuilder _ content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HTEyebrow(label)
+            content()
+                .padding(.horizontal, 12).padding(.vertical, 9)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .htField()
+        }
     }
 
     private var messageLog: some View {
@@ -98,9 +177,10 @@ struct RealtimeView: View {
 
     private var composer: some View {
         HStack(spacing: 8) {
-            TextField(model.rtProtocol.canSend ? "Send a message…" : "Receive-only stream", text: $model.wsOutgoing)
+            TextField(composerPlaceholder, text: $model.wsOutgoing)
                 .textFieldStyle(.plain)
-                .font(.system(size: 13, design: .monospaced))
+                .font(Theme.mono(13))
+                .foregroundStyle(Theme.color.textBright)
                 .padding(.horizontal, 12).padding(.vertical, 9)
                 .htField()
                 .onSubmit { model.sendRealtimeMessage() }
@@ -110,6 +190,16 @@ struct RealtimeView: View {
                 .disabled(!model.wsConnected || model.wsOutgoing.isEmpty || !model.rtProtocol.canSend)
         }
         .padding(10)
+    }
+
+    /// Composer placeholder matching the design: SSE is receive-only, MQTT
+    /// publishes to a topic, everything else sends a message.
+    private var composerPlaceholder: String {
+        switch model.rtProtocol {
+        case .sse: return "Receive-only stream"
+        case .mqtt: return "Publish payload to topic…"
+        default: return "Send a message…"
+        }
     }
 
     private var urlPlaceholder: String {

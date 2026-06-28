@@ -1,0 +1,6 @@
+/* Localized Info.plist strings. */
+
+"CFBundleDisplayName" = "HTTrail";
+"CFBundleName" = "HTTrail";
+"NSHumanReadableCopyright" = "HTTrail — Hoppscotch + Charles, স্থানীয়ভাবে সুইফটে।";
+"NSLocalNetworkUsageDescription" = "HTTrail এই ডিভাইসে HTTP/HTTPS ট্র্যাফিক ক্যাপচার করতে এবং HTTrail চলমান একটি Mac আবিষ্কার করতে স্থানীয় নেটওয়ার্ক ব্যবহার করে যাতে এই ডিভাইসের ট্র্যাফিক সেখানে ক্যাপচার করা যায়৷";
