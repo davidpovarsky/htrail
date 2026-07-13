@@ -64,12 +64,20 @@ jobs:
         if: always()
         run: scripts/collect_ios_build_diagnostics.sh
 
+      - name: Verify unsigned IPA exists
+        if: success()
+        run: |
+          test -s build/unsigned-ios/HTTrailiOS-unsigned.ipa
+          shasum -a 256 build/unsigned-ios/HTTrailiOS-unsigned.ipa
+
       - name: Upload unsigned IPA
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: HTTrail-unsigned-ipa-${{ github.run_number }}
-          path: build/unsigned-ios/HTTrail-unsigned.ipa
+          path: |
+            build/unsigned-ios/HTTrailiOS-unsigned.ipa
+            build/unsigned-ios/HTTrailiOS-unsigned.ipa.sha256
           if-no-files-found: error
           retention-days: 30
 
@@ -79,9 +87,9 @@ jobs:
         with:
           name: HTTrail-ios-build-products-${{ github.run_number }}
           path: |
-            build/unsigned-ios/Products/Applications/HTTrailiOS.app
-            build/unsigned-ios/Products/*.dSYM
-            build/unsigned-ios/Products/**/*.dSYM
+            build/unsigned-ios/DerivedData/Build/Products/Release-iphoneos/HTTrailiOS.app
+            build/unsigned-ios/DerivedData/Build/Products/Release-iphoneos/*.dSYM
+            build/unsigned-ios/DerivedData/Build/Products/Release-iphoneos/**/*.dSYM
           if-no-files-found: warn
           retention-days: 14
 
