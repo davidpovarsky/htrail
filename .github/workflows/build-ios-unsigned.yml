@@ -1,0 +1,98 @@
+name: Build Unsigned iOS IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'iosapp/**'
+      - 'Sources/**'
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'scripts/build_unsigned_ios.sh'
+      - 'scripts/collect_ios_build_diagnostics.sh'
+      - '.github/workflows/build-ios-unsigned.yml'
+  pull_request:
+    paths:
+      - 'iosapp/**'
+      - 'Sources/**'
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'scripts/build_unsigned_ios.sh'
+      - 'scripts/collect_ios_build_diagnostics.sh'
+      - '.github/workflows/build-ios-unsigned.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode.app
+          xcodebuild -version
+          swift --version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Cache SwiftPM
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/org.swift.swiftpm
+            ~/Library/Developer/Xcode/DerivedData/SourcePackages
+          key: ${{ runner.os }}-swiftpm-${{ hashFiles('Package.resolved', 'Package.swift') }}
+          restore-keys: |
+            ${{ runner.os }}-swiftpm-
+
+      - name: Make scripts executable
+        run: chmod +x scripts/build_unsigned_ios.sh scripts/collect_ios_build_diagnostics.sh
+
+      - name: Build unsigned IPA
+        id: build
+        run: scripts/build_unsigned_ios.sh
+
+      - name: Collect diagnostics
+        if: always()
+        run: scripts/collect_ios_build_diagnostics.sh
+
+      - name: Upload unsigned IPA
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: HTTrail-unsigned-ipa-${{ github.run_number }}
+          path: build/unsigned-ios/HTTrail-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload app bundle and dSYMs
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: HTTrail-ios-build-products-${{ github.run_number }}
+          path: |
+            build/unsigned-ios/Products/Applications/HTTrailiOS.app
+            build/unsigned-ios/Products/*.dSYM
+            build/unsigned-ios/Products/**/*.dSYM
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload build diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: HTTrail-ios-diagnostics-${{ github.run_number }}
+          path: |
+            build/unsigned-ios/logs
+            build/unsigned-ios/diagnostics
+            build/unsigned-ios/diagnostics.zip
+          if-no-files-found: warn
+          retention-days: 30
