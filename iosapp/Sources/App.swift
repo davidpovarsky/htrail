@@ -178,7 +178,7 @@ extension View {
 }
 
 /// Mobile-idiomatic layout that exposes the **same feature set** as the macOS
-/// app: Capture, Compose, Rules, Realtime, Setup.
+/// app: Capture, Compose, Rules, Realtime, Setup, plus the downstream classifier.
 struct RootTabView: View {
     @EnvironmentObject var model: AppModel
     var body: some View {
@@ -195,6 +195,8 @@ struct RootTabView: View {
                 .tabItem { Label("Realtime", systemImage: "bolt.fill") }.tag(3)
             SetupView()
                 .tabItem { Label("Setup", systemImage: "gearshape") }.tag(4)
+            ImageFilterTabHostView()
+                .tabItem { Label("Image Filter", systemImage: "shield.lefthalf.filled") }.tag(5)
         }
         // QA seam: `-htInitialTab N` launch arg (auto-mapped into UserDefaults by
         // iOS) selects a starting tab for screenshots. No-op in normal use.
