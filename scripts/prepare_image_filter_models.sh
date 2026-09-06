@@ -46,19 +46,28 @@ PROMPTS="$CONVERTED_DIR/MobileCLIP2S2PromptEmbeddings.json"
 MANIFEST="$CONVERTED_DIR/MobileCLIP2S2ModelManifest.json"
 REPORT="$CONVERTED_DIR/MobileCLIP2S2ConversionReport.json"
 
+# The original conversion scripts intentionally reference sibling tools through
+# repository-relative paths, so execute them from the pinned vendor repository's
+# root exactly as the standalone classifier workflow does.
 if [ ! -d "$IMAGE_PACKAGE" ] || [ ! -s "$PROMPTS" ] || [ ! -s "$MANIFEST" ] || [ ! -s "$REPORT" ]; then
   rm -rf "$CONVERTED_DIR"
   mkdir -p "$CONVERTED_DIR"
-  python "$TOOLS_DIR/convert_mobileclip2_s2.py" \
-    --checkpoint "$CHECKPOINT_DIR/mobileclip2_s2.pt" \
-    --output "$CONVERTED_DIR"
+  (
+    cd "$VENDOR_DIR"
+    python tools/MobileCLIPConversion/convert_mobileclip2_s2.py \
+      --checkpoint "$CHECKPOINT_DIR/mobileclip2_s2.pt" \
+      --output "$CONVERTED_DIR"
+  )
 fi
 
 VERIFY_JSON="$CACHE_ROOT/conversion-verification.json"
-python "$TOOLS_DIR/verify_conversion.py" \
-  --checkpoint "$CHECKPOINT_DIR/mobileclip2_s2.pt" \
-  --models "$CONVERTED_DIR" \
-  --output "$VERIFY_JSON"
+(
+  cd "$VENDOR_DIR"
+  python tools/MobileCLIPConversion/verify_conversion.py \
+    --checkpoint "$CHECKPOINT_DIR/mobileclip2_s2.pt" \
+    --models "$CONVERTED_DIR" \
+    --output "$VERIFY_JSON"
+)
 
 python - "$VERIFY_JSON" <<'PY'
 import json, pathlib, sys
