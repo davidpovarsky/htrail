@@ -1,0 +1,3 @@
+[submodule "Vendor/AI-Image-Classifier"]
+	path = Vendor/AI-Image-Classifier
+	url = https://github.com/davidpovarsky/AI-Image-Classifier.git
