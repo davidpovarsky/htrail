@@ -75,14 +75,12 @@ jobs:
             ${{ runner.os }}-httrail-image-filter-
             ${{ runner.os }}-swiftpm-
 
+      - name: Prepare build scripts
+        run: chmod +x scripts/prepare_image_filter_models.sh scripts/build_unsigned_ios.sh scripts/collect_ios_build_diagnostics.sh
+
       - name: Prepare verified image-filter models
         shell: bash
-        run: |
-          chmod +x scripts/prepare_image_filter_models.sh
-          scripts/prepare_image_filter_models.sh
-
-      - name: Make scripts executable
-        run: chmod +x scripts/build_unsigned_ios.sh scripts/collect_ios_build_diagnostics.sh
+        run: scripts/prepare_image_filter_models.sh
 
       - name: Build unsigned IPA
         id: build
