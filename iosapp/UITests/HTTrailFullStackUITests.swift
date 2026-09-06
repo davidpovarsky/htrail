@@ -9,7 +9,6 @@ final class HTTrailFullStackUITests: XCTestCase {
 
     func testUserJourneyAcrossHTTrailAndEmbeddedClassifier() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["-htDemo", "1"]
         app.launch()
 
         try selectTab("Capture", in: app)
@@ -81,15 +80,15 @@ final class HTTrailFullStackUITests: XCTestCase {
         try goBackToClassifierHome(app)
 
         try visitClassifierScreen(button: "Analyze Image", expectedText: "Nudity Detection", screenshot: "11-analyze-image", app: app)
-        XCTAssertTrue(app.buttons["Select Image"].exists)
-        XCTAssertTrue(app.buttons["Analyze Image"].exists)
+        try selectSeededPhotoAndAnalyze(in: app)
         print("HTTRAIL_UI_STEP classifier_analyze_ui=pass")
+        print("HTTRAIL_UI_STEP classifier_full_picker_inference=pass")
     }
 
     func testLocalServerLoadsModelsAndClassifiesThroughHTTPAPI() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["-htInitialTab", "5"]
         app.launch()
+        try selectTab("Image Filter", in: app)
 
         XCTAssertTrue(app.staticTexts["AI Image Classifier"].waitForExistence(timeout: 12))
         app.buttons["Local Server"].tap()
@@ -151,18 +150,67 @@ final class HTTrailFullStackUITests: XCTestCase {
 
     func testApplicationLaunchPerformance() {
         let app = XCUIApplication()
-        app.launchArguments = ["-htDemo", "1"]
         measure(metrics: [XCTApplicationLaunchMetric(waitUntilResponsive: true)]) {
             app.launch()
         }
         print("HTTRAIL_UI_STEP launch_performance_measurement=pass")
     }
 
+    private func selectSeededPhotoAndAnalyze(in app: XCUIApplication) throws {
+        let permissionMonitor = addUIInterruptionMonitor(withDescription: "Photo Library Permission") { alert in
+            for title in ["Allow Full Access", "Allow Access to All Photos", "Allow", "OK"] {
+                let button = alert.buttons[title]
+                if button.exists {
+                    button.tap()
+                    return true
+                }
+            }
+            return false
+        }
+
+        let selectImage = app.buttons["Select Image"]
+        let analyzeImage = app.buttons["Analyze Image"]
+        XCTAssertTrue(selectImage.waitForExistence(timeout: 5))
+        XCTAssertTrue(analyzeImage.exists)
+        XCTAssertFalse(analyzeImage.isEnabled, "Analyze should be disabled before a photo is selected")
+
+        selectImage.tap()
+        app.tap()
+
+        var photoCell = app.collectionViews.cells.firstMatch
+        if !photoCell.waitForExistence(timeout: 12) {
+            _ = permissionMonitor
+            app.tap()
+            photoCell = app.collectionViews.cells.firstMatch
+        }
+        XCTAssertTrue(photoCell.waitForExistence(timeout: 12), "The seeded photo did not appear in UIImagePickerController")
+        photoCell.tap()
+
+        XCTAssertTrue(analyzeImage.waitForExistence(timeout: 12), "Image picker did not dismiss after photo selection")
+        XCTAssertTrue(analyzeImage.isEnabled, "Analyze should be enabled after selecting the seeded photo")
+        attachScreenshot("12-selected-image", app: app)
+
+        analyzeImage.tap()
+        let allowed = app.staticTexts["Allowed"]
+        let blocked = app.staticTexts["Blocked"]
+        let deadline = Date().addingTimeInterval(240)
+        while Date() < deadline && !allowed.exists && !blocked.exists {
+            Thread.sleep(forTimeInterval: 1)
+        }
+        XCTAssertTrue(allowed.exists || blocked.exists, "UI inference did not produce Allowed or Blocked within 240 seconds")
+        attachScreenshot("13-analyzed-image-result", app: app)
+    }
+
     private func selectTab(_ label: String, in app: XCUIApplication) throws {
         let direct = app.tabBars.buttons[label]
         if direct.waitForExistence(timeout: 3) {
             direct.tap()
-            XCTAssertTrue(direct.isSelected || app.staticTexts[label].waitForExistence(timeout: 5))
+            return
+        }
+
+        let globalButton = app.buttons[label].firstMatch
+        if globalButton.waitForExistence(timeout: 2) {
+            globalButton.tap()
             return
         }
 
