@@ -39,16 +39,19 @@ cp -R "$WORK_ROOT/ml-mobileclip/mobileclip2/." "$WORK_ROOT/open_clip/src/open_cl
 python -m pip install -e "$WORK_ROOT/open_clip"
 export PYTHONPATH="$WORK_ROOT/ml-mobileclip:$WORK_ROOT/open_clip/src${PYTHONPATH:+:$PYTHONPATH}"
 
-"$TOOLS_DIR/download_model.sh" "$CHECKPOINT_DIR"
+# All original MobileCLIP helper scripts use repository-relative sibling paths.
+# Execute every vendor tool from the pinned classifier repository root, exactly
+# like its standalone workflow does.
+(
+  cd "$VENDOR_DIR"
+  tools/MobileCLIPConversion/download_model.sh "$CHECKPOINT_DIR"
+)
 
 IMAGE_PACKAGE="$CONVERTED_DIR/MobileCLIP2S2ImageEncoder.mlpackage"
 PROMPTS="$CONVERTED_DIR/MobileCLIP2S2PromptEmbeddings.json"
 MANIFEST="$CONVERTED_DIR/MobileCLIP2S2ModelManifest.json"
 REPORT="$CONVERTED_DIR/MobileCLIP2S2ConversionReport.json"
 
-# The original conversion scripts intentionally reference sibling tools through
-# repository-relative paths, so execute them from the pinned vendor repository's
-# root exactly as the standalone classifier workflow does.
 if [ ! -d "$IMAGE_PACKAGE" ] || [ ! -s "$PROMPTS" ] || [ ! -s "$MANIFEST" ] || [ ! -s "$REPORT" ]; then
   rm -rf "$CONVERTED_DIR"
   mkdir -p "$CONVERTED_DIR"
