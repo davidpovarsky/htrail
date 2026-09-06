@@ -4,7 +4,7 @@ import Foundation
 /// from AI-Image-Classifier. This is the direct bridge used by HTTrail's proxy;
 /// it deliberately bypasses the loopback HTTP server while running the same
 /// MobileCLIP2 + NudeNet pipeline.
-public struct DirectImageSafetyDecision: Sendable {
+public nonisolated struct DirectImageSafetyDecision: Sendable {
     public let allowed: Bool
     public let risk: String
     public let confidence: Double
