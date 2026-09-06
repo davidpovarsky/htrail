@@ -1,7 +1,6 @@
 import Darwin
 import Foundation
 import ImageFilterCore
-import HTTrailCore
 import XCTest
 
 final class IntegratedRuntimeTests: XCTestCase {
@@ -14,13 +13,6 @@ final class IntegratedRuntimeTests: XCTestCase {
             throw NSError(domain: "HTTrailRuntimeTests", code: 1)
         }
         return try Data(contentsOf: url)
-    }
-
-    func testHTTrailImageSnifferRecognizesClassifierFixture() throws {
-        let data = try fixtureData()
-        XCTAssertEqual(ImageSniffer.kind(data: data, contentType: "image/png"), .raster)
-        XCTAssertTrue(ImageSniffer.isImage(data: data, contentType: "application/octet-stream"))
-        print("HTTRAIL_RUNTIME_STEP image_sniffer=pass bytes=\(data.count)")
     }
 
     func testDirectImageSafetyPipelineLoadsModelsAndRunsRepeatedInference() async throws {

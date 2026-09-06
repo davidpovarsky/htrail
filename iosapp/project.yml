@@ -218,6 +218,40 @@ targets:
         ENABLE_USER_SCRIPT_SANDBOXING: NO
         APPLICATION_EXTENSION_API_ONLY: YES
 
+  ImageFilterRuntimeHost:
+    type: application
+    platform: iOS
+    sources:
+      - path: RuntimeHost
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/NudeNet320n.mlpackage
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/NudeNet320n.labels.json
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ImageEncoder.mlpackage
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2PromptEmbeddings.json
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ModelManifest.json
+        buildPhase: resources
+    dependencies:
+      - target: ImageFilterCore
+        embed: true
+    info:
+      path: RuntimeHost/Info.plist
+      properties:
+        CFBundleDisplayName: ImageFilter Runtime Host
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        UILaunchScreen: {}
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.1moby.httrail.ImageFilterRuntimeHost
+        SWIFT_VERSION: "6.0"
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        IPHONEOS_DEPLOYMENT_TARGET: "26.5"
+        TARGETED_DEVICE_FAMILY: "1,2"
+
   HTTrailRuntimeTests:
     type: bundle.unit-test
     platform: iOS
@@ -226,17 +260,17 @@ targets:
       - path: ../Vendor/AI-Image-Classifier/Screenshots/ClassificationImageSelected.png
         buildPhase: resources
     dependencies:
-      - target: HTTrailiOS
+      - target: ImageFilterRuntimeHost
       - target: ImageFilterCore
-      - package: HTTrail
-        product: HTTrailCore
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.1moby.httrail.RuntimeTests
         GENERATE_INFOPLIST_FILE: YES
-        SWIFT_VERSION: "5.0"
+        SWIFT_VERSION: "6.0"
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
         IPHONEOS_DEPLOYMENT_TARGET: "26.5"
-        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/HTTrailiOS.app/HTTrailiOS"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/ImageFilterRuntimeHost.app/ImageFilterRuntimeHost"
         BUNDLE_LOADER: "$(TEST_HOST)"
 
   HTTrailUITests:
@@ -257,10 +291,19 @@ targets:
         TEST_TARGET_NAME: HTTrailiOS
 
 schemes:
-  HTTrailRuntimeTests:
+  HTTrailiOS:
     build:
       targets:
         HTTrailiOS: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+
+  HTTrailRuntimeTests:
+    build:
+      targets:
+        ImageFilterRuntimeHost: all
         ImageFilterCore: all
         HTTrailRuntimeTests: [test]
     test:
@@ -268,6 +311,7 @@ schemes:
       gatherCoverageData: true
       targets:
         - name: HTTrailRuntimeTests
+
   HTTrailUITests:
     build:
       targets:

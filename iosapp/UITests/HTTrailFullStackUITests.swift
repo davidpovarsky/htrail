@@ -16,7 +16,6 @@ final class HTTrailFullStackUITests: XCTestCase {
         print("HTTRAIL_UI_STEP tab_capture=pass")
 
         try selectTab("Compose", in: app)
-        XCTAssertTrue(app.staticTexts["Compose"].waitForExistence(timeout: 8))
         if app.buttons["Headers"].exists {
             app.buttons["Headers"].tap()
             app.buttons["Body"].tap()
@@ -26,7 +25,6 @@ final class HTTrailFullStackUITests: XCTestCase {
         print("HTTRAIL_UI_STEP tab_compose=pass")
 
         try selectTab("Rules", in: app)
-        XCTAssertTrue(app.staticTexts["Rules"].waitForExistence(timeout: 8))
         let pinningSwitch = app.switches["Auto-detect Cert Pinning"]
         if pinningSwitch.exists {
             let original = String(describing: pinningSwitch.value)
@@ -37,7 +35,6 @@ final class HTTrailFullStackUITests: XCTestCase {
         print("HTTRAIL_UI_STEP tab_rules=pass")
 
         try selectTab("Realtime", in: app)
-        XCTAssertTrue(app.staticTexts["Realtime"].waitForExistence(timeout: 8))
         if app.buttons["MQTT"].exists {
             app.buttons["MQTT"].tap()
             attachScreenshot("04-realtime-mqtt", app: app)
@@ -48,7 +45,6 @@ final class HTTrailFullStackUITests: XCTestCase {
         print("HTTRAIL_UI_STEP tab_realtime=pass")
 
         try selectTab("Setup", in: app)
-        XCTAssertTrue(app.staticTexts["Setup"].waitForExistence(timeout: 8))
         attachScreenshot("05-setup", app: app)
         print("HTTRAIL_UI_STEP tab_setup=pass")
 
@@ -87,10 +83,10 @@ final class HTTrailFullStackUITests: XCTestCase {
 
     func testLocalServerLoadsModelsAndClassifiesThroughHTTPAPI() throws {
         let app = XCUIApplication()
+        app.launchArguments = ["-htInitialTab", "5"]
         app.launch()
-        try selectTab("Image Filter", in: app)
 
-        XCTAssertTrue(app.staticTexts["AI Image Classifier"].waitForExistence(timeout: 12))
+        XCTAssertTrue(app.staticTexts["AI Image Classifier"].waitForExistence(timeout: 12), "Initial-tab QA seam did not open the embedded classifier")
         app.buttons["Local Server"].tap()
         XCTAssertTrue(app.staticTexts["Local Server"].waitForExistence(timeout: 10))
         attachScreenshot("20-local-server-starting", app: app)
@@ -202,27 +198,60 @@ final class HTTrailFullStackUITests: XCTestCase {
     }
 
     private func selectTab(_ label: String, in app: XCUIApplication) throws {
-        let direct = app.tabBars.buttons[label]
+        if waitForScreen(label, in: app, timeout: 0.5) { return }
+
+        let direct = app.buttons[label].firstMatch
         if direct.waitForExistence(timeout: 3) {
-            direct.tap()
-            return
+            tapTabButton(direct, label: label)
+            if waitForScreen(label, in: app, timeout: 4) { return }
         }
 
-        let globalButton = app.buttons[label].firstMatch
-        if globalButton.waitForExistence(timeout: 2) {
-            globalButton.tap()
-            return
+        // iPadOS 26 paginates SwiftUI's top tab bar. With six tabs the final
+        // Image Filter tab is reached by the real system "Next Page" affordance,
+        // not by a legacy "More" tab.
+        let nextPage = app.buttons["Next Page"].firstMatch
+        if nextPage.waitForExistence(timeout: 3) {
+            nextPage.tap()
+            if waitForScreen(label, in: app, timeout: 2) { return }
+            let paged = app.buttons[label].firstMatch
+            if paged.waitForExistence(timeout: 4) {
+                paged.tap()
+                if waitForScreen(label, in: app, timeout: 6) { return }
+            }
         }
 
-        let more = app.tabBars.buttons["More"]
-        if more.waitForExistence(timeout: 3) {
-            more.tap()
-            let item = app.staticTexts[label].firstMatch
-            XCTAssertTrue(item.waitForExistence(timeout: 5), "Could not find \(label) in the system More tab")
-            item.tap()
-            return
+        XCTFail("Tab \(label) is not reachable through the iPad tab bar")
+    }
+
+    private func tapTabButton(_ button: XCUIElement, label: String) {
+        if label == "Setup" {
+            // On iPadOS 26 the system's narrow Next Page affordance overlaps the
+            // leading portion of the Setup tab's accessibility frame. Tap the
+            // unobscured trailing side, exactly as a user can.
+            button.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.5)).tap()
+        } else {
+            button.tap()
         }
-        XCTFail("Tab \(label) is not reachable")
+    }
+
+    private func waitForScreen(_ label: String, in app: XCUIApplication, timeout: TimeInterval) -> Bool {
+        switch label {
+        case "Capture":
+            return app.buttons["Start (This iPad)"].waitForExistence(timeout: timeout)
+        case "Compose":
+            return app.staticTexts["Compose"].waitForExistence(timeout: timeout)
+        case "Rules":
+            return app.staticTexts["INTERCEPTION RULES"].waitForExistence(timeout: timeout)
+        case "Realtime":
+            return app.buttons["Connect"].waitForExistence(timeout: timeout)
+        case "Setup":
+            return app.staticTexts["Certificate Authority"].waitForExistence(timeout: timeout)
+                || app.staticTexts["CERTIFICATE AUTHORITY"].waitForExistence(timeout: 0.2)
+        case "Image Filter":
+            return app.staticTexts["AI Image Classifier"].waitForExistence(timeout: timeout)
+        default:
+            return app.staticTexts[label].waitForExistence(timeout: timeout)
+        }
     }
 
     private func visitClassifierScreen(
@@ -260,10 +289,27 @@ final class HTTrailFullStackUITests: XCTestCase {
         var bodyBase64: String { data.base64EncodedString() }
     }
 
+    private final class HTTPResultBox: @unchecked Sendable {
+        private let lock = NSLock()
+        private var storage: HTTPResult?
+
+        func store(_ result: HTTPResult) {
+            lock.lock()
+            storage = result
+            lock.unlock()
+        }
+
+        func load() -> HTTPResult? {
+            lock.lock()
+            defer { lock.unlock() }
+            return storage
+        }
+    }
+
     private func request(_ request: URLRequest, timeout: TimeInterval) -> HTTPResult? {
         let semaphore = DispatchSemaphore(value: 0)
         let start = Date()
-        var result: HTTPResult?
+        let box = HTTPResultBox()
         let configuration = URLSessionConfiguration.ephemeral
         configuration.timeoutIntervalForRequest = timeout
         configuration.timeoutIntervalForResource = timeout
@@ -271,11 +317,11 @@ final class HTTrailFullStackUITests: XCTestCase {
         let task = session.dataTask(with: request) { data, response, _ in
             defer { semaphore.signal() }
             guard let http = response as? HTTPURLResponse else { return }
-            result = HTTPResult(
+            box.store(HTTPResult(
                 statusCode: http.statusCode,
                 data: data ?? Data(),
                 latencyMs: Int(Date().timeIntervalSince(start) * 1_000)
-            )
+            ))
         }
         task.resume()
         guard semaphore.wait(timeout: .now() + timeout + 5) == .success else {
@@ -283,6 +329,6 @@ final class HTTrailFullStackUITests: XCTestCase {
             return nil
         }
         session.invalidateAndCancel()
-        return result
+        return box.load()
     }
 }
