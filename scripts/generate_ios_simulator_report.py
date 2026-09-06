@@ -69,7 +69,9 @@ metrics = extract_json_marker(runtime_log, "HTTRAIL_RUNTIME_METRICS") or {}
 health = extract_server_marker(ui_log, "HTTRAIL_SERVER_HEALTH") or {}
 server_classify = extract_server_marker(ui_log, "HTTRAIL_SERVER_CLASSIFY") or {}
 steps = ui_steps(ui_log)
-rsteps = runtime_steps(runtime_log)
+# ImageSniffer is deliberately exercised by the repository's HTTrailCore test
+# target rather than the isolated model-runtime host, so merge both marker logs.
+rsteps = runtime_steps(runtime_log + "\n" + core_log)
 
 sizes = {}
 try: sizes = json.loads(read(root / "sizes.json", "{}"))

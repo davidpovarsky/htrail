@@ -15,6 +15,7 @@ final class IntegratedRuntimeTests: XCTestCase {
         return try Data(contentsOf: url)
     }
 
+    @MainActor
     func testDirectImageSafetyPipelineLoadsModelsAndRunsRepeatedInference() async throws {
         let imageData = try fixtureData()
         let analyzer = DirectImageSafetyAnalyzer.shared

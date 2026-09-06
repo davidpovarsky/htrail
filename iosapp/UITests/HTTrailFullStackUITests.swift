@@ -83,10 +83,10 @@ final class HTTrailFullStackUITests: XCTestCase {
 
     func testLocalServerLoadsModelsAndClassifiesThroughHTTPAPI() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["-htInitialTab", "5"]
         app.launch()
+        try selectTab("Image Filter", in: app)
 
-        XCTAssertTrue(app.staticTexts["AI Image Classifier"].waitForExistence(timeout: 12), "Initial-tab QA seam did not open the embedded classifier")
+        XCTAssertTrue(app.staticTexts["AI Image Classifier"].waitForExistence(timeout: 12))
         app.buttons["Local Server"].tap()
         XCTAssertTrue(app.staticTexts["Local Server"].waitForExistence(timeout: 10))
         attachScreenshot("20-local-server-starting", app: app)
@@ -107,12 +107,26 @@ final class HTTrailFullStackUITests: XCTestCase {
         }
         print("HTTRAIL_SERVER_HEALTH status=\(health.statusCode) attempts=\(healthAttempts) latencyMs=\(health.latencyMs) body=\(health.bodyBase64)")
         XCTAssertEqual(health.statusCode, 200, "Local server did not report both models ready. Body: \(health.bodyString)")
-        XCTAssertTrue(app.staticTexts["Ready"].waitForExistence(timeout: 10))
+
+        // SwiftUI LabeledContent exposes this row to accessibility as the combined
+        // label "Status, Ready", not as a standalone StaticText named "Ready".
+        XCTAssertTrue(
+            app.staticTexts["Status, Ready"].waitForExistence(timeout: 10),
+            "The health endpoint is ready but the Local Server UI did not expose Status, Ready"
+        )
         attachScreenshot("21-local-server-ready", app: app)
 
         UIPasteboard.general.string = nil
         let copyToken = app.buttons["Copy Token"]
-        XCTAssertTrue(copyToken.waitForExistence(timeout: 5))
+        let form = app.collectionViews.firstMatch
+        for _ in 0..<8 where !(copyToken.exists && copyToken.isHittable) {
+            if form.exists {
+                form.swipeUp()
+            } else {
+                app.swipeUp()
+            }
+        }
+        XCTAssertTrue(copyToken.exists && copyToken.isHittable, "Copy Token was not reachable in the Local Server form")
         copyToken.tap()
         Thread.sleep(forTimeInterval: 0.5)
         guard let token = UIPasteboard.general.string, !token.isEmpty else {
@@ -153,17 +167,6 @@ final class HTTrailFullStackUITests: XCTestCase {
     }
 
     private func selectSeededPhotoAndAnalyze(in app: XCUIApplication) throws {
-        let permissionMonitor = addUIInterruptionMonitor(withDescription: "Photo Library Permission") { alert in
-            for title in ["Allow Full Access", "Allow Access to All Photos", "Allow", "OK"] {
-                let button = alert.buttons[title]
-                if button.exists {
-                    button.tap()
-                    return true
-                }
-            }
-            return false
-        }
-
         let selectImage = app.buttons["Select Image"]
         let analyzeImage = app.buttons["Analyze Image"]
         XCTAssertTrue(selectImage.waitForExistence(timeout: 5))
@@ -171,16 +174,27 @@ final class HTTrailFullStackUITests: XCTestCase {
         XCTAssertFalse(analyzeImage.isEnabled, "Analyze should be disabled before a photo is selected")
 
         selectImage.tap()
-        app.tap()
+        handlePhotoPermissionIfNeeded(in: app)
 
-        var photoCell = app.collectionViews.cells.firstMatch
-        if !photoCell.waitForExistence(timeout: 12) {
-            _ = permissionMonitor
-            app.tap()
-            photoCell = app.collectionViews.cells.firstMatch
+        // On iPad a stray tap outside UIImagePickerController dismisses its sheet.
+        // Do not tap the host app merely to trigger an interruption monitor. First
+        // prove that the real picker is still on screen, then select the seeded
+        // simulator photo through its actual UI.
+        let pickerCancel = app.buttons["Cancel"].firstMatch
+        let pickerVisible = pickerCancel.waitForExistence(timeout: 8)
+            || app.navigationBars["Photos"].waitForExistence(timeout: 2)
+            || app.navigationBars["All Photos"].waitForExistence(timeout: 2)
+            || app.cells.firstMatch.waitForExistence(timeout: 2)
+        XCTAssertTrue(pickerVisible, "UIImagePickerController did not remain presented after Select Image")
+
+        let photoCell = app.cells.firstMatch
+        if photoCell.waitForExistence(timeout: 12) {
+            photoCell.tap()
+        } else {
+            let photo = app.images.firstMatch
+            XCTAssertTrue(photo.waitForExistence(timeout: 8) && photo.isHittable, "The seeded photo was not reachable in UIImagePickerController")
+            photo.tap()
         }
-        XCTAssertTrue(photoCell.waitForExistence(timeout: 12), "The seeded photo did not appear in UIImagePickerController")
-        photoCell.tap()
 
         XCTAssertTrue(analyzeImage.waitForExistence(timeout: 12), "Image picker did not dismiss after photo selection")
         XCTAssertTrue(analyzeImage.isEnabled, "Analyze should be enabled after selecting the seeded photo")
@@ -195,6 +209,20 @@ final class HTTrailFullStackUITests: XCTestCase {
         }
         XCTAssertTrue(allowed.exists || blocked.exists, "UI inference did not produce Allowed or Blocked within 240 seconds")
         attachScreenshot("13-analyzed-image-result", app: app)
+    }
+
+    private func handlePhotoPermissionIfNeeded(in app: XCUIApplication) {
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        for alert in [app.alerts.firstMatch, springboard.alerts.firstMatch] {
+            guard alert.waitForExistence(timeout: 2) else { continue }
+            for title in ["Allow Full Access", "Allow Access to All Photos", "Allow", "OK"] {
+                let button = alert.buttons[title]
+                if button.exists {
+                    button.tap()
+                    return
+                }
+            }
+        }
     }
 
     private func selectTab(_ label: String, in app: XCUIApplication) throws {
