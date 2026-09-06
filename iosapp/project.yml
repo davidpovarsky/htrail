@@ -217,3 +217,64 @@ targets:
         IPHONEOS_DEPLOYMENT_TARGET: "26.5"
         ENABLE_USER_SCRIPT_SANDBOXING: NO
         APPLICATION_EXTENSION_API_ONLY: YES
+
+  HTTrailRuntimeTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: RuntimeTests
+      - path: ../Vendor/AI-Image-Classifier/Screenshots/ClassificationImageSelected.png
+        buildPhase: resources
+    dependencies:
+      - target: HTTrailiOS
+      - target: ImageFilterCore
+      - package: HTTrail
+        product: HTTrailCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.1moby.httrail.RuntimeTests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "5.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "26.5"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/HTTrailiOS.app/HTTrailiOS"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+
+  HTTrailUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+      - path: ../Vendor/AI-Image-Classifier/Screenshots/ClassificationImageSelected.png
+        buildPhase: resources
+    dependencies:
+      - target: HTTrailiOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.1moby.httrail.UITests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "5.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "26.5"
+        TEST_TARGET_NAME: HTTrailiOS
+
+schemes:
+  HTTrailRuntimeTests:
+    build:
+      targets:
+        HTTrailiOS: all
+        ImageFilterCore: all
+        HTTrailRuntimeTests: [test]
+    test:
+      config: Debug
+      gatherCoverageData: true
+      targets:
+        - name: HTTrailRuntimeTests
+  HTTrailUITests:
+    build:
+      targets:
+        HTTrailiOS: all
+        HTTrailUITests: [test]
+    test:
+      config: Debug
+      gatherCoverageData: true
+      targets:
+        - name: HTTrailUITests
