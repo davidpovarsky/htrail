@@ -24,6 +24,15 @@ open dist/HTTrail.app
 - `swift test` opens a real outbound TLS connection — it needs network access and will fail offline.
 - iOS app: `cd iosapp && xcodegen generate` (regenerates `HTTrailiOS.xcodeproj` from `project.yml`), then build in Xcode. Running on a device needs a **paid** Apple Developer team (the `packet-tunnel-provider` Network Extension entitlement is unavailable to free personal teams). Signing team is `NA6HPWARQ2`. See the project memory for device-install commands.
 
+### Test scope policy
+
+- Default to the smallest relevant test set for the files and behavior changed. Use `swift test --filter ...`, XCTest `-only-testing:...`, or a target-only build as appropriate.
+- After fixing a failing test or build error, rerun only that test or the directly affected target. Do not restart unrelated suites that already passed.
+- Do not run the complete Swift suite, the full iOS Simulator runtime suite, UI tests, or the full-stack Simulator workflow unless the user explicitly requests broad/full validation.
+- UI tests are warranted only for user-interface changes or an explicit request. Packet Tunnel/core/model-policy changes do not by themselves authorize the full UI journey suite.
+- Before release, broad validation may be proposed, but it still requires an explicit user request. A required signed archive/TestFlight workflow is a build/distribution check, not permission to rerun every test suite.
+- For long CI commands, use one blocking watcher that exits on success or failure. Do not repeatedly poll status in a loop.
+
 ## Distribution & release
 
 Full procedure in **`docs/DEPLOY.md`**. Two paths:

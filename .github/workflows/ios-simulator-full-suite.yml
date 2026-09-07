@@ -3,11 +3,24 @@ name: Full iOS Simulator QA
 on:
   workflow_dispatch:
     inputs:
-      fast_qa:
-        description: 'Skip unrelated UI journeys and run the hardening runtime suite only'
+      full_qa:
+        description: 'Explicitly run core, runtime, and UI suites'
         required: false
-        default: true
+        default: false
         type: boolean
+      run_core_tests:
+        description: 'Run HTTrailCore tests (use a filter for targeted validation)'
+        required: false
+        default: false
+        type: boolean
+      core_test_filter:
+        description: 'Optional swift test filter'
+        required: false
+        type: string
+      runtime_test_filter:
+        description: 'Optional XCTest only-testing identifier'
+        required: false
+        type: string
   pull_request:
     branches: [main]
     paths:
@@ -32,7 +45,9 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 45
     env:
-      FAST_QA: ${{ github.event_name == 'workflow_dispatch' && inputs.fast_qa && '1' || '0' }}
+      FULL_QA: ${{ github.event_name != 'workflow_dispatch' || inputs.full_qa && '1' || '0' }}
+      CORE_TEST_FILTER: ${{ inputs.core_test_filter || '' }}
+      RUNTIME_TEST_FILTER: ${{ inputs.runtime_test_filter || '' }}
 
     steps:
       - name: Checkout
@@ -80,11 +95,16 @@ jobs:
           scripts/prepare_image_filter_models.sh
 
       - name: Run HTTrailCore tests and live MITM integration
+        if: github.event_name != 'workflow_dispatch' || inputs.full_qa || inputs.run_core_tests
         shell: bash
         run: |
           mkdir -p build/simulator-full-suite/logs
           set +e
-          swift test 2>&1 | tee build/simulator-full-suite/logs/swift-test.log
+          if [ -n "$CORE_TEST_FILTER" ] && [ "$FULL_QA" != "1" ]; then
+            swift test --filter "$CORE_TEST_FILTER" 2>&1 | tee build/simulator-full-suite/logs/swift-test.log
+          else
+            swift test 2>&1 | tee build/simulator-full-suite/logs/swift-test.log
+          fi
           status=${PIPESTATUS[0]}
           echo "$status" > build/simulator-full-suite/core-tests-exit.txt
           exit 0
@@ -128,7 +148,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          core="$(cat build/simulator-full-suite/core-tests-exit.txt 2>/dev/null || echo 1)"
+          core="$(cat build/simulator-full-suite/core-tests-exit.txt 2>/dev/null || echo 0)"
           suite="$(cat build/simulator-full-suite/suite-exit.txt 2>/dev/null || echo 1)"
           echo "core-tests=$core simulator-suite=$suite"
           test "$core" = "0"
