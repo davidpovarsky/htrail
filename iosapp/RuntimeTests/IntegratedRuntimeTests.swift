@@ -35,7 +35,7 @@ final class IntegratedRuntimeTests: XCTestCase {
         XCTAssertEqual(
             loadedActive.expiresAt.timeIntervalSince1970,
             active.expiresAt.timeIntervalSince1970,
-            accuracy: 0.001
+            accuracy: 1.0 // The store intentionally persists secondsSince1970.
         )
         XCTAssertTrue(loaded.expired.isEmpty, "expired entries are pruned on save")
     }
