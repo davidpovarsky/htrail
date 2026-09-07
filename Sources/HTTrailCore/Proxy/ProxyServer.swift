@@ -27,6 +27,23 @@ public struct UpstreamTarget: Sendable {
     }
 }
 
+public struct StreamingResponseMetadata: Sendable {
+    public let statusCode: Int
+    public let reasonPhrase: String
+    public let httpVersion: String
+    public let headers: [HeaderPair]
+    public init(statusCode: Int, reasonPhrase: String, httpVersion: String, headers: [HeaderPair]) {
+        self.statusCode = statusCode; self.reasonPhrase = reasonPhrase
+        self.httpVersion = httpVersion; self.headers = headers
+    }
+    public func header(_ name: String) -> String? {
+        headers.first { $0.name.caseInsensitiveCompare(name) == .orderedSame }?.value
+    }
+}
+
+public typealias StreamingResponseInspectionPolicy = @Sendable (CapturedRequest, StreamingResponseMetadata) -> Int?
+public typealias StreamingResponseInspector = @Sendable (CapturedRequest, CapturedResponse) async throws -> CapturedResponse?
+
 /// A Charles-style intercepting HTTP/HTTPS proxy.
 ///
 /// Plain HTTP requests (absolute-form URI) are proxied directly. HTTPS requests
@@ -66,6 +83,10 @@ public final class ProxyServer: @unchecked Sendable {
     /// genuinely needs complete request content.
     public var requestInspectionBodyCap: Int = ProxyTuning.defaultCaptureBodyCap
     public var requestCaptureBodyCap: Int = ProxyTuning.defaultCaptureBodyCap
+    /// Optional bounded response-inspection seam. A positive policy result is
+    /// the maximum body bytes that may be held; nil streams immediately.
+    public var streamingResponseInspectionPolicy: StreamingResponseInspectionPolicy?
+    public var streamingResponseInspector: StreamingResponseInspector?
     public var upstreamIdleTimeout: TimeAmount = ProxyTuning.defaultIdleTimeout
     public var upstreamConnectTimeout: TimeAmount = ProxyTuning.defaultConnectTimeout
 
@@ -116,6 +137,8 @@ public final class ProxyServer: @unchecked Sendable {
         let streamRequestBodies = self.streamRequestBodies
         let requestInspectionBodyCap = self.requestInspectionBodyCap
         let requestCaptureBodyCap = self.requestCaptureBodyCap
+        let responseInspectionPolicy = self.streamingResponseInspectionPolicy
+        let responseInspector = self.streamingResponseInspector
         let idleTimeout = self.upstreamIdleTimeout
         let connectTimeout = self.upstreamConnectTimeout
 
@@ -133,6 +156,8 @@ public final class ProxyServer: @unchecked Sendable {
                                                   streamRequestBodies: streamRequestBodies,
                                                   requestInspectionBodyCap: requestInspectionBodyCap,
                                                   requestCaptureBodyCap: requestCaptureBodyCap,
+                                                  responseInspectionPolicy: responseInspectionPolicy,
+                                                  responseInspector: responseInspector,
                                                   idleTimeout: idleTimeout,
                                                   connectTimeout: connectTimeout)
                 return channel.pipeline.addHandler(encoder, name: ProxyHandlerName.httpEncoder)

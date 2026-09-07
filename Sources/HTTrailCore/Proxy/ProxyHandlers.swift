@@ -108,6 +108,8 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
     private let streamRequestBodies: Bool
     private let requestInspectionBodyCap: Int
     private let requestCaptureBodyCap: Int
+    private let responseInspectionPolicy: StreamingResponseInspectionPolicy?
+    private let responseInspector: StreamingResponseInspector?
     private let idleTimeout: TimeAmount
     private let connectTimeout: TimeAmount
     private var connectTarget: (host: String, port: Int)?
@@ -119,6 +121,8 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
          streamRequestBodies: Bool = false,
          requestInspectionBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
          requestCaptureBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
+         responseInspectionPolicy: StreamingResponseInspectionPolicy? = nil,
+         responseInspector: StreamingResponseInspector? = nil,
          idleTimeout: TimeAmount = ProxyTuning.defaultIdleTimeout,
          connectTimeout: TimeAmount = ProxyTuning.defaultConnectTimeout) {
         self.ca = ca
@@ -130,6 +134,8 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
         self.streamRequestBodies = streamRequestBodies
         self.requestInspectionBodyCap = requestInspectionBodyCap
         self.requestCaptureBodyCap = requestCaptureBodyCap
+        self.responseInspectionPolicy = responseInspectionPolicy
+        self.responseInspector = responseInspector
         self.idleTimeout = idleTimeout
         self.connectTimeout = connectTimeout
     }
@@ -163,7 +169,9 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
                                           connectTimeout: connectTimeout,
                                           streamRequestBodies: streamRequestBodies,
                                           requestInspectionBodyCap: requestInspectionBodyCap,
-                                          requestCaptureBodyCap: requestCaptureBodyCap)
+                                          requestCaptureBodyCap: requestCaptureBodyCap,
+                                          responseInspectionPolicy: responseInspectionPolicy,
+                                          responseInspector: responseInspector)
         let pipeline = context.pipeline
         _ = pipeline.addHandler(proxy, position: .after(self)).flatMap { () -> EventLoopFuture<Void> in
             // Re-deliver the head we already consumed, then retire ourselves so
@@ -215,7 +223,9 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
                         idleTimeout: self.idleTimeout, connectTimeout: self.connectTimeout,
                         streamRequestBodies: self.streamRequestBodies,
                         requestInspectionBodyCap: self.requestInspectionBodyCap,
-                        requestCaptureBodyCap: self.requestCaptureBodyCap
+                        requestCaptureBodyCap: self.requestCaptureBodyCap,
+                        responseInspectionPolicy: self.responseInspectionPolicy,
+                        responseInspector: self.responseInspector
                     )
                     let sensor = TLSHandshakeSensor(host: host, engine: self.engine)
                     // tls then sensor at the head, in order, so the sensor sits

@@ -2,6 +2,7 @@ import Foundation
 import HTTrailCore
 import ImageFilterCore
 import OSLog
+import PurelineSupport
 
 /// Downstream adapter between HTTrail's existing response-breakpoint seam and
 /// the vendored image-safety pipeline. No loopback HTTP request is made here.
@@ -10,48 +11,42 @@ enum ImageFilterProxyBridge {
         subsystem: "com.davidpovarsky.pureline.PacketTunnel",
         category: "direct-image-filter"
     )
-    private static let internalRulePrefix = "__HTTrailDirectImageFilter:"
-    private static let maximumImageBytes = 10 * 1024 * 1024
-
-    /// URL patterns that cover ordinary raster-image fetches without forcing
-    /// every HTML/JSON/download response through HTTrail's buffered path.
-    private static let imageURLPatterns = [
-        "*.jpg*", "*.jpeg*", "*.png*", "*.webp*", "*.gif*", "*.bmp*",
-        "*.tif*", "*.tiff*", "*.heic*", "*.heif*", "*.avif*"
-    ]
+    static let maximumImageBytes = 4 * 1024 * 1024
 
     static func apply(config: SharedConfig, to engine: InterceptEngine) {
-        guard DirectImageFilterSettings.isEnabled else {
-            engine.breakpointHandler = nil
-            engine.apply(config)
-            return
-        }
+        engine.breakpointHandler = nil
+        engine.apply(config)
+    }
 
-        var runtime = config
-        runtime.rules.removeAll { $0.name.hasPrefix(internalRulePrefix) }
-        runtime.rules.append(contentsOf: imageURLPatterns.enumerated().map { index, pattern in
-            var rule = InterceptRule()
-            rule.name = "\(internalRulePrefix)\(index)"
-            rule.enabled = true
-            rule.kind = .breakpoint
-            rule.urlPattern = pattern
-            rule.breakRequest = false
-            rule.breakResponse = true
-            return rule
-        })
-
-        let analyzer = DirectImageSafetyAnalyzer.shared
-        engine.breakpointHandler = { event in
-            guard case .response = event.phase, let response = event.response else { return nil }
-            return await transform(response: response, request: event.request, analyzer: analyzer)
+    static func configure(server: ProxyServer, diagnostics: PurelinePacketTunnelDiagnostics) {
+        server.streamingResponseInspectionPolicy = { request, metadata in
+            guard DirectImageFilterSettings.isEnabled,
+                  (200..<300).contains(metadata.statusCode),
+                  Self.isPlausibleRaster(request: request, metadata: metadata) else { return nil }
+            if let encoding = metadata.header("Content-Encoding")?.lowercased(),
+               !encoding.isEmpty, encoding != "identity" { return nil }
+            if let length = metadata.header("Content-Length").flatMap(Int.init), length > maximumImageBytes {
+                diagnostics.record(category: "image-filter", event: "image filtering skipped because payload exceeded limits", details: [
+                    "host": request.host, "contentLength": String(length), "limit": String(maximumImageBytes)
+                ])
+                return nil
+            }
+            return maximumImageBytes
         }
-        engine.apply(runtime)
+        server.streamingResponseInspector = { request, response in
+            let analyzer = DirectImageSafetyAnalyzer.shared
+            guard let edit = await transform(
+                response: response, request: request, analyzer: analyzer, diagnostics: diagnostics
+            ) else { return nil }
+            return edit.response
+        }
     }
 
     private static func transform(
         response: CapturedResponse,
         request: CapturedRequest,
-        analyzer: DirectImageSafetyAnalyzer
+        analyzer: DirectImageSafetyAnalyzer,
+        diagnostics: PurelinePacketTunnelDiagnostics
     ) async -> BreakpointEdit? {
         guard response.statusCode >= 200, response.statusCode < 300,
               !response.body.isEmpty,
@@ -68,6 +63,9 @@ enum ImageFilterProxyBridge {
         }
 
         do {
+            diagnostics.record(category: "image-filter", event: "inference start", details: [
+                "host": request.host, "bytes": String(response.body.count)
+            ])
             let decision = try await analyzer.classify(
                 imageData: response.body,
                 mimeType: contentType ?? "application/octet-stream"
@@ -97,8 +95,21 @@ enum ImageFilterProxyBridge {
             // Fail open: classifier trouble must never turn a previously working
             // HTTrail capture session into broken browsing.
             logger.error("Direct image classification failed: \(String(describing: error), privacy: .public)")
+            diagnostics.record(category: "image-filter", event: "inference failure; fail open", details: [
+                "host": request.host, "error": String(describing: error)
+            ])
             return nil
         }
+    }
+
+    private static func isPlausibleRaster(request: CapturedRequest, metadata: StreamingResponseMetadata) -> Bool {
+        if let contentType = metadata.header("Content-Type")?.lowercased() {
+            if contentType.hasPrefix("image/") && !contentType.contains("svg") { return true }
+            if !contentType.isEmpty && !contentType.hasPrefix("application/octet-stream") { return false }
+        }
+        let path = request.path.lowercased().split(separator: "?", maxSplits: 1).first.map(String.init) ?? request.path
+        return [".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".tif", ".tiff", ".heic", ".heif", ".avif"]
+            .contains { path.hasSuffix($0) }
     }
 
     private static func blockedPlaceholderData() -> Data {

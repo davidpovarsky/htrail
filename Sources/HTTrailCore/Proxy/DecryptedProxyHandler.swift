@@ -24,6 +24,8 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
     private let streamRequestBodies: Bool
     private let requestInspectionBodyCap: Int
     private let requestCaptureBodyCap: Int
+    private let responseInspectionPolicy: StreamingResponseInspectionPolicy?
+    private let responseInspector: StreamingResponseInspector?
 
     private var requestHead: HTTPRequestHead?
     private var requestBody = ByteBuffer()
@@ -42,7 +44,9 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
          connectTimeout: TimeAmount = ProxyTuning.defaultConnectTimeout,
          streamRequestBodies: Bool = false,
          requestInspectionBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
-         requestCaptureBodyCap: Int = ProxyTuning.defaultCaptureBodyCap) {
+         requestCaptureBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
+         responseInspectionPolicy: StreamingResponseInspectionPolicy? = nil,
+         responseInspector: StreamingResponseInspector? = nil) {
         self.fixedTarget = fixedTarget
         self.sink = sink
         self.group = group
@@ -54,6 +58,8 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         self.streamRequestBodies = streamRequestBodies
         self.requestInspectionBodyCap = requestInspectionBodyCap
         self.requestCaptureBodyCap = requestCaptureBodyCap
+        self.responseInspectionPolicy = responseInspectionPolicy
+        self.responseInspector = responseInspector
     }
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
@@ -163,7 +169,9 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             requestBody: initialBody ?? context.channel.allocator.buffer(capacity: 0),
             captured: request, flowID: flowID, startedAt: startedAt, secure: secure,
             keepAlive: keepAlive, captureCap: captureBodyCap, sink: sink,
-            completeRequestOnActive: false, capturedRequestProvider: { capture.snapshot() }
+            completeRequestOnActive: false, capturedRequestProvider: { capture.snapshot() },
+            responseInspectionPolicy: responseInspectionPolicy,
+            responseInspector: responseInspector
         )
         let verify = verifyUpstream
         let idleTimeout = self.idleTimeout
@@ -389,7 +397,9 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         let handler = StreamingProxyHandler(
             clientChannel: clientChannel, requestHead: head, requestBody: bodyBuffer,
             captured: request, flowID: flowID, startedAt: startedAt, secure: secure,
-            keepAlive: keepAlive, captureCap: captureBodyCap, sink: sink)
+            keepAlive: keepAlive, captureCap: captureBodyCap, sink: sink,
+            responseInspectionPolicy: responseInspectionPolicy,
+            responseInspector: responseInspector)
 
         let verify = verifyUpstream
         let idleTimeout = self.idleTimeout

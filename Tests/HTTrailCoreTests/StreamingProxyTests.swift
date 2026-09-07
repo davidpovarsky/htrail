@@ -173,6 +173,38 @@ final class StreamingProxyTests: XCTestCase {
         XCTAssertEqual(flow.request.bodyTruncated, true)
     }
 
+    func testOversizedUnknownLengthInspectionPassesThroughWithoutInspector() async throws {
+        let origin = TestOrigin()
+        let originPort = try origin.start(bodyByteCount: 5000, chunked: true)
+        defer { origin.stop() }
+        let calls = LockedCounter()
+        let (proxy, _) = try await makeProxy {
+            $0.streamingResponseInspectionPolicy = { _, _ in 1000 }
+            $0.streamingResponseInspector = { _, response in calls.increment(); return response }
+        }
+        defer { Task { try? await proxy.stop() } }
+        guard let result = curlThroughProxy(proxyPort: proxy.boundPort, url: "http://127.0.0.1:\(originPort)/image")
+        else { throw XCTSkip("curl unavailable") }
+        XCTAssertEqual(result.code, "200")
+        XCTAssertEqual(result.body.utf8.count, 5000)
+        XCTAssertEqual(calls.value, 0, "oversized body must not reach the inspector")
+    }
+
+    func testInspectionFailureFailsOpenWithOriginalResponse() async throws {
+        let origin = TestOrigin()
+        let originPort = try origin.start(bodyString: "ORIGINAL")
+        defer { origin.stop() }
+        let (proxy, _) = try await makeProxy {
+            $0.streamingResponseInspectionPolicy = { _, _ in 1024 }
+            $0.streamingResponseInspector = { _, _ in throw CocoaError(.fileReadCorruptFile) }
+        }
+        defer { Task { try? await proxy.stop() } }
+        guard let result = curlThroughProxy(proxyPort: proxy.boundPort, url: "http://127.0.0.1:\(originPort)/image")
+        else { throw XCTSkip("curl unavailable") }
+        XCTAssertEqual(result.code, "200")
+        XCTAssertEqual(result.body, "ORIGINAL")
+    }
+
     // MARK: - Helpers
 
     private func makeProxy(engine: InterceptEngine = InterceptEngine(),
@@ -237,7 +269,8 @@ final class TestOrigin {
     private let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
     private var channel: Channel?
 
-    func start(bodyString: String? = nil, bodyByteCount: Int? = nil, hang: Bool = false) throws -> Int {
+    func start(bodyString: String? = nil, bodyByteCount: Int? = nil,
+               hang: Bool = false, chunked: Bool = false) throws -> Int {
         let body: [UInt8]
         if let bodyString { body = Array(bodyString.utf8) }
         else if let bodyByteCount { body = Array(repeating: UInt8(ascii: "x"), count: bodyByteCount) }
@@ -247,7 +280,7 @@ final class TestOrigin {
             .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
             .childChannelInitializer { channel in
                 channel.pipeline.configureHTTPServerPipeline().flatMap {
-                    channel.pipeline.addHandler(OriginHandler(body: body, hang: hang))
+                    channel.pipeline.addHandler(OriginHandler(body: body, hang: hang, chunked: chunked))
                 }
             }
         let ch = try bootstrap.bind(host: "127.0.0.1", port: 0).wait()
@@ -267,13 +300,17 @@ private final class OriginHandler: ChannelInboundHandler {
 
     private let body: [UInt8]
     private let hang: Bool
-    init(body: [UInt8], hang: Bool) { self.body = body; self.hang = hang }
+    private let chunked: Bool
+    init(body: [UInt8], hang: Bool, chunked: Bool) {
+        self.body = body; self.hang = hang; self.chunked = chunked
+    }
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         guard case .end = unwrapInboundIn(data) else { return }
         if hang { return }   // accept the request, never reply
         var headers = HTTPHeaders()
-        headers.add(name: "Content-Length", value: "\(body.count)")
+        if chunked { headers.add(name: "Transfer-Encoding", value: "chunked") }
+        else { headers.add(name: "Content-Length", value: "\(body.count)") }
         headers.add(name: "Content-Type", value: "text/plain")
         let head = HTTPResponseHead(version: .http1_1, status: .ok, headers: headers)
         context.write(wrapOutboundOut(.head(head)), promise: nil)
@@ -282,6 +319,13 @@ private final class OriginHandler: ChannelInboundHandler {
         context.write(wrapOutboundOut(.body(.byteBuffer(buffer))), promise: nil)
         context.writeAndFlush(wrapOutboundOut(.end(nil)), promise: nil)
     }
+}
+
+private final class LockedCounter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var count = 0
+    func increment() { lock.lock(); count += 1; lock.unlock() }
+    var value: Int { lock.lock(); defer { lock.unlock() }; return count }
 }
 
 private final class UploadOrigin {

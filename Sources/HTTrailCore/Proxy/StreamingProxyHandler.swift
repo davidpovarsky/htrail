@@ -44,6 +44,8 @@ final class StreamingProxyHandler: ChannelInboundHandler {
     private let captured: CapturedRequest
     private let capturedRequestProvider: (() -> CapturedRequest)?
     private let completeRequestOnActive: Bool
+    private let responseInspectionPolicy: StreamingResponseInspectionPolicy?
+    private let responseInspector: StreamingResponseInspector?
     private let flowID: UUID
     private let startedAt: Date
     private let secure: Bool
@@ -61,18 +63,25 @@ final class StreamingProxyHandler: ChannelInboundHandler {
     private var headSent = false
     private var completed = false
     private var lastWrite: EventLoopFuture<Void>?
+    private var inspectionLimit: Int?
+    private var inspectionBuffer = Data()
+    private var upstreamHead: HTTPResponseHead?
 
     init(clientChannel: Channel, requestHead: HTTPRequestHead, requestBody: ByteBuffer,
          captured: CapturedRequest, flowID: UUID, startedAt: Date, secure: Bool,
          keepAlive: Bool, captureCap: Int, sink: FlowSink,
          completeRequestOnActive: Bool = true,
-         capturedRequestProvider: (() -> CapturedRequest)? = nil) {
+         capturedRequestProvider: (() -> CapturedRequest)? = nil,
+         responseInspectionPolicy: StreamingResponseInspectionPolicy? = nil,
+         responseInspector: StreamingResponseInspector? = nil) {
         self.clientChannel = clientChannel
         self.requestHead = requestHead
         self.requestBody = requestBody
         self.captured = captured
         self.capturedRequestProvider = capturedRequestProvider
         self.completeRequestOnActive = completeRequestOnActive
+        self.responseInspectionPolicy = responseInspectionPolicy
+        self.responseInspector = responseInspector
         self.flowID = flowID
         self.startedAt = startedAt
         self.secure = secure
@@ -103,12 +112,39 @@ final class StreamingProxyHandler: ChannelInboundHandler {
             status = head.status
             version = head.version
             capturedHeaders = head.headers.map { HeaderPair(name: $0.name, value: $0.value) }
-            let clientHead = makeClientHead(from: head)
-            lastWrite = clientChannel.write(NIOAny(HTTPServerResponsePart.head(clientHead)))
-            headSent = true
+            upstreamHead = head
+            let metadata = StreamingResponseMetadata(
+                statusCode: Int(head.status.code), reasonPhrase: head.status.reasonPhrase,
+                httpVersion: "HTTP/\(head.version.major).\(head.version.minor)", headers: capturedHeaders
+            )
+            let request = capturedRequestProvider?() ?? captured
+            if let limit = responseInspectionPolicy?(request, metadata), limit > 0,
+               responseInspector != nil {
+                inspectionLimit = limit
+                inspectionBuffer.reserveCapacity(min(limit, 512 * 1024))
+            } else {
+                sendHead(head)
+            }
 
         case .body(var chunk):
             let available = chunk.readableBytes
+            if let limit = inspectionLimit {
+                if inspectionBuffer.count + available <= limit {
+                    if let bytes = chunk.readBytes(length: available) { inspectionBuffer.append(contentsOf: bytes) }
+                    break
+                }
+                // Unknown/chunked response crossed the safe inspection limit:
+                // release the held prefix and continue transparent streaming.
+                inspectionLimit = nil
+                if let head = upstreamHead { sendHead(head) }
+                if !inspectionBuffer.isEmpty {
+                    captureInspectionPrefix()
+                    var prefix = clientChannel.allocator.buffer(capacity: inspectionBuffer.count)
+                    prefix.writeBytes(inspectionBuffer)
+                    lastWrite = clientChannel.write(NIOAny(HTTPServerResponsePart.body(.byteBuffer(prefix))))
+                    inspectionBuffer.removeAll(keepingCapacity: false)
+                }
+            }
             if capturedBytes < captureCap, available > 0 {
                 let room = captureCap - capturedBytes
                 let take = min(room, available)
@@ -123,7 +159,8 @@ final class StreamingProxyHandler: ChannelInboundHandler {
             lastWrite = clientChannel.write(NIOAny(HTTPServerResponsePart.body(.byteBuffer(chunk))))
 
         case .end:
-            finish(context: context, success: true)
+            if inspectionLimit != nil { finishInspection(context: context) }
+            else { finish(context: context, success: true) }
         }
     }
 
@@ -182,6 +219,69 @@ final class StreamingProxyHandler: ChannelInboundHandler {
             recordFlow(failed: true, error: "Upstream did not respond")
         }
         context.close(promise: nil)
+    }
+
+    private func finishInspection(context: ChannelHandlerContext) {
+        guard !completed, let head = upstreamHead, let inspector = responseInspector else {
+            finish(context: context, success: true); return
+        }
+        completed = true
+        inspectionLimit = nil
+        let original = CapturedResponse(
+            statusCode: Int(head.status.code), reasonPhrase: head.status.reasonPhrase,
+            httpVersion: "HTTP/\(head.version.major).\(head.version.minor)",
+            headers: capturedHeaders, body: inspectionBuffer, timestamp: Date()
+        )
+        let request = capturedRequestProvider?() ?? captured
+        Task {
+            let output: CapturedResponse
+            do { output = try await inspector(request, original) ?? original }
+            catch { output = original }
+            self.sendInspected(output)
+            self.sink.record(Flow(id: self.flowID, request: request, response: self.captureVersion(output),
+                                  state: .completed, startedAt: self.startedAt, endedAt: Date(), secure: self.secure))
+            context.channel.close(promise: nil)
+        }
+    }
+
+    private func sendHead(_ head: HTTPResponseHead) {
+        guard !headSent else { return }
+        lastWrite = clientChannel.write(NIOAny(HTTPServerResponsePart.head(makeClientHead(from: head))))
+        headSent = true
+    }
+
+    private func sendInspected(_ response: CapturedResponse) {
+        var headers = HTTPHeaders()
+        for header in response.headers
+        where header.name.caseInsensitiveCompare("Transfer-Encoding") != .orderedSame
+            && header.name.caseInsensitiveCompare("Content-Length") != .orderedSame
+            && header.name.caseInsensitiveCompare("Connection") != .orderedSame {
+            headers.add(name: header.name, value: header.value)
+        }
+        headers.replaceOrAdd(name: "Content-Length", value: String(response.body.count))
+        headers.replaceOrAdd(name: "Connection", value: keepAlive ? "keep-alive" : "close")
+        let status = HTTPResponseStatus(statusCode: response.statusCode, reasonPhrase: response.reasonPhrase)
+        clientChannel.write(NIOAny(HTTPServerResponsePart.head(HTTPResponseHead(version: .http1_1, status: status, headers: headers))), promise: nil)
+        if !response.body.isEmpty {
+            var body = clientChannel.allocator.buffer(capacity: response.body.count); body.writeBytes(response.body)
+            clientChannel.write(NIOAny(HTTPServerResponsePart.body(.byteBuffer(body))), promise: nil)
+        }
+        let end = clientChannel.writeAndFlush(NIOAny(HTTPServerResponsePart.end(nil)))
+        if !keepAlive { end.whenComplete { [clientChannel] _ in clientChannel.close(promise: nil) } }
+    }
+
+    private func captureInspectionPrefix() {
+        let room = max(0, captureCap - captureBuffer.count)
+        if room > 0 { captureBuffer.append(inspectionBuffer.prefix(room)) }
+        capturedBytes += inspectionBuffer.count
+        if inspectionBuffer.count > room { truncated = true }
+    }
+
+    private func captureVersion(_ response: CapturedResponse) -> CapturedResponse {
+        guard response.body.count > captureCap else { return response }
+        var result = response
+        result.body = Data(response.body.prefix(captureCap)); result.bodyTruncated = true
+        return result
     }
 
     private func recordFlow(failed: Bool, error: String?) {

@@ -78,6 +78,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         server.streamRequestBodies = true
         server.requestInspectionBodyCap = 1024 * 1024
         server.requestCaptureBodyCap = PurelineCaptureLimits.packetTunnel.requestPreviewBytes
+        ImageFilterProxyBridge.configure(server: server, diagnostics: diagnostics)
         self.proxy = server
         startConfigSync()
 
