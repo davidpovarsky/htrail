@@ -26,7 +26,9 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
     private let requestCaptureBodyCap: Int
     private let responseInspectionPolicy: StreamingResponseInspectionPolicy?
     private let responseInspector: StreamingResponseInspector?
+    private let responseObserver: StreamingResponseObserver?
     private let runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)?
+    private let upstreamPool: UpstreamConnectionPool?
 
     private var requestHead: HTTPRequestHead?
     private var requestBody = ByteBuffer()
@@ -47,8 +49,10 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
          requestInspectionBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
          requestCaptureBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
          responseInspectionPolicy: StreamingResponseInspectionPolicy? = nil,
-         responseInspector: StreamingResponseInspector? = nil,
-         runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)? = nil) {
+          responseInspector: StreamingResponseInspector? = nil,
+          responseObserver: StreamingResponseObserver? = nil,
+          runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)? = nil,
+          upstreamPool: UpstreamConnectionPool? = nil) {
         self.fixedTarget = fixedTarget
         self.sink = sink
         self.group = group
@@ -62,7 +66,9 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         self.requestCaptureBodyCap = requestCaptureBodyCap
         self.responseInspectionPolicy = responseInspectionPolicy
         self.responseInspector = responseInspector
+        self.responseObserver = responseObserver
         self.runtimeEventHandler = runtimeEventHandler
+        self.upstreamPool = upstreamPool
     }
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
@@ -181,6 +187,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             completeRequestOnActive: false, capturedRequestProvider: { capture.snapshot() },
             responseInspectionPolicy: responseInspectionPolicy,
             responseInspector: responseInspector,
+            responseObserver: responseObserver,
             targetHost: target.host, targetUsesTLS: target.tls,
             runtimeEventHandler: runtimeEventHandler
         )
@@ -191,7 +198,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             .channelOption(ChannelOptions.autoRead, value: false)
             .channelInitializer { channel in
                 do {
-                    var handlers: [ChannelHandler] = [IdleStateHandler(readTimeout: idleTimeout), IdleCloseHandler()]
+                    var handlers: [ChannelHandler] = [IdleStateHandler(readTimeout: idleTimeout), IdleCloseHandler(host: target.host, events: self.runtimeEventHandler)]
                     if target.tls { handlers.append(try ProxyTLS.clientHandler(host: target.host, verify: verify)) }
                     handlers.append(HTTPRequestEncoder())
                     handlers.append(ByteToMessageHandler(HTTPResponseDecoder(leftOverBytesStrategy: .dropBytes)))
@@ -352,7 +359,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             headers.add(name: header.name, value: header.value)
         }
         headers.replaceOrAdd(name: "Host", value: hostHeader(target))
-        headers.replaceOrAdd(name: "Connection", value: "close")
+        headers.replaceOrAdd(name: "Connection", value: upstreamPool == nil ? "close" : "keep-alive")
         if !request.body.isEmpty {
             headers.replaceOrAdd(name: "Content-Length", value: "\(request.body.count)")
         }
@@ -368,7 +375,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
                 do {
                     var handlers: [ChannelHandler] = [
                         IdleStateHandler(readTimeout: idleTimeout),
-                        IdleCloseHandler()
+                        IdleCloseHandler(host: target.host, events: self.runtimeEventHandler)
                     ]
                     if target.tls {
                         handlers.append(try ProxyTLS.clientHandler(host: target.host, verify: verify))
@@ -417,12 +424,24 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             keepAlive: keepAlive, captureCap: captureBodyCap, sink: sink,
             responseInspectionPolicy: responseInspectionPolicy,
             responseInspector: responseInspector,
+            responseObserver: responseObserver,
             targetHost: target.host, targetUsesTLS: target.tls,
-            runtimeEventHandler: runtimeEventHandler)
+            runtimeEventHandler: runtimeEventHandler,
+            upstreamTarget: target, upstreamPool: upstreamPool)
+
+        if let reused = upstreamPool?.checkout(target: target, events: runtimeEventHandler) {
+            handler.markReused()
+            reused.pipeline.addHandler(handler).whenFailure { error in
+                upstreamPool?.discard(reused, target: target, reason: "handler-install-failure", events: self.runtimeEventHandler)
+                self.runtimeEventHandler?(ProxyFailureClassifier.event(error: error, host: target.host, tls: target.tls))
+            }
+            return
+        }
 
         let verify = verifyUpstream
         let idleTimeout = self.idleTimeout
         let sink = self.sink
+        let connectStarted = DispatchTime.now().uptimeNanoseconds
         let bootstrap = ClientBootstrap(group: group)
             .connectTimeout(connectTimeout)
             // autoRead off: StreamingProxyHandler paces reads against client writes.
@@ -431,10 +450,11 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
                 do {
                     var handlers: [ChannelHandler] = [
                         IdleStateHandler(readTimeout: idleTimeout),
-                        IdleCloseHandler()
+                        IdleCloseHandler(host: target.host, events: self.runtimeEventHandler)
                     ]
                     if target.tls {
                         handlers.append(try ProxyTLS.clientHandler(host: target.host, verify: verify))
+                        handlers.append(UpstreamTLSHandshakeTimingHandler(host: target.host, started: connectStarted, events: self.runtimeEventHandler))
                     }
                     handlers.append(HTTPRequestEncoder())
                     handlers.append(ByteToMessageHandler(HTTPResponseDecoder(leftOverBytesStrategy: .dropBytes)))
@@ -445,15 +465,17 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
                 }
             }
 
-        bootstrap.connect(host: target.host, port: target.port).whenFailure { error in
-            self.runtimeEventHandler?(ProxyFailureClassifier.event(
-                error: error, host: target.host, tls: target.tls
-            ))
-            // Never connected: record the failure and tell the client 502.
-            sink.record(Flow(id: flowID, request: request, response: nil, state: .failed,
-                             error: "\(error)", startedAt: startedAt, endedAt: Date(), secure: secure))
-            self.respondError(channel: clientChannel, status: .badGateway,
-                              message: "Upstream error: \(error)")
+        bootstrap.connect(host: target.host, port: target.port).whenComplete { result in
+            switch result {
+            case .success:
+                self.runtimeEventHandler?(ProxyRuntimeEvent(kind: .upstreamTiming, host: target.host,
+                    detail: "tcpConnectMs=\((DispatchTime.now().uptimeNanoseconds - connectStarted) / 1_000_000) protocol=http/1.1 reused=false"))
+            case .failure(let error):
+                self.runtimeEventHandler?(ProxyFailureClassifier.event(error: error, host: target.host, tls: target.tls))
+                sink.record(Flow(id: flowID, request: request, response: nil, state: .failed,
+                                 error: "\(error)", startedAt: startedAt, endedAt: Date(), secure: secure))
+                self.respondError(channel: clientChannel, status: .badGateway, message: "Upstream error: \(error)")
+            }
         }
     }
 

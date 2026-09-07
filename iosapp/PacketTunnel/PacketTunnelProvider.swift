@@ -20,6 +20,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     private let configStore = SharedConfigStore()
     private let diagnostics = PurelinePacketTunnelDiagnostics.shared
     private let bypassStore = PurelineCompatibilityBypassStore()
+    private let antiBotStore = PurelineAntiBotCompatibilityStore.shared
     private var configSyncTask: Task<Void, Never>?
 
     override func startTunnel(options: [String: NSObject]?,
@@ -34,6 +35,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         applyRuntimeConfig(config)
         let restored = bypassStore.load()
         engine.restoreDetectedPinnedHosts(restored.active)
+        engine.restoreCompatibilityBypasses(antiBotStore.load())
         for entry in restored.expired {
             diagnostics.record(category: "tls", event: "compatibility bypass expired", details: ["host": entry.host])
         }
@@ -78,7 +80,20 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         server.streamRequestBodies = true
         server.requestInspectionBodyCap = PurelineRuntimePolicy.requestInspectionBytes
         server.requestCaptureBodyCap = PurelineCaptureLimits.packetTunnel.requestPreviewBytes
+        server.upstreamConnectionPoolConfiguration = UpstreamConnectionPoolConfiguration(
+            maximumConnectionsPerOrigin: 2, maximumConnectionsTotal: 8, idleTimeout: 15
+        )
         ImageFilterProxyBridge.configure(server: server, diagnostics: diagnostics)
+        server.streamingResponseObserver = { [weak self, diagnostics] request, response in
+            ImageFilterProxyBridge.responseCompleted(request)
+            guard PurelineAntiBotChallengeDetector.isStrongChallenge(response) else { return }
+            guard let self else { return }
+            let info = self.antiBotStore.add(host: request.host)
+            self.engine.installCompatibilityBypass(info)
+            diagnostics.record(category: "compatibility", event: "strong anti-bot challenge detected; temporary bypass installed", details: [
+                "host": request.host, "expiresAt": ISO8601DateFormatter().string(from: info.expiresAt)
+            ])
+        }
         server.runtimeEventHandler = { [diagnostics] event in
             let details = [
                 "host": event.host ?? "unknown",
@@ -96,6 +111,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         startConfigSync()
 
         Task {
+            await ImageFilterProxyBridge.refreshRuntimeConfiguration(diagnostics: self.diagnostics)
             do {
                 try await server.start()
             } catch {
@@ -124,6 +140,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 guard let self else { break }
                 let config = self.configStore.load() ?? SharedConfig()
                 self.applyRuntimeConfig(config)
+                await ImageFilterProxyBridge.refreshRuntimeConfiguration(diagnostics: self.diagnostics)
                 let pinnedInfo = self.engine.detectedPinnedHosts()
                 self.bypassStore.save(pinnedInfo)
                 let pinned = pinnedInfo.map(\.host)
@@ -158,6 +175,12 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     private func configurePinningDiagnostics() {
+        engine.compatibilityBypassEventHandler = { [weak self] info in
+            self?.diagnostics.record(category: "compatibility", event: "host blind-tunneled for compatibility", details: [
+                "host": info.host, "reason": info.reason,
+                "expiresAt": ISO8601DateFormatter().string(from: info.expiresAt)
+            ])
+        }
         engine.pinningEventHandler = { [weak self] event in
             guard let self else { return }
             switch event {

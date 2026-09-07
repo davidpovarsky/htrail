@@ -43,6 +43,7 @@ public struct StreamingResponseMetadata: Sendable {
 
 public typealias StreamingResponseInspectionPolicy = @Sendable (CapturedRequest, StreamingResponseMetadata) -> Int?
 public typealias StreamingResponseInspector = @Sendable (CapturedRequest, CapturedResponse) async throws -> CapturedResponse?
+public typealias StreamingResponseObserver = @Sendable (CapturedRequest, CapturedResponse) -> Void
 
 /// A Charles-style intercepting HTTP/HTTPS proxy.
 ///
@@ -60,6 +61,7 @@ public final class ProxyServer: @unchecked Sendable {
     /// False when a caller passed in a shared group we don't own.
     private let ownsGroup: Bool
     private var channel: Channel?
+    private var upstreamPool: UpstreamConnectionPool?
     private let stateLock = NSLock()
 
     /// Rule engine (block / map / rewrite / throttle / breakpoint). Shared so the
@@ -87,9 +89,12 @@ public final class ProxyServer: @unchecked Sendable {
     /// the maximum body bytes that may be held; nil streams immediately.
     public var streamingResponseInspectionPolicy: StreamingResponseInspectionPolicy?
     public var streamingResponseInspector: StreamingResponseInspector?
+    public var streamingResponseObserver: StreamingResponseObserver?
     public var runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)?
     public var upstreamIdleTimeout: TimeAmount = ProxyTuning.defaultIdleTimeout
     public var upstreamConnectTimeout: TimeAmount = ProxyTuning.defaultConnectTimeout
+    /// Nil preserves HTTrail's historical fresh-connection behavior.
+    public var upstreamConnectionPoolConfiguration: UpstreamConnectionPoolConfiguration?
 
     public init(port: Int, certificateAuthority: CertificateAuthority, sink: FlowSink,
                 engine: InterceptEngine = InterceptEngine(), group: EventLoopGroup? = nil) {
@@ -140,9 +145,12 @@ public final class ProxyServer: @unchecked Sendable {
         let requestCaptureBodyCap = self.requestCaptureBodyCap
         let responseInspectionPolicy = self.streamingResponseInspectionPolicy
         let responseInspector = self.streamingResponseInspector
+        let responseObserver = self.streamingResponseObserver
         let runtimeEventHandler = self.runtimeEventHandler
         let idleTimeout = self.upstreamIdleTimeout
         let connectTimeout = self.upstreamConnectTimeout
+        let upstreamPool = upstreamConnectionPoolConfiguration.map { UpstreamConnectionPool(configuration: $0) }
+        stateLock.lock(); self.upstreamPool = upstreamPool; stateLock.unlock()
 
         let bootstrap = ServerBootstrap(group: group)
             .serverChannelOption(ChannelOptions.backlog, value: 256)
@@ -159,8 +167,10 @@ public final class ProxyServer: @unchecked Sendable {
                                                   requestInspectionBodyCap: requestInspectionBodyCap,
                                                   requestCaptureBodyCap: requestCaptureBodyCap,
                                                   responseInspectionPolicy: responseInspectionPolicy,
-                                                  responseInspector: responseInspector,
-                                                  runtimeEventHandler: runtimeEventHandler,
+                                                   responseInspector: responseInspector,
+                                                   responseObserver: responseObserver,
+                                                   runtimeEventHandler: runtimeEventHandler,
+                                                   upstreamPool: upstreamPool,
                                                   idleTimeout: idleTimeout,
                                                   connectTimeout: connectTimeout)
                 return channel.pipeline.addHandler(encoder, name: ProxyHandlerName.httpEncoder)
@@ -175,6 +185,8 @@ public final class ProxyServer: @unchecked Sendable {
     public func stop() async throws {
         let ch = takeChannel()
         try await ch?.close().get()
+        stateLock.lock(); let pool = upstreamPool; upstreamPool = nil; stateLock.unlock()
+        pool?.shutdown()
         // Only shut down the event-loop group if we created it; a caller-owned
         // group must outlive us. Without this each pair/unpair cycle leaks an
         // OS thread pool.

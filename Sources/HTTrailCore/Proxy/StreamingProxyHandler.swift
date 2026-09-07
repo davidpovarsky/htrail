@@ -1,15 +1,22 @@
 import Foundation
 import NIOCore
 import NIOHTTP1
+import NIOTLS
 
 /// Closes the channel when an `IdleStateHandler` reports inactivity. Used on
 /// upstream connections so an origin that accepts the socket but never (or no
 /// longer) sends data is torn down instead of hanging the client forever.
 final class IdleCloseHandler: ChannelInboundHandler {
     typealias InboundIn = NIOAny
+    private let host: String?
+    private let events: (@Sendable (ProxyRuntimeEvent) -> Void)?
+    init(host: String? = nil, events: (@Sendable (ProxyRuntimeEvent) -> Void)? = nil) {
+        self.host = host; self.events = events
+    }
 
     func userInboundEventTriggered(context: ChannelHandlerContext, event: Any) {
         if event is IdleStateHandler.IdleStateEvent {
+            events?(ProxyRuntimeEvent(kind: .upstreamReadTimeout, host: host, detail: "upstream read idle timeout"))
             context.close(promise: nil)
         } else {
             context.fireUserInboundEventTriggered(event)
@@ -34,7 +41,7 @@ final class IdleCloseHandler: ChannelInboundHandler {
 /// Lives on the **upstream** channel. All client I/O goes through the thread-safe
 /// `Channel` API (never the client's handler context), so crossing event loops is
 /// safe.
-final class StreamingProxyHandler: ChannelInboundHandler {
+final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandler {
     typealias InboundIn = HTTPClientResponsePart
     typealias OutboundOut = HTTPClientRequestPart
 
@@ -46,9 +53,12 @@ final class StreamingProxyHandler: ChannelInboundHandler {
     private let completeRequestOnActive: Bool
     private let responseInspectionPolicy: StreamingResponseInspectionPolicy?
     private let responseInspector: StreamingResponseInspector?
+    private let responseObserver: StreamingResponseObserver?
     private let targetHost: String?
     private let targetUsesTLS: Bool
     private let runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)?
+    private let upstreamTarget: UpstreamTarget?
+    private let upstreamPool: UpstreamConnectionPool?
     private let flowID: UUID
     private let startedAt: Date
     private let secure: Bool
@@ -69,6 +79,11 @@ final class StreamingProxyHandler: ChannelInboundHandler {
     private var inspectionLimit: Int?
     private var inspectionBuffer = Data()
     private var upstreamHead: HTTPResponseHead?
+    private var requestSent = false
+    private var responseBytes = 0
+    private var responseEnded = false
+    private var reused = false
+    private let requestStarted = DispatchTime.now().uptimeNanoseconds
 
     init(clientChannel: Channel, requestHead: HTTPRequestHead, requestBody: ByteBuffer,
          captured: CapturedRequest, flowID: UUID, startedAt: Date, secure: Bool,
@@ -77,8 +92,10 @@ final class StreamingProxyHandler: ChannelInboundHandler {
          capturedRequestProvider: (() -> CapturedRequest)? = nil,
          responseInspectionPolicy: StreamingResponseInspectionPolicy? = nil,
          responseInspector: StreamingResponseInspector? = nil,
+         responseObserver: StreamingResponseObserver? = nil,
          targetHost: String? = nil, targetUsesTLS: Bool = false,
-         runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)? = nil) {
+         runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)? = nil,
+         upstreamTarget: UpstreamTarget? = nil, upstreamPool: UpstreamConnectionPool? = nil) {
         self.clientChannel = clientChannel
         self.requestHead = requestHead
         self.requestBody = requestBody
@@ -87,9 +104,12 @@ final class StreamingProxyHandler: ChannelInboundHandler {
         self.completeRequestOnActive = completeRequestOnActive
         self.responseInspectionPolicy = responseInspectionPolicy
         self.responseInspector = responseInspector
+        self.responseObserver = responseObserver
         self.targetHost = targetHost
         self.targetUsesTLS = targetUsesTLS
         self.runtimeEventHandler = runtimeEventHandler
+        self.upstreamTarget = upstreamTarget
+        self.upstreamPool = upstreamPool
         self.flowID = flowID
         self.startedAt = startedAt
         self.secure = secure
@@ -99,7 +119,17 @@ final class StreamingProxyHandler: ChannelInboundHandler {
         self.isHeadRequest = captured.method.caseInsensitiveCompare("HEAD") == .orderedSame
     }
 
-    func channelActive(context: ChannelHandlerContext) {
+    func handlerAdded(context: ChannelHandlerContext) {
+        if context.channel.isActive { sendRequest(context: context) }
+    }
+
+    func channelActive(context: ChannelHandlerContext) { sendRequest(context: context) }
+
+    func markReused() { reused = true }
+
+    private func sendRequest(context: ChannelHandlerContext) {
+        guard !requestSent else { return }
+        requestSent = true
         context.write(wrapOutboundOut(.head(requestHead)), promise: nil)
         if requestBody.readableBytes > 0 {
             context.write(wrapOutboundOut(.body(.byteBuffer(requestBody))), promise: nil)
@@ -121,6 +151,8 @@ final class StreamingProxyHandler: ChannelInboundHandler {
             version = head.version
             capturedHeaders = head.headers.map { HeaderPair(name: $0.name, value: $0.value) }
             upstreamHead = head
+            runtimeEventHandler?(ProxyRuntimeEvent(kind: .upstreamTiming, host: targetHost,
+                detail: "ttfbMs=\((DispatchTime.now().uptimeNanoseconds - requestStarted) / 1_000_000) protocol=http/1.1 reused=\(reused)"))
             if head.status.code >= 400 {
                 runtimeEventHandler?(ProxyRuntimeEvent(
                     kind: .originHTTPStatus, host: targetHost,
@@ -142,6 +174,7 @@ final class StreamingProxyHandler: ChannelInboundHandler {
 
         case .body(var chunk):
             let available = chunk.readableBytes
+            responseBytes += available
             if let limit = inspectionLimit {
                 if inspectionBuffer.count + available <= limit {
                     if let bytes = chunk.readBytes(length: available) { inspectionBuffer.append(contentsOf: bytes) }
@@ -173,6 +206,7 @@ final class StreamingProxyHandler: ChannelInboundHandler {
             lastWrite = clientChannel.write(NIOAny(HTTPServerResponsePart.body(.byteBuffer(chunk))))
 
         case .end:
+            responseEnded = true
             if inspectionLimit != nil { finishInspection(context: context) }
             else { finish(context: context, success: true) }
         }
@@ -200,6 +234,12 @@ final class StreamingProxyHandler: ChannelInboundHandler {
     }
 
     func errorCaught(context: ChannelHandlerContext, error: Error) {
+        if isUncleanShutdown(error), framingComplete {
+            runtimeEventHandler?(ProxyRuntimeEvent(kind: .benignTLSPeerClose, host: targetHost,
+                                                    detail: "complete response followed by uncleanShutdown"))
+            finish(context: context, success: true)
+            return
+        }
         runtimeEventHandler?(ProxyFailureClassifier.event(error: error, host: targetHost, tls: targetUsesTLS))
         finish(context: context, success: false)
     }
@@ -207,7 +247,7 @@ final class StreamingProxyHandler: ChannelInboundHandler {
     func channelInactive(context: ChannelHandlerContext) {
         // A clean close after the head (HTTP/1.0 / close-delimited bodies) is a
         // successful completion; a close before any head is an upstream failure.
-        finish(context: context, success: headSent)
+        finish(context: context, success: framingComplete)
     }
 
     // MARK: - Finalisation
@@ -233,7 +273,7 @@ final class StreamingProxyHandler: ChannelInboundHandler {
             sendBadGateway()
             recordFlow(failed: true, error: "Upstream did not respond")
         }
-        context.close(promise: nil)
+        finishUpstream(context: context, reusable: success && responseEnded)
     }
 
     private func finishInspection(context: ChannelHandlerContext) {
@@ -256,8 +296,45 @@ final class StreamingProxyHandler: ChannelInboundHandler {
             self.sendInspected(output)
             self.sink.record(Flow(id: self.flowID, request: request, response: self.captureVersion(output),
                                   state: .completed, startedAt: self.startedAt, endedAt: Date(), secure: self.secure))
-            upstreamChannel.close(promise: nil)
+            self.responseObserver?(request, self.captureVersion(output))
+            self.finishUpstream(channel: upstreamChannel, reusable: true)
         }
+    }
+
+    private var framingComplete: Bool {
+        guard let head = upstreamHead else { return false }
+        if responseEnded { return true }
+        if isHeadRequest || head.status.code == 204 || head.status.code == 304 || (100..<200).contains(Int(head.status.code)) { return true }
+        if let value = head.headers.first(name: "Content-Length"), let expected = Int(value) { return responseBytes == expected }
+        return !head.isKeepAlive // close-delimited HTTP/1.x body completes at peer close
+    }
+
+    private func finishUpstream(context: ChannelHandlerContext, reusable: Bool) {
+        finishUpstream(channel: context.channel, reusable: reusable)
+    }
+
+    private func finishUpstream(channel: Channel, reusable: Bool) {
+        let elapsed = (DispatchTime.now().uptimeNanoseconds - requestStarted) / 1_000_000
+        runtimeEventHandler?(ProxyRuntimeEvent(kind: .upstreamTiming, host: targetHost,
+                                               detail: "totalMs=\(elapsed) protocol=http/1.1 reused=\(reused)"))
+        guard reusable, let pool = upstreamPool, let target = upstreamTarget,
+              upstreamHead?.isKeepAlive == true, requestHead.isKeepAlive else {
+            if let pool = upstreamPool, let target = upstreamTarget {
+                let reason = upstreamHead?.isKeepAlive == false ? "origin-connection-close" : "response-not-reusable"
+                pool.discard(channel, target: target, reason: reason, events: runtimeEventHandler)
+            } else { channel.close(promise: nil) }
+            return
+        }
+        channel.pipeline.removeHandler(self).whenComplete { result in
+            switch result {
+            case .success: pool.release(channel, target: target, events: self.runtimeEventHandler)
+            case .failure: pool.discard(channel, target: target, reason: "handler-removal-failure", events: self.runtimeEventHandler)
+            }
+        }
+    }
+
+    private func isUncleanShutdown(_ error: Error) -> Bool {
+        String(describing: error).localizedCaseInsensitiveContains("uncleanShutdown")
     }
 
     private func sendHead(_ head: HTTPResponseHead) {
@@ -307,9 +384,11 @@ final class StreamingProxyHandler: ChannelInboundHandler {
             headers: capturedHeaders, body: captureBuffer, timestamp: Date(),
             bodyTruncated: truncated ? true : nil
         ) : nil
-        sink.record(Flow(id: flowID, request: capturedRequestProvider?() ?? captured, response: response,
+        let request = capturedRequestProvider?() ?? captured
+        sink.record(Flow(id: flowID, request: request, response: response,
                          state: failed ? .failed : .completed, error: error,
                          startedAt: startedAt, endedAt: Date(), secure: secure))
+        if let response { responseObserver?(request, response) }
     }
 
     private func sendBadGateway() {
@@ -348,5 +427,23 @@ final class StreamingProxyHandler: ChannelInboundHandler {
         }
         headers.replaceOrAdd(name: "Connection", value: keepAlive ? "keep-alive" : "close")
         return HTTPResponseHead(version: .http1_1, status: status, headers: headers)
+    }
+}
+
+final class UpstreamTLSHandshakeTimingHandler: ChannelInboundHandler, RemovableChannelHandler {
+    typealias InboundIn = NIOAny
+    private let host: String
+    private let started: UInt64
+    private let events: (@Sendable (ProxyRuntimeEvent) -> Void)?
+    init(host: String, started: UInt64, events: (@Sendable (ProxyRuntimeEvent) -> Void)?) {
+        self.host = host; self.started = started; self.events = events
+    }
+    func userInboundEventTriggered(context: ChannelHandlerContext, event: Any) {
+        if case TLSUserEvent.handshakeCompleted = event {
+            events?(ProxyRuntimeEvent(kind: .upstreamTiming, host: host,
+                                     detail: "tlsHandshakeMs=\((DispatchTime.now().uptimeNanoseconds - started) / 1_000_000)"))
+            context.pipeline.removeHandler(self, promise: nil)
+        }
+        context.fireUserInboundEventTriggered(event)
     }
 }

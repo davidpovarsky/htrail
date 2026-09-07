@@ -5,9 +5,18 @@ public enum ProxyRuntimeEventKind: String, Sendable {
     case upstreamTLSFailure
     case upstreamCertificateFailure
     case upstreamTimeout
+    case upstreamConnectTimeout
+    case upstreamTLSHandshakeTimeout
+    case upstreamReadTimeout
     case parserOrProtocolFailure
     case blindTunnelFailure
     case originHTTPStatus
+    case upstreamPoolHit
+    case upstreamPoolMiss
+    case upstreamPoolEviction
+    case upstreamTiming
+    case benignTLSPeerClose
+    case antiBotChallenge
 }
 
 public struct ProxyRuntimeEvent: Sendable {
@@ -25,6 +34,8 @@ enum ProxyFailureClassifier {
         let detail = String(describing: error)
         let lower = detail.lowercased()
         if lower.contains("timeout") || lower.contains("timed out") {
+            if lower.contains("connect") { return ProxyRuntimeEvent(kind: .upstreamConnectTimeout, host: host, detail: detail) }
+            if lower.contains("handshake") { return ProxyRuntimeEvent(kind: .upstreamTLSHandshakeTimeout, host: host, detail: detail) }
             return ProxyRuntimeEvent(kind: .upstreamTimeout, host: host, detail: detail)
         }
         if tls && (lower.contains("certificate") || lower.contains("cert verify") || lower.contains("unknown ca")) {

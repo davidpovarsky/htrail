@@ -90,6 +90,16 @@ public struct PinnedHostInfo: Sendable, Identifiable, Equatable, Codable {
     }
 }
 
+public struct CompatibilityBypassInfo: Sendable, Identifiable, Equatable, Codable {
+    public var id: String { host }
+    public let host: String
+    public let reason: String
+    public let expiresAt: Date
+    public init(host: String, reason: String, expiresAt: Date) {
+        self.host = host; self.reason = reason; self.expiresAt = expiresAt
+    }
+}
+
 /// Generic observability events for pinning/compatibility decisions. Callers
 /// decide whether and where to persist or log them.
 public enum PinningEvent: Sendable, Equatable {
@@ -149,11 +159,13 @@ public final class InterceptEngine: @unchecked Sendable {
     private var globalMITMSucceeded = false
     /// Hosts the user has explicitly forced back into decryption despite detection.
     private var forceDecryptHosts: Set<String> = []
+    private var temporaryCompatibilityBypasses: [String: CompatibilityBypassInfo] = [:]
     private var pinningConfig = PinningConfig()
 
     /// Provided by the UI to handle breakpoints interactively.
     public var breakpointHandler: (@Sendable (BreakpointEvent) async -> BreakpointEdit?)?
     public var pinningEventHandler: (@Sendable (PinningEvent) -> Void)?
+    public var compatibilityBypassEventHandler: (@Sendable (CompatibilityBypassInfo) -> Void)?
 
     public init() {}
 
@@ -189,6 +201,12 @@ public final class InterceptEngine: @unchecked Sendable {
         // A user-forced host is always decrypted, overriding pinning + allowlist.
         if forceDecryptHosts.contains(host) {
             lock.unlock(); pinningEventHandler?(.forceDecryptOverride(host: host)); return true
+        }
+        if let bypass = temporaryCompatibilityBypasses[host] {
+            if bypass.expiresAt > Date() {
+                lock.unlock(); compatibilityBypassEventHandler?(bypass); return false
+            }
+            temporaryCompatibilityBypasses[host] = nil
         }
         // Auto-detected pinned hosts tunnel until their entry expires.
         if pinningConfig.enabled, let expiry = autoPinned[host] {
@@ -244,6 +262,22 @@ public final class InterceptEngine: @unchecked Sendable {
         pinningEventHandler?(.mitmHandshakeFailed(host: host))
         pinningEventHandler?(.compatibilitySuspected(info))
         return true
+    }
+
+    public func installCompatibilityBypass(_ info: CompatibilityBypassInfo, now: Date = Date()) {
+        guard info.expiresAt > now else { return }
+        lock.lock(); temporaryCompatibilityBypasses[info.host] = info; lock.unlock()
+        compatibilityBypassEventHandler?(info)
+    }
+
+    public func restoreCompatibilityBypasses(_ entries: [CompatibilityBypassInfo], now: Date = Date()) {
+        entries.forEach { installCompatibilityBypass($0, now: now) }
+    }
+
+    public func activeCompatibilityBypasses(now: Date = Date()) -> [CompatibilityBypassInfo] {
+        lock.lock(); defer { lock.unlock() }
+        temporaryCompatibilityBypasses = temporaryCompatibilityBypasses.filter { $0.value.expiresAt > now }
+        return temporaryCompatibilityBypasses.values.sorted { $0.host < $1.host }
     }
 
     /// Restores unexpired auto-detected entries before a constrained proxy begins
