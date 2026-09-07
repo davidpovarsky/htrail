@@ -1,0 +1,49 @@
+{
+  "enabled" : true,
+  "failurePolicy" : {
+    "classifierError" : "failOpen",
+    "imageTooLarge" : "failOpen",
+    "memoryPressure" : "failOpen",
+    "modelUnavailable" : "failOpen",
+    "unsupportedEncoding" : "failOpen"
+  },
+  "mobileCLIP2Policy" : {
+    "blockWomanWithoutMarginIfScoreAtLeast" : 0.7,
+    "faceFallbackWomanMinScore" : 0.48,
+    "uncertainMinScore" : 0.9,
+    "wholeImageFallbackWomanMinScore" : 0.58,
+    "womanMinMarginOverMan" : 0.1,
+    "womanMinScore" : 0.42
+  },
+  "models" : { "mobileCLIP2" : true, "nudeNet" : true },
+  "name" : "combined-default",
+  "nudeNet" : {
+    "runFullImage" : true,
+    "runPersonCrops" : true,
+    "thresholds" : {
+      "ANUS_COVERED" : 0.9, "ANUS_EXPOSED" : 0.3,
+      "ARMPITS_COVERED" : 1.01, "ARMPITS_EXPOSED" : 1.01,
+      "BELLY_COVERED" : 1.01, "BELLY_EXPOSED" : 0.75,
+      "BUTTOCKS_COVERED" : 0.82, "BUTTOCKS_EXPOSED" : 0.35,
+      "FACE_FEMALE" : 1.01, "FACE_MALE" : 1.01,
+      "FEET_COVERED" : 1.01, "FEET_EXPOSED" : 1.01,
+      "FEMALE_BREAST_COVERED" : 0.82, "FEMALE_BREAST_EXPOSED" : 0.3,
+      "FEMALE_GENITALIA_COVERED" : 0.8, "FEMALE_GENITALIA_EXPOSED" : 0.3,
+      "MALE_BREAST_EXPOSED" : 1.01, "MALE_GENITALIA_EXPOSED" : 0.3
+    }
+  },
+  "personDetection" : {
+    "enabled" : true, "horizontalCropPadding" : 0.15, "maximumPersonCrops" : 12,
+    "useFaceFallback" : true, "useWholeImageFallback" : true, "verticalCropPadding" : 0.2
+  },
+  "pipeline" : {
+    "maximumImageBytes" : 4194304, "maximumPixelDimension" : 2048,
+    "maximumTotalPixels" : 12000000, "shortCircuitOnBlock" : true
+  },
+  "runtime" : {
+    "inspectionQueueOverflowAction" : "failOpen", "maxConcurrentImageInspections" : 1,
+    "maxConcurrentInference" : 1, "maxQueuedImageInspections" : 2,
+    "minimumAvailableMemoryBytes" : 33554432
+  },
+  "schemaVersion" : 1
+}

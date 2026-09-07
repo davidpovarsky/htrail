@@ -5,6 +5,10 @@ import Foundation
 public enum PurelineDiagnosticArchive {
     public static func export(diagnostics: PurelinePacketTunnelDiagnostics = .shared) throws -> URL {
         let events = (try? Data(contentsOf: diagnostics.logURL)) ?? Data()
+        let configurationStore = PurelineFilterConfigurationStore.shared
+        let activeConfiguration = (try? Data(contentsOf: configurationStore.activeURL)) ?? Data()
+        let revision = (try? Data(contentsOf: configurationStore.revisionURL)) ?? Data()
+        let acknowledgement = (try? Data(contentsOf: configurationStore.acknowledgementURL)) ?? Data()
         let summaryObject: [String: Any] = [
             "exportedAt": ISO8601DateFormatter().string(from: Date()),
             "packetTunnelEventCount": diagnostics.events().count,
@@ -15,6 +19,9 @@ public enum PurelineDiagnosticArchive {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("Pureline-Diagnostics-\(stamp).zip")
         let data = makeZIP(entries: [
             ("packet-tunnel-events.jsonl", events),
+            ("filter-active.json", activeConfiguration),
+            ("filter-revision.json", revision),
+            ("filter-packet-tunnel-acknowledgement.json", acknowledgement),
             ("summary.json", summary)
         ])
         try data.write(to: url, options: .atomic)
