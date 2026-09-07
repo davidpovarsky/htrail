@@ -189,6 +189,14 @@ targets:
       - path: PurelineIntegration
       - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/NudeNet320n.mlpackage
         buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/NudeNet320n.labels.json
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ImageEncoder.mlpackage
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2PromptEmbeddings.json
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ModelManifest.json
+        buildPhase: resources
     dependencies:
       - package: HTTrail
         product: HTTrailCore

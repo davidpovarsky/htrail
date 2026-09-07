@@ -163,12 +163,128 @@ final class IntegratedRuntimeTests: XCTestCase {
     }
 
     func testPacketTunnelDirectDecisionUsesOnlyNudeNet() {
-        XCTAssertFalse(DirectImageSafetyAnalyzer.packetTunnelUsesMobileCLIP)
+        XCTAssertTrue(DirectImageSafetyAnalyzer.packetTunnelUsesMobileCLIP)
         XCTAssertTrue(DirectImageSafetyAnalyzer.packetTunnelUsesNudeNet)
+    }
+
+    func testConfigurationValidationImportAndRoundTrip() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = PurelineFilterConfigurationStore(directory: directory)
+        let data = try PurelineFilterConfiguration.builtIn.normalizedData()
+        let installed = try store.install(data: data, importedFilename: "test.json")
+        XCTAssertEqual(installed.configuration, .builtIn)
+        XCTAssertEqual(try store.exportActive(), data)
+        XCTAssertEqual(try PurelineFilterConfigurationValidator.decodeAndValidate(store.exportActive()), .builtIn)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: store.activeURL.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: store.lastGoodURL.path))
+    }
+
+    func testMalformedUnsupportedAndUnsafeConfigurationsAreRejected() throws {
+        XCTAssertThrowsError(try PurelineFilterConfigurationValidator.decodeAndValidate(Data("{".utf8)))
+        var invalid = PurelineFilterConfiguration.builtIn
+        invalid.schemaVersion = 99
+        XCTAssertThrowsError(try PurelineFilterConfigurationValidator.decodeAndValidate(invalid.normalizedData()))
+        invalid = .builtIn; invalid.mobileCLIP2Policy.womanMinScore = 1.02
+        XCTAssertThrowsError(try PurelineFilterConfigurationValidator.decodeAndValidate(invalid.normalizedData()))
+        invalid = .builtIn; invalid.runtime.maxConcurrentInference = 99
+        XCTAssertThrowsError(try PurelineFilterConfigurationValidator.decodeAndValidate(invalid.normalizedData()))
+        invalid = .builtIn; invalid.pipeline.maximumImageBytes = PurelineFilterConfigurationValidator.maximumImageBytes + 1
+        XCTAssertThrowsError(try PurelineFilterConfigurationValidator.decodeAndValidate(invalid.normalizedData()))
+    }
+
+    func testInvalidConfigurationNeverReplacesLastGoodAndAcknowledgementMatchesRevision() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = PurelineFilterConfigurationStore(directory: directory)
+        let good = try store.restoreDefault()
+        XCTAssertThrowsError(try store.install(data: Data("not json".utf8), importedFilename: "bad.json"))
+        XCTAssertEqual(try store.loadActive(), good)
+        try store.acknowledge(good.revision)
+        XCTAssertEqual(store.loadAcknowledgement()?.hash, good.revision.hash)
+        XCTAssertNotNil(store.loadAcknowledgement()?.appliedAt)
+    }
+
+    func testCombinedPolicyMatchesCrossPlatformORSemantics() {
+        let config = PurelineFilterConfiguration.builtIn
+        let woman = PurelineMobileCLIPEvidence(source: "humanRectangle", woman: 0.50, man: 0.20, uncertain: 0)
+        let allowPerson = PurelineMobileCLIPEvidence(source: "humanRectangle", woman: 0.41, man: 0.20, uncertain: 0)
+        let nude = PurelineNudeNetEvidence(label: "FEMALE_BREAST_EXPOSED", confidence: 0.31)
+        XCTAssertTrue(PurelineImageSafetyPolicy.blocks(mobileCLIP: [woman], nudeNet: [], configuration: config))
+        XCTAssertTrue(PurelineImageSafetyPolicy.blocks(mobileCLIP: [allowPerson], nudeNet: [nude], configuration: config))
+        XCTAssertFalse(PurelineImageSafetyPolicy.blocks(mobileCLIP: [allowPerson], nudeNet: [], configuration: config))
+        XCTAssertTrue(PurelineImageSafetyPolicy.mobileCLIPBlocks(.init(source: "humanRectangle", woman: 0.1, man: 0.1, uncertain: 0.91), policy: config.mobileCLIP2Policy))
+        XCTAssertFalse(PurelineImageSafetyPolicy.mobileCLIPBlocks(.init(source: "humanRectangle", woman: 0.50, man: 0.45, uncertain: 0), policy: config.mobileCLIP2Policy))
+        XCTAssertTrue(PurelineImageSafetyPolicy.mobileCLIPBlocks(.init(source: "faceFallback", woman: 0.49, man: 0.20, uncertain: 0), policy: config.mobileCLIP2Policy))
+        XCTAssertTrue(PurelineImageSafetyPolicy.mobileCLIPBlocks(.init(source: "wholeImageFallback", woman: 0.59, man: 0.20, uncertain: 0), policy: config.mobileCLIP2Policy))
+        XCTAssertTrue(PurelineImageSafetyPolicy.mobileCLIPBlocks(.init(source: "humanRectangle", woman: 0.71, man: 0.70, uncertain: 0), policy: config.mobileCLIP2Policy))
+    }
+
+    func testModelPreparationIsTrueSingleFlightAndRetriesAfterFailure() async throws {
+        for _ in 0..<2 { // one lifecycle for each expensive model wrapper
+            let counter = AttemptCounter()
+            let lifecycle = PurelineModelLifecycle {
+                await counter.increment()
+                try await Task.sleep(for: .milliseconds(50))
+            }
+            let created = try await withThrowingTaskGroup(of: Bool.self) { group in
+                for _ in 0..<10 { group.addTask { try await lifecycle.prepareIfNeeded() } }
+                var values: [Bool] = []
+                for try await value in group { values.append(value) }
+                return values
+            }
+            XCTAssertEqual(created.filter { $0 }.count, 1)
+            let attempts = await counter.value()
+            XCTAssertEqual(attempts, 1)
+            let snapshot = await lifecycle.snapshot()
+            XCTAssertEqual(snapshot.attempts, 1); XCTAssertEqual(snapshot.completions, 1)
+        }
+
+        let counter = AttemptCounter()
+        let failing = PurelineModelLifecycle {
+            let attempt = await counter.increment()
+            if attempt == 1 { throw CocoaError(.fileReadCorruptFile) }
+        }
+        do { _ = try await failing.prepareIfNeeded(); XCTFail("first preparation should fail") } catch {}
+        let retryPrepared = try await failing.prepareIfNeeded()
+        XCTAssertTrue(retryPrepared)
+        let retryAttempts = await counter.value()
+        XCTAssertEqual(retryAttempts, 2)
+    }
+
+    func testInspectionAdmissionIsBoundedAndOverflowFailsOpen() async {
+        let admission = PurelineInspectionAdmissionController()
+        var config = PurelineFilterConfiguration.builtIn
+        config.runtime.maxConcurrentImageInspections = 1
+        config.runtime.maxQueuedImageInspections = 2
+        admission.apply(config.runtime, maximumImageBytes: config.pipeline.maximumImageBytes)
+        XCTAssertTrue(admission.tryReserve(id: "one", bytes: 100))
+        XCTAssertTrue(admission.tryReserve(id: "two", bytes: 100))
+        XCTAssertTrue(admission.tryReserve(id: "three", bytes: 100))
+        XCTAssertFalse(admission.tryReserve(id: "overflow", bytes: 100))
+        XCTAssertFalse(admission.tryReserve(id: "oversized", bytes: config.pipeline.maximumImageBytes + 1))
+        let snapshot = admission.snapshot()
+        XCTAssertEqual(snapshot.active, 1); XCTAssertEqual(snapshot.queued, 2)
+        XCTAssertLessThanOrEqual(snapshot.inFlightBytes, PurelineInspectionAdmissionController.hardInFlightByteCeiling)
+        admission.release(id: "one"); admission.release(id: "two"); admission.release(id: "three")
+        XCTAssertEqual(admission.snapshot().inFlightBytes, 0)
+    }
+
+    func testAntiBotDetectionRequiresStrongChallengeSignals() {
+        let normal = CapturedResponse(statusCode: 403, reasonPhrase: "Forbidden", httpVersion: "HTTP/1.1", headers: [], body: Data("denied".utf8), timestamp: Date())
+        XCTAssertFalse(PurelineAntiBotChallengeDetector.isStrongChallenge(normal))
+        let challenge = CapturedResponse(statusCode: 403, reasonPhrase: "Forbidden", httpVersion: "HTTP/1.1",
+            headers: [HeaderPair(name: "Server", value: "cloudflare"), HeaderPair(name: "CF-Ray", value: "abc")],
+            body: Data("<title>Just a moment...</title><script src='challenge-platform'></script>".utf8), timestamp: Date())
+        XCTAssertTrue(PurelineAntiBotChallengeDetector.isStrongChallenge(challenge))
     }
 
     func testDisabledDirectFilteringDoesNotPrepareClassifier() async {
         let analyzer = DirectImageSafetyAnalyzer()
+        var disabled = PurelineFilterConfiguration.builtIn
+        disabled.enabled = false
+        await analyzer.apply(configuration: disabled, revisionHash: "disabled")
+        await analyzer.prepare()
         let attempts = await analyzer.preparationAttemptCount()
         XCTAssertEqual(attempts, 0)
     }
@@ -215,4 +331,10 @@ final class IntegratedRuntimeTests: XCTestCase {
         guard result == KERN_SUCCESS else { return 0 }
         return UInt64(info.phys_footprint)
     }
+}
+
+private actor AttemptCounter {
+    private var count = 0
+    @discardableResult func increment() -> Int { count += 1; return count }
+    func value() -> Int { count }
 }
