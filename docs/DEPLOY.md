@@ -69,10 +69,11 @@ The signed iOS workflow uses these additional secrets:
 
 | Secret | Required | Contents |
 |---|---|---|
-| `IOS_DISTRIBUTION_CERTIFICATE_P12_BASE64` | Every signed build | Base64-encoded Apple Distribution `.p12` |
-| `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD` | Every signed build | Password used when exporting that `.p12` |
-| `IOS_APP_PROVISIONING_PROFILE_BASE64` | Every signed build | Base64 App Store profile for `com.davidpovarsky.httrail` |
-| `IOS_PACKET_TUNNEL_PROVISIONING_PROFILE_BASE64` | Every signed build | Base64 App Store profile for `com.davidpovarsky.httrail.PacketTunnel` |
+| `APPLE_CERTIFICATE_P12_B64` | Every signed build | Base64-encoded Apple Distribution `.p12` |
+| `APPLE_CERTIFICATE_PASSWORD` | Every signed build | Plain-text password used when exporting that `.p12` |
+| `APPLE_MAIN_PROVISIONING_PROFILE_B64` | Every signed build | Base64 App Store profile for `com.davidpovarsky.httrail` |
+| `APPLE_TUNNEL_PROVISIONING_PROFILE_B64` | Every signed build | Base64 App Store profile for `com.davidpovarsky.httrail.PacketTunnel` |
+| `APPLE_TEAM_ID` | Every signed build | Plain-text Apple Developer Team ID |
 | `ASC_KEY_P8` | TestFlight upload only | Base64-encoded App Store Connect API key `.p8` |
 | `ASC_KEY_ID` | TestFlight upload only | App Store Connect API key ID |
 | `ASC_ISSUER_ID` | TestFlight upload only | App Store Connect API issuer ID |
@@ -94,6 +95,12 @@ branch to distribute. Leave `upload_to_testflight` enabled to validate and
 upload automatically, or disable it to produce and retain only the signed IPA
 artifact. CI derives `CFBundleVersion` as `GITHUB_RUN_NUMBER * 100 +
 GITHUB_RUN_ATTEMPT`, so reruns have a distinct TestFlight build number.
+
+Before spending time on the archive, upload-enabled runs use the App Store
+Connect API to confirm an app record exists for `com.davidpovarsky.httrail`.
+Apple requires this record before the first upload. If it is absent, the workflow
+stops with instructions to create it using that Bundle ID plus the app name,
+primary language, SKU, and user-access choice required by App Store Connect.
 
 The workflow decodes signing assets only into runner-temporary storage, imports
 the certificate into a temporary keychain, installs both provisioning profiles,
