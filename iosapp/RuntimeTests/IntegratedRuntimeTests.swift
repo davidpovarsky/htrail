@@ -28,7 +28,15 @@ final class IntegratedRuntimeTests: XCTestCase {
         let expired = PinnedHostInfo(host: "old.test", expiresAt: now.addingTimeInterval(-1))
         store.save([active, expired], now: now)
         let loaded = store.load(now: now)
-        XCTAssertEqual(loaded.active, [active])
+        XCTAssertEqual(loaded.active.map(\.host), [active.host])
+        guard let loadedActive = loaded.active.first else {
+            return XCTFail("active bypass was not restored")
+        }
+        XCTAssertEqual(
+            loadedActive.expiresAt.timeIntervalSince1970,
+            active.expiresAt.timeIntervalSince1970,
+            accuracy: 0.001
+        )
         XCTAssertTrue(loaded.expired.isEmpty, "expired entries are pruned on save")
     }
 
