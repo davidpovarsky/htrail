@@ -22,7 +22,7 @@ open dist/HTTrail.app
 
 - **Always launch the macOS app via the `.app` bundle**, not `swift run HTTrail`. Without the bundle + `Info.plist` the window server may not surface the window. `make_app.sh` also ad-hoc codesigns so WKWebView/network APIs run without Gatekeeper friction.
 - `swift test` opens a real outbound TLS connection — it needs network access and will fail offline.
-- iOS app: `cd iosapp && xcodegen generate` (regenerates `HTTrailiOS.xcodeproj` from `project.yml`), then build in Xcode. Running on a device needs a **paid** Apple Developer team (the `packet-tunnel-provider` Network Extension entitlement is unavailable to free personal teams). Signing team is `D62Y8JVXB9`. See the project memory for device-install commands.
+- iOS app: `cd iosapp && xcodegen generate` (regenerates `HTTrailiOS.xcodeproj` from `project.yml`), then build in Xcode. Running on a device needs a **paid** Apple Developer team (the `packet-tunnel-provider` Network Extension entitlement is unavailable to free personal teams). Signing team is `NA6HPWARQ2`. See the project memory for device-install commands.
 
 ## Distribution & release
 
@@ -67,7 +67,7 @@ The MITM data flow: plain HTTP (absolute-form URI) is proxied directly; HTTPS ar
 
 ### iOS two-process sharing
 
-The iOS app renders only; the **Packet Tunnel extension** (`iosapp/PacketTunnel/`) runs the MITM proxy so capture survives backgrounding. The two processes coordinate through the **App Group `group.com.1moby.httrail`**:
+The iOS app renders only; the **Packet Tunnel extension** (`iosapp/PacketTunnel/`) runs the MITM proxy so capture survives backgrounding. The two processes coordinate through the **App Group `group.com.davidpovarsky.httrail`**:
 - `AppGroup.swift` — group container + `captured-flows.ndjson` (extension appends, app tails).
 - `AppPaths.swift` — on iOS prefers the App Group container (so both processes read the *same* CA); falls back to per-app Application Support on macOS/tests/missing entitlement.
 - `SharedConfigStore.swift` / `SharedFlowStore.swift` — config + flow exchange across the boundary.

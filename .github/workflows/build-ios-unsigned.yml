@@ -7,18 +7,24 @@ on:
     paths:
       - 'iosapp/**'
       - 'Sources/**'
+      - 'Vendor/AI-Image-Classifier'
+      - '.gitmodules'
       - 'Package.swift'
       - 'Package.resolved'
       - 'scripts/build_unsigned_ios.sh'
+      - 'scripts/prepare_image_filter_models.sh'
       - 'scripts/collect_ios_build_diagnostics.sh'
       - '.github/workflows/build-ios-unsigned.yml'
   pull_request:
     paths:
       - 'iosapp/**'
       - 'Sources/**'
+      - 'Vendor/AI-Image-Classifier'
+      - '.gitmodules'
       - 'Package.swift'
       - 'Package.resolved'
       - 'scripts/build_unsigned_ios.sh'
+      - 'scripts/prepare_image_filter_models.sh'
       - 'scripts/collect_ios_build_diagnostics.sh'
       - '.github/workflows/build-ios-unsigned.yml'
 
@@ -28,11 +34,17 @@ permissions:
 jobs:
   build:
     runs-on: macos-latest
-    timeout-minutes: 90
+    timeout-minutes: 240
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Verify pinned classifier source
+        run: |
+          test "$(git -C Vendor/AI-Image-Classifier rev-parse HEAD)" = "5291eedb9b46fa978e36ccec4f5504b017afe809"
 
       - name: Select Xcode
         run: |
@@ -43,18 +55,32 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen
 
-      - name: Cache SwiftPM
+      - name: Set up model conversion Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: Vendor/AI-Image-Classifier/tools/MobileCLIPConversion/requirements.txt
+
+      - name: Cache SwiftPM and converted MobileCLIP
         uses: actions/cache@v4
         with:
           path: |
             ~/Library/Caches/org.swift.swiftpm
             ~/Library/Developer/Xcode/DerivedData/SourcePackages
-          key: ${{ runner.os }}-swiftpm-${{ hashFiles('Package.resolved', 'Package.swift') }}
+            .model-cache/mobileclip2-s2
+            .model-cache/coreml-mobileclip2-s2
+          key: ${{ runner.os }}-httrail-image-filter-${{ hashFiles('Package.resolved', 'Package.swift', 'Vendor/AI-Image-Classifier/tools/MobileCLIPConversion/**') }}
           restore-keys: |
+            ${{ runner.os }}-httrail-image-filter-
             ${{ runner.os }}-swiftpm-
 
-      - name: Make scripts executable
-        run: chmod +x scripts/build_unsigned_ios.sh scripts/collect_ios_build_diagnostics.sh
+      - name: Prepare build scripts
+        run: chmod +x scripts/prepare_image_filter_models.sh scripts/build_unsigned_ios.sh scripts/collect_ios_build_diagnostics.sh
+
+      - name: Prepare verified image-filter models
+        shell: bash
+        run: scripts/prepare_image_filter_models.sh
 
       - name: Build unsigned IPA
         id: build
@@ -63,6 +89,20 @@ jobs:
       - name: Collect diagnostics
         if: always()
         run: scripts/collect_ios_build_diagnostics.sh
+
+      - name: Verify embedded classifier products
+        if: success()
+        shell: bash
+        run: |
+          app="build/unsigned-ios/DerivedData/Build/Products/Release-iphoneos/HTTrailiOS.app"
+          tunnel="$app/PlugIns/PacketTunnel.appex"
+          test -d "$app/MobileCLIP2S2ImageEncoder.mlmodelc"
+          test -d "$app/NudeNet320n.mlmodelc"
+          test -s "$app/MobileCLIP2S2PromptEmbeddings.json"
+          test -d "$tunnel/MobileCLIP2S2ImageEncoder.mlmodelc"
+          test -d "$tunnel/NudeNet320n.mlmodelc"
+          test -s "$tunnel/MobileCLIP2S2PromptEmbeddings.json"
+          find "$app" -maxdepth 3 \( -name 'EmbeddedImageFilter.framework' -o -name 'ImageFilterCore.framework' \) -print
 
       - name: Verify unsigned IPA exists
         if: success()
@@ -102,5 +142,6 @@ jobs:
             build/unsigned-ios/logs
             build/unsigned-ios/diagnostics
             build/unsigned-ios/diagnostics.zip
+            .model-cache/conversion-verification.json
           if-no-files-found: warn
           retention-days: 30

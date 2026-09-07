@@ -2,7 +2,7 @@ import NetworkExtension
 import HTTrailCore
 import os.log
 
-private let tunnelLog = Logger(subsystem: "com.1moby.httrail.PacketTunnel", category: "capture")
+private let tunnelLog = Logger(subsystem: "com.davidpovarsky.httrail.PacketTunnel", category: "capture")
 
 /// HTTrail's iOS capture engine. `NETransparentProxyProvider` is macOS-only, so
 /// on iOS we use a `NEPacketTunnelProvider` whose job is to (a) run the HTTrail
@@ -37,7 +37,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             return
         }
 
-        engine.apply(config)
+        ImageFilterProxyBridge.apply(config: config, to: engine)
         tunnelLog.log("startTunnel: on-device port=\(port) rules=\(config.rules.filter { $0.enabled }.count) allowlist=\(config.sslAllowlist.count)")
 
         guard let ca = try? CertificateAuthority.loadOrCreate(in: AppPaths.certificatesDirectory) else {
@@ -72,7 +72,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 try? await Task.sleep(nanoseconds: 1_500_000_000)
                 guard let self else { break }
                 let config = self.configStore.load() ?? SharedConfig()
-                self.engine.apply(config)
+                ImageFilterProxyBridge.apply(config: config, to: self.engine)
                 let pinned = self.engine.detectedPinnedHosts().map(\.host)
                 self.configStore.savePinnedHosts(pinned)
                 // Publish what the engine is actually running so the app can show it.

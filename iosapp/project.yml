@@ -1,13 +1,83 @@
 name: HTTrailiOS
 options:
-  bundleIdPrefix: com.1moby
+  bundleIdPrefix: com.davidpovarsky
   deploymentTarget:
-    iOS: "17.0"
+    iOS: "26.5"
   createIntermediateGroups: true
 packages:
   HTTrail:
     path: ".."
+  FlyingFox:
+    url: https://github.com/swhitty/FlyingFox.git
+    from: 0.27.0
 targets:
+  EmbeddedImageFilter:
+    type: framework
+    platform: iOS
+    sources:
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Configuration
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/LocalServer
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models
+        excludes:
+          - NudeNet320n.mlpackage
+          - NudeNet320n.labels.json
+          - MobileCLIP2S2ImageEncoder.mlpackage
+          - MobileCLIP2S2PromptEmbeddings.json
+          - MobileCLIP2S2ModelManifest.json
+          - MobileCLIP2S2ConversionReport.json
+          - MobileCLIP2S2-MODEL-LICENSE.md
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Services
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/ViewModels
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Views
+      - path: ImageFilterIntegration/EmbeddedImageFilterRootView.swift
+    dependencies:
+      - package: FlyingFox
+        product: FlyingFox
+      - package: FlyingFox
+        product: FlyingSocks
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.EmbeddedImageFilter
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "6.0"
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY: YES
+        IPHONEOS_DEPLOYMENT_TARGET: "26.5"
+        DEFINES_MODULE: YES
+
+  ImageFilterCore:
+    type: framework
+    platform: iOS
+    sources:
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Configuration/MobileCLIPPromptConfiguration.swift
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Configuration/PersonClassifierConfiguration.swift
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/ImageSafetyModels.swift
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/NudeDetection.swift
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/PersonClassification.swift
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/LocalServer/ServerConfiguration.swift
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/CoreMLService.swift
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/DetectionMappingService.swift
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/DetectionMergeService.swift
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/HumanDetectionService.swift
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/ImageSafetyPipelineService.swift
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/MobileCLIPService.swift
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/NudityFilterPolicy.swift
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/PersonCropService.swift
+      - path: ImageFilterIntegration/Core/ExtensionSafeDiagnosticLogService.swift
+      - path: ImageFilterIntegration/Core/DirectImageSafetyAnalyzer.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.ImageFilterCore
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "6.0"
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY: YES
+        IPHONEOS_DEPLOYMENT_TARGET: "26.5"
+        DEFINES_MODULE: YES
+        APPLICATION_EXTENSION_API_ONLY: YES
+
   HTTrailiOS:
     type: application
     platform: iOS
@@ -17,9 +87,25 @@ targets:
         buildPhase: resources
       - path: ../Resources/Localizations
         buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/NudeNet320n.mlpackage
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/NudeNet320n.labels.json
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ImageEncoder.mlpackage
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2PromptEmbeddings.json
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ModelManifest.json
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ConversionReport.json
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2-MODEL-LICENSE.md
+        buildPhase: resources
     dependencies:
       - package: HTTrail
         product: HTTrailCore
+      - target: EmbeddedImageFilter
+        embed: true
       - target: PacketTunnel
         embed: true
     info:
@@ -27,7 +113,7 @@ targets:
       properties:
         CFBundleDisplayName: HTTrail
         CFBundleShortVersionString: "1.0"
-        CFBundleVersion: "8"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         CFBundleLocalizations:
           - en
           - zh-Hans
@@ -50,37 +136,41 @@ targets:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
-        # iPad multitasking requires all four orientations or the upload is
-        # rejected (STATE_ERROR.VALIDATION_ERROR). iPhone stays upright via the
-        # base key above; iPad gets PortraitUpsideDown too.
         UISupportedInterfaceOrientations~ipad:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
-        NSLocalNetworkUsageDescription: "HTTrail uses the local network to capture HTTP/HTTPS traffic on this device and to discover a Mac running HTTrail so this device's traffic can be captured there."
+        NSLocalNetworkUsageDescription: "HTTrail uses the local network to capture HTTP/HTTPS traffic on this device and to run the optional local image-classification server."
         NSBonjourServices:
           - _httrail._tcp
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
+        NSCameraUsageDescription: "The embedded image classifier uses the camera for live image classification."
+        NSMicrophoneUsageDescription: "The embedded image classifier uses the microphone for its voice features."
+        NSPhotoLibraryUsageDescription: "The embedded image classifier needs photo-library access to select images for classification."
+        NSSpeechRecognitionUsageDescription: "The embedded image classifier uses speech recognition for voice commands."
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
     entitlements:
       path: HTTrailiOS.entitlements
       properties:
         com.apple.developer.networking.networkextension:
           - packet-tunnel-provider
         com.apple.security.application-groups:
-          - group.com.1moby.httrail
+          - group.com.davidpovarsky.httrail
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.1moby.httrail
-        DEVELOPMENT_TEAM: D62Y8JVXB9
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail
+        DEVELOPMENT_TEAM: NA6HPWARQ2
         CODE_SIGN_STYLE: Automatic
+        PROVISIONING_PROFILE_SPECIFIER: "$(HTTRAIL_APP_PROFILE_SPECIFIER)"
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "8"
         TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SWIFT_VERSION: "5.0"
-        IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "26.5"
         ENABLE_USER_SCRIPT_SANDBOXING: NO
 
   PacketTunnel:
@@ -88,15 +178,25 @@ targets:
     platform: iOS
     sources:
       - path: PacketTunnel
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/NudeNet320n.mlpackage
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ImageEncoder.mlpackage
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2PromptEmbeddings.json
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ModelManifest.json
+        buildPhase: resources
     dependencies:
       - package: HTTrail
         product: HTTrailCore
+      - target: ImageFilterCore
+        embed: true
     info:
       path: PacketTunnel/Info.plist
       properties:
         CFBundleDisplayName: HTTrail Capture
         CFBundleShortVersionString: "1.0"
-        CFBundleVersion: "8"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         NSExtension:
           NSExtensionPointIdentifier: com.apple.networkextension.packet-tunnel
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PacketTunnelProvider
@@ -106,14 +206,120 @@ targets:
         com.apple.developer.networking.networkextension:
           - packet-tunnel-provider
         com.apple.security.application-groups:
-          - group.com.1moby.httrail
+          - group.com.davidpovarsky.httrail
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.1moby.httrail.PacketTunnel
-        DEVELOPMENT_TEAM: D62Y8JVXB9
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.PacketTunnel
+        DEVELOPMENT_TEAM: NA6HPWARQ2
         CODE_SIGN_STYLE: Automatic
+        PROVISIONING_PROFILE_SPECIFIER: "$(HTTRAIL_PACKET_TUNNEL_PROFILE_SPECIFIER)"
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "8"
         SWIFT_VERSION: "5.0"
-        IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "26.5"
         ENABLE_USER_SCRIPT_SANDBOXING: NO
+        APPLICATION_EXTENSION_API_ONLY: YES
+
+  ImageFilterRuntimeHost:
+    type: application
+    platform: iOS
+    sources:
+      - path: RuntimeHost
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/NudeNet320n.mlpackage
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/NudeNet320n.labels.json
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ImageEncoder.mlpackage
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2PromptEmbeddings.json
+        buildPhase: resources
+      - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ModelManifest.json
+        buildPhase: resources
+    dependencies:
+      - target: ImageFilterCore
+        embed: true
+    info:
+      path: RuntimeHost/Info.plist
+      properties:
+        CFBundleDisplayName: ImageFilter Runtime Host
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        UILaunchScreen: {}
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.ImageFilterRuntimeHost
+        SWIFT_VERSION: "6.0"
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        IPHONEOS_DEPLOYMENT_TARGET: "26.5"
+        TARGETED_DEVICE_FAMILY: "1,2"
+
+  HTTrailRuntimeTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: RuntimeTests
+      - path: ../Vendor/AI-Image-Classifier/Screenshots/ClassificationImageSelected.png
+        buildPhase: resources
+    dependencies:
+      - target: ImageFilterRuntimeHost
+      - target: ImageFilterCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.RuntimeTests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "6.0"
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+        IPHONEOS_DEPLOYMENT_TARGET: "26.5"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/ImageFilterRuntimeHost.app/ImageFilterRuntimeHost"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+
+  HTTrailUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+      - path: ../Vendor/AI-Image-Classifier/Screenshots/ClassificationImageSelected.png
+        buildPhase: resources
+    dependencies:
+      - target: HTTrailiOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.UITests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "5.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "26.5"
+        TEST_TARGET_NAME: HTTrailiOS
+
+schemes:
+  HTTrailiOS:
+    build:
+      targets:
+        HTTrailiOS: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+
+  HTTrailRuntimeTests:
+    build:
+      targets:
+        ImageFilterRuntimeHost: all
+        ImageFilterCore: all
+        HTTrailRuntimeTests: [test]
+    test:
+      config: Debug
+      gatherCoverageData: true
+      targets:
+        - name: HTTrailRuntimeTests
+
+  HTTrailUITests:
+    build:
+      targets:
+        HTTrailiOS: all
+        HTTrailUITests: [test]
+    test:
+      config: Debug
+      gatherCoverageData: true
+      targets:
+        - name: HTTrailUITests

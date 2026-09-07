@@ -1,0 +1,127 @@
+name: Full iOS Simulator QA
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'iosapp/**'
+      - 'Sources/**'
+      - 'Tests/**'
+      - 'Vendor/AI-Image-Classifier'
+      - '.gitmodules'
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'scripts/prepare_image_filter_models.sh'
+      - 'scripts/run_ios_simulator_full_suite.sh'
+      - 'scripts/generate_ios_simulator_report.py'
+      - '.github/workflows/ios-simulator-full-suite.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  simulator-full-suite:
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'feature/integrated-image-filter'
+    runs-on: macos-latest
+    timeout-minutes: 240
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Verify pinned classifier source
+        run: |
+          test "$(git -C Vendor/AI-Image-Classifier rev-parse HEAD)" = "5291eedb9b46fa978e36ccec4f5504b017afe809"
+
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode.app
+          xcodebuild -version
+          swift --version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Set up model conversion Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: Vendor/AI-Image-Classifier/tools/MobileCLIPConversion/requirements.txt
+
+      - name: Cache SwiftPM and converted MobileCLIP
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/org.swift.swiftpm
+            ~/Library/Developer/Xcode/DerivedData/SourcePackages
+            .model-cache/mobileclip2-s2
+            .model-cache/coreml-mobileclip2-s2
+          key: ${{ runner.os }}-httrail-image-filter-${{ hashFiles('Package.resolved', 'Package.swift', 'Vendor/AI-Image-Classifier/tools/MobileCLIPConversion/**') }}
+          restore-keys: |
+            ${{ runner.os }}-httrail-image-filter-
+            ${{ runner.os }}-swiftpm-
+
+      - name: Prepare image-filter models
+        shell: bash
+        run: |
+          chmod +x scripts/prepare_image_filter_models.sh scripts/run_ios_simulator_full_suite.sh scripts/generate_ios_simulator_report.py
+          scripts/prepare_image_filter_models.sh
+
+      - name: Run HTTrailCore tests and live MITM integration
+        shell: bash
+        run: |
+          mkdir -p build/simulator-full-suite/logs
+          set +e
+          swift test 2>&1 | tee build/simulator-full-suite/logs/swift-test.log
+          status=${PIPESTATUS[0]}
+          echo "$status" > build/simulator-full-suite/core-tests-exit.txt
+          exit 0
+
+      - name: Run full iPad Simulator suite
+        id: simulator
+        continue-on-error: true
+        shell: bash
+        run: scripts/run_ios_simulator_full_suite.sh
+
+      - name: Generate comprehensive QA report
+        if: always()
+        run: python3 scripts/generate_ios_simulator_report.py build/simulator-full-suite
+
+      - name: Upload full Simulator QA artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: HTTrail-full-simulator-report-${{ github.run_number }}
+          path: |
+            build/simulator-full-suite/report.html
+            build/simulator-full-suite/report.md
+            build/simulator-full-suite/report.json
+            build/simulator-full-suite/environment.txt
+            build/simulator-full-suite/simulator-device.txt
+            build/simulator-full-suite/xcode-project-list.json
+            build/simulator-full-suite/*-summary.json
+            build/simulator-full-suite/*-exit.txt
+            build/simulator-full-suite/sizes.json
+            build/simulator-full-suite/process-samples.tsv
+            build/simulator-full-suite/logs
+            build/simulator-full-suite/attachments
+            build/simulator-full-suite/xcresults
+            build/simulator-full-suite/app-data
+            build/simulator-full-suite/crash-reports
+            .model-cache/conversion-verification.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce test result
+        if: always()
+        shell: bash
+        run: |
+          core="$(cat build/simulator-full-suite/core-tests-exit.txt 2>/dev/null || echo 1)"
+          suite="$(cat build/simulator-full-suite/suite-exit.txt 2>/dev/null || echo 1)"
+          echo "core-tests=$core simulator-suite=$suite"
+          test "$core" = "0"
+          test "$suite" = "0"
