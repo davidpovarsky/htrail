@@ -5,6 +5,33 @@ import PurelineSupport
 import XCTest
 
 final class IntegratedRuntimeTests: XCTestCase {
+    func testBoundedCaptureNeverExceedsPreviewOrAggregateBudgets() {
+        let limits = PurelineCaptureLimits(
+            requestPreviewBytes: 16, responsePreviewBytes: 24,
+            totalBodyBytes: 64, flowCount: 4
+        )
+        let sink = PurelineBoundedFlowSink(limits: limits, store: nil)
+        for index in 0..<10 {
+            let request = CapturedRequest(
+                method: "POST", url: "https://example.test/\(index)", scheme: "https",
+                host: "example.test", port: 443, path: "/\(index)", httpVersion: "HTTP/1.1",
+                headers: [], body: Data(repeating: 1, count: 100), timestamp: Date()
+            )
+            let response = CapturedResponse(
+                statusCode: 200, reasonPhrase: "OK", httpVersion: "HTTP/1.1",
+                headers: [], body: Data(repeating: 2, count: 100), timestamp: Date()
+            )
+            sink.record(Flow(request: request, response: response, state: .completed, startedAt: Date(), secure: true))
+        }
+        let flows = sink.retainedFlowsNewestFirst()
+        XCTAssertLessThanOrEqual(flows.count, 4)
+        XCTAssertLessThanOrEqual(sink.snapshot().retainedBodyBytes, 64)
+        XCTAssertTrue(flows.allSatisfy { $0.request.body.count <= 16 })
+        XCTAssertTrue(flows.allSatisfy { ($0.response?.body.count ?? 0) <= 24 })
+        XCTAssertTrue(flows.contains { $0.request.bodyTruncated == true })
+        XCTAssertTrue(flows.contains { $0.response?.bodyTruncated == true })
+    }
+
     func testPacketTunnelDiagnosticsRingBufferIsBoundedAndUnexpectedRunIsAccurate() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }

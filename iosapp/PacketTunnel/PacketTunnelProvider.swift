@@ -55,9 +55,19 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 userInfo: [NSLocalizedDescriptionKey: "Could not load HTTrail CA from the App Group."]))
             return
         }
-        let sink: FlowSink = SharedFlowStore().map(SharedFlowSink.init(store:)) ?? NullFlowSink()
+        let boundedSink = PurelineBoundedFlowSink(limits: .packetTunnel)
+        boundedSink?.onSnapshot = { [diagnostics] snapshot in
+            diagnostics.record(category: "resources", event: "capture counters", details: [
+                "flows": String(snapshot.flowCount),
+                "retainedBodyBytes": String(snapshot.retainedBodyBytes),
+                "truncatedRequests": String(snapshot.truncatedRequestCount),
+                "truncatedResponses": String(snapshot.truncatedResponseCount)
+            ])
+        }
+        let sink: FlowSink = boundedSink ?? NullFlowSink()
         let server = ProxyServer(port: port, certificateAuthority: ca, sink: sink, engine: engine)
         server.bindHost = "127.0.0.1"
+        server.captureBodyCap = PurelineCaptureLimits.packetTunnel.responsePreviewBytes
         self.proxy = server
         startConfigSync()
 

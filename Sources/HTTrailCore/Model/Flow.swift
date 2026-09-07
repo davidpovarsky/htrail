@@ -22,9 +22,13 @@ public struct CapturedRequest: Sendable, Codable {
     public var headers: [HeaderPair]
     public var body: Data
     public var timestamp: Date
+    /// True when `body` is only a capture preview. This never implies that the
+    /// bytes forwarded to the origin were truncated.
+    public var bodyTruncated: Bool?
 
     public init(method: String, url: String, scheme: String, host: String, port: Int,
-                path: String, httpVersion: String, headers: [HeaderPair], body: Data, timestamp: Date) {
+                path: String, httpVersion: String, headers: [HeaderPair], body: Data, timestamp: Date,
+                bodyTruncated: Bool? = nil) {
         self.method = method
         self.url = url
         self.scheme = scheme
@@ -35,6 +39,7 @@ public struct CapturedRequest: Sendable, Codable {
         self.headers = headers
         self.body = body
         self.timestamp = timestamp
+        self.bodyTruncated = bodyTruncated
     }
 
     public func header(_ name: String) -> String? {
