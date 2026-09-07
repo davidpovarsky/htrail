@@ -619,7 +619,7 @@ public final class AppModel: ObservableObject {
     /// open in Safari to kick off the *Settings ▸ Profile* install flow (the user
     /// then approves both the CA and the VPN there). Returns `nil` on failure.
     public func captureProfileInstallURL() -> URL? {
-        let appID = Bundle.main.bundleIdentifier ?? "com.davidpovarsky.httrail"
+        let appID = Bundle.main.bundleIdentifier ?? "com.davidpovarsky.pureline"
         let providerID = appID + ".PacketTunnel"
         guard let data = try? ProfileGenerator().makeCaptureProfile(
             caCertificateDER: ca.caCertificateDER, appBundleID: appID,

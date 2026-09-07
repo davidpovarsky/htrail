@@ -7,7 +7,7 @@ import OSLog
 /// the vendored image-safety pipeline. No loopback HTTP request is made here.
 enum ImageFilterProxyBridge {
     private static let logger = Logger(
-        subsystem: "com.davidpovarsky.httrail.PacketTunnel",
+        subsystem: "com.davidpovarsky.pureline.PacketTunnel",
         category: "direct-image-filter"
     )
     private static let internalRulePrefix = "__HTTrailDirectImageFilter:"

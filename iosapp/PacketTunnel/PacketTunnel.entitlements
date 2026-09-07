@@ -8,7 +8,7 @@
 	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.davidpovarsky.httrail</string>
+		<string>group.com.davidpovarsky.pureline</string>
 	</array>
 </dict>
 </plist>

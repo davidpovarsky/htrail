@@ -37,7 +37,7 @@ targets:
         product: FlyingSocks
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.EmbeddedImageFilter
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.EmbeddedImageFilter
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_VERSION: "6.0"
         SWIFT_APPROACHABLE_CONCURRENCY: YES
@@ -68,7 +68,7 @@ targets:
       - path: ImageFilterIntegration/Core/DirectImageSafetyAnalyzer.swift
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.ImageFilterCore
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.ImageFilterCore
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_VERSION: "6.0"
         SWIFT_APPROACHABLE_CONCURRENCY: YES
@@ -111,7 +111,7 @@ targets:
     info:
       path: Info.plist
       properties:
-        CFBundleDisplayName: HTTrail
+        CFBundleDisplayName: Pureline
         CFBundleShortVersionString: "1.0"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         CFBundleLocalizations:
@@ -158,10 +158,10 @@ targets:
         com.apple.developer.networking.networkextension:
           - packet-tunnel-provider
         com.apple.security.application-groups:
-          - group.com.davidpovarsky.httrail
+          - group.com.davidpovarsky.pureline
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline
         DEVELOPMENT_TEAM: NA6HPWARQ2
         CODE_SIGN_STYLE: Automatic
         PROVISIONING_PROFILE_SPECIFIER: "$(HTTRAIL_APP_PROFILE_SPECIFIER)"
@@ -206,10 +206,10 @@ targets:
         com.apple.developer.networking.networkextension:
           - packet-tunnel-provider
         com.apple.security.application-groups:
-          - group.com.davidpovarsky.httrail
+          - group.com.davidpovarsky.pureline
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.PacketTunnel
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.PacketTunnel
         DEVELOPMENT_TEAM: NA6HPWARQ2
         CODE_SIGN_STYLE: Automatic
         PROVISIONING_PROFILE_SPECIFIER: "$(HTTRAIL_PACKET_TUNNEL_PROFILE_SPECIFIER)"
@@ -247,7 +247,7 @@ targets:
         UILaunchScreen: {}
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.ImageFilterRuntimeHost
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.ImageFilterRuntimeHost
         SWIFT_VERSION: "6.0"
         SWIFT_APPROACHABLE_CONCURRENCY: YES
         SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
@@ -266,7 +266,7 @@ targets:
       - target: ImageFilterCore
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.RuntimeTests
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.RuntimeTests
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_VERSION: "6.0"
         SWIFT_APPROACHABLE_CONCURRENCY: YES
@@ -285,7 +285,7 @@ targets:
       - target: HTTrailiOS
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.UITests
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.UITests
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_VERSION: "5.0"
         IPHONEOS_DEPLOYMENT_TARGET: "26.5"

@@ -71,8 +71,8 @@ The signed iOS workflow uses these additional secrets:
 |---|---|---|
 | `APPLE_CERTIFICATE_P12_B64` | Every signed build | Base64-encoded Apple Distribution `.p12` |
 | `APPLE_CERTIFICATE_PASSWORD` | Every signed build | Plain-text password used when exporting that `.p12` |
-| `APPLE_MAIN_PROVISIONING_PROFILE_B64` | Every signed build | Base64 App Store profile for `com.davidpovarsky.httrail` |
-| `APPLE_TUNNEL_PROVISIONING_PROFILE_B64` | Every signed build | Base64 App Store profile for `com.davidpovarsky.httrail.PacketTunnel` |
+| `APPLE_MAIN_PROVISIONING_PROFILE_B64` | Every signed build | Base64 App Store profile for `com.davidpovarsky.pureline` |
+| `APPLE_TUNNEL_PROVISIONING_PROFILE_B64` | Every signed build | Base64 App Store profile for `com.davidpovarsky.pureline.PacketTunnel` |
 | `APPLE_TEAM_ID` | Every signed build | Plain-text Apple Developer Team ID |
 | `ASC_KEY_P8` | TestFlight upload only | Base64-encoded App Store Connect API key `.p8` |
 | `ASC_KEY_ID` | TestFlight upload only | App Store Connect API key ID |
@@ -97,7 +97,7 @@ artifact. CI derives `CFBundleVersion` as `GITHUB_RUN_NUMBER * 100 +
 GITHUB_RUN_ATTEMPT`, so reruns have a distinct TestFlight build number.
 
 Before spending time on the archive, upload-enabled runs use the App Store
-Connect API to confirm an app record exists for `com.davidpovarsky.httrail`.
+Connect API to confirm an app record exists for `com.davidpovarsky.pureline`.
 Apple requires this record before the first upload. If it is absent, the workflow
 stops with instructions to create it using that Bundle ID plus the app name,
 primary language, SKU, and user-access choice required by App Store Connect.

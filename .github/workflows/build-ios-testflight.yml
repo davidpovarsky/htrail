@@ -3,8 +3,8 @@
 # Required repository secrets for every run:
 #   APPLE_CERTIFICATE_P12_B64                 base64-encoded Apple Distribution .p12
 #   APPLE_CERTIFICATE_PASSWORD                plain-text password for the .p12
-#   APPLE_MAIN_PROVISIONING_PROFILE_B64       base64 App Store profile for com.davidpovarsky.httrail
-#   APPLE_TUNNEL_PROVISIONING_PROFILE_B64     base64 App Store profile for com.davidpovarsky.httrail.PacketTunnel
+#   APPLE_MAIN_PROVISIONING_PROFILE_B64       base64 App Store profile for com.davidpovarsky.pureline
+#   APPLE_TUNNEL_PROVISIONING_PROFILE_B64     base64 App Store profile for com.davidpovarsky.pureline.PacketTunnel
 #   APPLE_TEAM_ID                              plain-text Apple Developer Team ID
 # Required only when upload_to_testflight is enabled:
 #   ASC_KEY_P8                                base64-encoded App Store Connect API .p8
@@ -33,9 +33,9 @@ jobs:
     timeout-minutes: 240
     env:
       TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-      APP_BUNDLE_ID: com.davidpovarsky.httrail
-      TUNNEL_BUNDLE_ID: com.davidpovarsky.httrail.PacketTunnel
-      APP_GROUP_ID: group.com.davidpovarsky.httrail
+      APP_BUNDLE_ID: com.davidpovarsky.pureline
+      TUNNEL_BUNDLE_ID: com.davidpovarsky.pureline.PacketTunnel
+      APP_GROUP_ID: group.com.davidpovarsky.pureline
       BUILD_DIR: ${{ github.workspace }}/build/signed-ios
 
     steps:

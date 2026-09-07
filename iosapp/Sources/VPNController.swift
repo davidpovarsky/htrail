@@ -11,7 +11,7 @@ import HTTrailCore
 @MainActor
 final class VPNController: ObservableObject {
     /// Must match the extension target's bundle identifier.
-    static let providerBundleID = "com.davidpovarsky.httrail.PacketTunnel"
+    static let providerBundleID = "com.davidpovarsky.pureline.PacketTunnel"
 
     @Published var status: NEVPNStatus = .invalid
     @Published var lastError: String?

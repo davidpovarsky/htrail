@@ -67,7 +67,7 @@ The MITM data flow: plain HTTP (absolute-form URI) is proxied directly; HTTPS ar
 
 ### iOS two-process sharing
 
-The iOS app renders only; the **Packet Tunnel extension** (`iosapp/PacketTunnel/`) runs the MITM proxy so capture survives backgrounding. The two processes coordinate through the **App Group `group.com.davidpovarsky.httrail`**:
+The iOS app renders only; the **Packet Tunnel extension** (`iosapp/PacketTunnel/`) runs the MITM proxy so capture survives backgrounding. The two processes coordinate through the **App Group `group.com.davidpovarsky.pureline`**:
 - `AppGroup.swift` — group container + `captured-flows.ndjson` (extension appends, app tails).
 - `AppPaths.swift` — on iOS prefers the App Group container (so both processes read the *same* CA); falls back to per-app Application Support on macOS/tests/missing entitlement.
 - `SharedConfigStore.swift` / `SharedFlowStore.swift` — config + flow exchange across the boundary.

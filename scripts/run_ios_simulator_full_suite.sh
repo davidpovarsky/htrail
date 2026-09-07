@@ -137,7 +137,7 @@ xcrun simctl spawn "$UDID" log show --style compact --last 45m \
   --predicate 'process == "HTTrailiOS" OR process CONTAINS "HTTrail" OR process CONTAINS "xctest"' \
   > "$LOGS/simulator-unified.log" 2>&1 || true
 
-APP_DATA="$(xcrun simctl get_app_container "$UDID" com.davidpovarsky.httrail data 2>/dev/null || true)"
+APP_DATA="$(xcrun simctl get_app_container "$UDID" com.davidpovarsky.pureline data 2>/dev/null || true)"
 if [ -n "$APP_DATA" ] && [ -d "$APP_DATA" ]; then
   echo "$APP_DATA" > "$OUT/app-data-container.txt"
   for rel in Documents "Library/Application Support" Library/Logs tmp; do

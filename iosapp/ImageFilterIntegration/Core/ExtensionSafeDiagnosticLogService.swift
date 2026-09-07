@@ -9,7 +9,7 @@ actor DiagnosticLogService {
     static let shared = DiagnosticLogService()
 
     private static let logger = Logger(
-        subsystem: Bundle.main.bundleIdentifier ?? "com.davidpovarsky.httrail.PacketTunnel",
+        subsystem: Bundle.main.bundleIdentifier ?? "com.davidpovarsky.pureline.PacketTunnel",
         category: "image-filter"
     )
 
