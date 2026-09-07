@@ -242,18 +242,26 @@ jobs:
           mkdir -p "$BUILD_DIR/logs"
           cd iosapp
           xcodegen generate
-          xcodebuild -project HTTrailiOS.xcodeproj -scheme HTTrailiOS \
+          xcodebuild -project HTTrailiOS.xcodeproj -target HTTrailiOS \
             -configuration Release -destination 'generic/platform=iOS' \
             DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual \
             HTTRAIL_APP_PROFILE_SPECIFIER="$APP_PROFILE_SPECIFIER" \
             HTTRAIL_PACKET_TUNNEL_PROFILE_SPECIFIER="$TUNNEL_PROFILE_SPECIFIER" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
-            -showBuildSettings | tee "$BUILD_DIR/logs/signing-build-settings.log"
-          grep -F "PRODUCT_BUNDLE_IDENTIFIER = $APP_BUNDLE_ID" "$BUILD_DIR/logs/signing-build-settings.log"
-          grep -F "PRODUCT_BUNDLE_IDENTIFIER = $TUNNEL_BUNDLE_ID" "$BUILD_DIR/logs/signing-build-settings.log"
-          grep -F "DEVELOPMENT_TEAM = $TEAM_ID" "$BUILD_DIR/logs/signing-build-settings.log"
-          grep -F "PROVISIONING_PROFILE_SPECIFIER = $APP_PROFILE_SPECIFIER" "$BUILD_DIR/logs/signing-build-settings.log"
-          grep -F "PROVISIONING_PROFILE_SPECIFIER = $TUNNEL_PROFILE_SPECIFIER" "$BUILD_DIR/logs/signing-build-settings.log"
+            -showBuildSettings | tee "$BUILD_DIR/logs/app-signing-build-settings.log"
+          xcodebuild -project HTTrailiOS.xcodeproj -target PacketTunnel \
+            -configuration Release -destination 'generic/platform=iOS' \
+            DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual \
+            HTTRAIL_APP_PROFILE_SPECIFIER="$APP_PROFILE_SPECIFIER" \
+            HTTRAIL_PACKET_TUNNEL_PROFILE_SPECIFIER="$TUNNEL_PROFILE_SPECIFIER" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            -showBuildSettings | tee "$BUILD_DIR/logs/tunnel-signing-build-settings.log"
+          grep -F "PRODUCT_BUNDLE_IDENTIFIER = $APP_BUNDLE_ID" "$BUILD_DIR/logs/app-signing-build-settings.log"
+          grep -F "DEVELOPMENT_TEAM = $TEAM_ID" "$BUILD_DIR/logs/app-signing-build-settings.log"
+          grep -F "PROVISIONING_PROFILE_SPECIFIER = $APP_PROFILE_SPECIFIER" "$BUILD_DIR/logs/app-signing-build-settings.log"
+          grep -F "PRODUCT_BUNDLE_IDENTIFIER = $TUNNEL_BUNDLE_ID" "$BUILD_DIR/logs/tunnel-signing-build-settings.log"
+          grep -F "DEVELOPMENT_TEAM = $TEAM_ID" "$BUILD_DIR/logs/tunnel-signing-build-settings.log"
+          grep -F "PROVISIONING_PROFILE_SPECIFIER = $TUNNEL_PROFILE_SPECIFIER" "$BUILD_DIR/logs/tunnel-signing-build-settings.log"
 
       - name: Archive signed app
         shell: bash
