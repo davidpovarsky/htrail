@@ -10,6 +10,7 @@ final class ProfileGeneratorTests: XCTestCase {
         let plist = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any]
         let root = try XCTUnwrap(plist)
         XCTAssertEqual(root["PayloadType"] as? String, "Configuration")
+        XCTAssertEqual(root["PayloadIdentifier"] as? String, "com.davidpovarsky.httrail.profile")
 
         let payloads = try XCTUnwrap(root["PayloadContent"] as? [[String: Any]])
         XCTAssertEqual(payloads.count, 2)
@@ -17,10 +18,31 @@ final class ProfileGeneratorTests: XCTestCase {
         let cert = try XCTUnwrap(payloads.first { ($0["PayloadType"] as? String) == "com.apple.security.root" })
         let certData = try XCTUnwrap(cert["PayloadContent"] as? Data)
         XCTAssertFalse(certData.isEmpty, "CA DER must be embedded")
+        XCTAssertTrue((cert["PayloadIdentifier"] as? String)?.hasPrefix("com.davidpovarsky.httrail.ca.") == true)
 
         let proxy = try XCTUnwrap(payloads.first { ($0["PayloadType"] as? String) == "com.apple.proxy.http.global" })
         XCTAssertEqual(proxy["HTTPProxy"] as? String, "192.168.1.50")
         XCTAssertEqual(proxy["HTTPSPort"] as? Int, 9090)
+        XCTAssertTrue((proxy["PayloadIdentifier"] as? String)?.hasPrefix("com.davidpovarsky.httrail.proxy.") == true)
+    }
+
+    func testCaptureProfileUsesMigratedAppAndExtensionIdentifiers() throws {
+        let ca = try CertificateAuthority.create()
+        let data = try ProfileGenerator(hostIdentifier: "review-device").makeCaptureProfile(
+            caCertificateDER: ca.caCertificateDER,
+            appBundleID: "com.davidpovarsky.httrail",
+            providerBundleID: "com.davidpovarsky.httrail.PacketTunnel",
+            proxyPort: 9090
+        )
+        let plist = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any]
+        let root = try XCTUnwrap(plist)
+        XCTAssertEqual(root["PayloadIdentifier"] as? String, "com.davidpovarsky.httrail.capture.profile")
+        let payloads = try XCTUnwrap(root["PayloadContent"] as? [[String: Any]])
+        let vpn = try XCTUnwrap(payloads.first { ($0["PayloadType"] as? String) == "com.apple.vpn.managed" })
+        XCTAssertEqual(vpn["VPNSubType"] as? String, "com.davidpovarsky.httrail")
+        XCTAssertTrue((vpn["PayloadIdentifier"] as? String)?.hasPrefix("com.davidpovarsky.httrail.vpn.") == true)
+        let vpnSettings = try XCTUnwrap(vpn["VPN"] as? [String: Any])
+        XCTAssertEqual(vpnSettings["ProviderBundleIdentifier"] as? String, "com.davidpovarsky.httrail.PacketTunnel")
     }
 
     func testProfileUUIDsAreStableForHostIdentifier() throws {

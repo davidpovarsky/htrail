@@ -1,6 +1,6 @@
 name: HTTrailiOS
 options:
-  bundleIdPrefix: com.1moby
+  bundleIdPrefix: com.davidpovarsky
   deploymentTarget:
     iOS: "26.5"
   createIntermediateGroups: true
@@ -37,7 +37,7 @@ targets:
         product: FlyingSocks
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.1moby.httrail.EmbeddedImageFilter
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.EmbeddedImageFilter
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_VERSION: "6.0"
         SWIFT_APPROACHABLE_CONCURRENCY: YES
@@ -68,7 +68,7 @@ targets:
       - path: ImageFilterIntegration/Core/DirectImageSafetyAnalyzer.swift
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.1moby.httrail.ImageFilterCore
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.ImageFilterCore
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_VERSION: "6.0"
         SWIFT_APPROACHABLE_CONCURRENCY: YES
@@ -113,7 +113,7 @@ targets:
       properties:
         CFBundleDisplayName: HTTrail
         CFBundleShortVersionString: "1.0"
-        CFBundleVersion: "8"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         CFBundleLocalizations:
           - en
           - zh-Hans
@@ -158,12 +158,13 @@ targets:
         com.apple.developer.networking.networkextension:
           - packet-tunnel-provider
         com.apple.security.application-groups:
-          - group.com.1moby.httrail
+          - group.com.davidpovarsky.httrail
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.1moby.httrail
-        DEVELOPMENT_TEAM: D62Y8JVXB9
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail
+        DEVELOPMENT_TEAM: NA6HPWARQ2
         CODE_SIGN_STYLE: Automatic
+        PROVISIONING_PROFILE_SPECIFIER: "$(HTTRAIL_APP_PROFILE_SPECIFIER)"
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "8"
         TARGETED_DEVICE_FAMILY: "1,2"
@@ -195,7 +196,7 @@ targets:
       properties:
         CFBundleDisplayName: HTTrail Capture
         CFBundleShortVersionString: "1.0"
-        CFBundleVersion: "8"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         NSExtension:
           NSExtensionPointIdentifier: com.apple.networkextension.packet-tunnel
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PacketTunnelProvider
@@ -205,12 +206,13 @@ targets:
         com.apple.developer.networking.networkextension:
           - packet-tunnel-provider
         com.apple.security.application-groups:
-          - group.com.1moby.httrail
+          - group.com.davidpovarsky.httrail
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.1moby.httrail.PacketTunnel
-        DEVELOPMENT_TEAM: D62Y8JVXB9
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.PacketTunnel
+        DEVELOPMENT_TEAM: NA6HPWARQ2
         CODE_SIGN_STYLE: Automatic
+        PROVISIONING_PROFILE_SPECIFIER: "$(HTTRAIL_PACKET_TUNNEL_PROFILE_SPECIFIER)"
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "8"
         SWIFT_VERSION: "5.0"
@@ -245,7 +247,7 @@ targets:
         UILaunchScreen: {}
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.1moby.httrail.ImageFilterRuntimeHost
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.ImageFilterRuntimeHost
         SWIFT_VERSION: "6.0"
         SWIFT_APPROACHABLE_CONCURRENCY: YES
         SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
@@ -264,7 +266,7 @@ targets:
       - target: ImageFilterCore
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.1moby.httrail.RuntimeTests
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.RuntimeTests
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_VERSION: "6.0"
         SWIFT_APPROACHABLE_CONCURRENCY: YES
@@ -283,7 +285,7 @@ targets:
       - target: HTTrailiOS
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.1moby.httrail.UITests
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.httrail.UITests
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_VERSION: "5.0"
         IPHONEOS_DEPLOYMENT_TARGET: "26.5"

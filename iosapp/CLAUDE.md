@@ -14,21 +14,21 @@ cd iosapp && xcodegen generate          # regenerates HTTrailiOS.xcodeproj
 # Build both targets (app + PacketTunnel) signed for a device:
 xcodebuild -project HTTrailiOS.xcodeproj -scheme HTTrailiOS -configuration Debug \
   -destination 'generic/platform=iOS' -derivedDataPath build/dd \
-  -allowProvisioningUpdates DEVELOPMENT_TEAM=D62Y8JVXB9 build
+  -allowProvisioningUpdates DEVELOPMENT_TEAM=NA6HPWARQ2 build
 
 # Install on the paired device:
 xcrun devicectl device install app --device <DEVICE_UDID> \
   build/dd/Build/Products/Debug-iphoneos/HTTrailiOS.app
-# Launch with console: xcrun devicectl device process launch --console --device <UDID> com.1moby.httrail
+# Launch with console: xcrun devicectl device process launch --console --device <UDID> com.davidpovarsky.httrail
 ```
 
 - **Tests live in `HTTrailCore`** (`swift test` from repo root). The app/extension stay thin; add coverage at the core level. There is no iOS-target test bundle.
-- **A paid Apple Developer team is required** to run on device — the `packet-tunnel-provider` Network Extension entitlement is unavailable to free personal teams. Signing team is `D62Y8JVXB9`; app bundle `com.1moby.httrail`, extension `com.1moby.httrail.PacketTunnel`.
-- Diagnose extension crashes/jetsam via the device's `.ips` reports and `os.log` (subsystem `com.1moby.httrail.PacketTunnel`).
+- **A paid Apple Developer team is required** to run on device — the `packet-tunnel-provider` Network Extension entitlement is unavailable to free personal teams. Signing team is `NA6HPWARQ2`; app bundle `com.davidpovarsky.httrail`, extension `com.davidpovarsky.httrail.PacketTunnel`.
+- Diagnose extension crashes/jetsam via the device's `.ips` reports and `os.log` (subsystem `com.davidpovarsky.httrail.PacketTunnel`).
 
 ## Two-process architecture (the thing to internalize)
 
-The app renders only; the **Packet Tunnel extension is a separate process that does the actual capturing** and keeps running when the app is backgrounded. They never share memory — they coordinate exclusively through the **App Group `group.com.1moby.httrail`** (core's `AppGroup`/`AppPaths`/`SharedConfigStore`/`SharedFlowStore`):
+The app renders only; the **Packet Tunnel extension is a separate process that does the actual capturing** and keeps running when the app is backgrounded. They never share memory — they coordinate exclusively through the **App Group `group.com.davidpovarsky.httrail`** (core's `AppGroup`/`AppPaths`/`SharedConfigStore`/`SharedFlowStore`):
 
 - App writes rules / SSL allowlist / port / capture target into the shared config; the extension polls it (`startConfigSync`, ~1.5s) so edits take effect live, and publishes back detected pinned hosts + an `EngineStatus` heartbeat.
 - Extension appends captured flows to the App Group; the app **tails them on a 1.5s timer** in `App.swift` (`refreshSharedFlows` / `refreshPinnedHosts` / `refreshCaptureStatus`).

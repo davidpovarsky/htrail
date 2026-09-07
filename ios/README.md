@@ -18,7 +18,7 @@ The iOS app ships a **Packet Tunnel network extension**
    process — which keeps running even when the app is backgrounded — runs the
    HTTrail MITM proxy on `127.0.0.1` and publishes proxy settings that route the
    device's HTTP/HTTPS through it. Captured flows are written to the shared
-   **App Group** (`group.com.1moby.httrail`) and the app tails them into the
+   **App Group** (`group.com.davidpovarsky.httrail`) and the app tails them into the
    Capture tab.
 
 > `NETransparentProxyProvider` is macOS-only, so iOS uses a packet tunnel. It is

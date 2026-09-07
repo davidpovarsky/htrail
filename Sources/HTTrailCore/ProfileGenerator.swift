@@ -27,7 +27,7 @@ public struct ProfileGenerator: Sendable {
         let certPayload: [String: Any] = [
             "PayloadType": "com.apple.security.root",
             "PayloadVersion": 1,
-            "PayloadIdentifier": "com.httrail.ca.\(stableUUID("ca"))",
+            "PayloadIdentifier": "com.davidpovarsky.httrail.ca.\(stableUUID("ca"))",
             "PayloadUUID": stableUUID("ca-uuid"),
             "PayloadDisplayName": "HTTrail Root CA",
             "PayloadDescription": "Allows HTTrail to inspect encrypted HTTPS traffic.",
@@ -41,7 +41,7 @@ public struct ProfileGenerator: Sendable {
             let proxyPayload: [String: Any] = [
                 "PayloadType": "com.apple.proxy.http.global",
                 "PayloadVersion": 1,
-                "PayloadIdentifier": "com.httrail.proxy.\(stableUUID("proxy"))",
+                "PayloadIdentifier": "com.davidpovarsky.httrail.proxy.\(stableUUID("proxy"))",
                 "PayloadUUID": stableUUID("proxy-uuid"),
                 "PayloadDisplayName": "HTTrail Proxy",
                 "PayloadDescription": "Routes traffic through HTTrail at \(proxyHost):\(proxyPort).",
@@ -59,7 +59,7 @@ public struct ProfileGenerator: Sendable {
         let profile: [String: Any] = [
             "PayloadType": "Configuration",
             "PayloadVersion": 1,
-            "PayloadIdentifier": "com.httrail.profile",
+            "PayloadIdentifier": "com.davidpovarsky.httrail.profile",
             "PayloadUUID": stableUUID("root"),
             "PayloadDisplayName": "HTTrail (Proxy + Root CA)",
             "PayloadDescription": "Installs the HTTrail certificate authority and proxy configuration.",
@@ -81,7 +81,7 @@ public struct ProfileGenerator: Sendable {
         let certPayload: [String: Any] = [
             "PayloadType": "com.apple.security.root",
             "PayloadVersion": 1,
-            "PayloadIdentifier": "com.httrail.ca.\(stableUUID("ca"))",
+            "PayloadIdentifier": "com.davidpovarsky.httrail.ca.\(stableUUID("ca"))",
             "PayloadUUID": stableUUID("ca-uuid"),
             "PayloadDisplayName": "HTTrail Root CA",
             "PayloadDescription": "Allows HTTrail to inspect encrypted HTTPS traffic.",
@@ -92,7 +92,7 @@ public struct ProfileGenerator: Sendable {
         let vpnPayload: [String: Any] = [
             "PayloadType": "com.apple.vpn.managed",
             "PayloadVersion": 1,
-            "PayloadIdentifier": "com.httrail.vpn.\(stableUUID("vpn"))",
+            "PayloadIdentifier": "com.davidpovarsky.httrail.vpn.\(stableUUID("vpn"))",
             "PayloadUUID": stableUUID("vpn-uuid"),
             "PayloadDisplayName": "HTTrail Capture VPN",
             "PayloadDescription": "Routes this device's traffic through the on-device HTTrail proxy.",
@@ -113,7 +113,7 @@ public struct ProfileGenerator: Sendable {
         let profile: [String: Any] = [
             "PayloadType": "Configuration",
             "PayloadVersion": 1,
-            "PayloadIdentifier": "com.httrail.capture.profile",
+            "PayloadIdentifier": "com.davidpovarsky.httrail.capture.profile",
             "PayloadUUID": stableUUID("capture-root"),
             "PayloadDisplayName": "HTTrail Capture (VPN + Root CA)",
             "PayloadDescription": "Installs the HTTrail certificate authority and the on-device capture VPN.",

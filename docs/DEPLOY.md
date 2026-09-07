@@ -47,10 +47,14 @@ notarization (`notarytool`) — not currently provisioned.
 
 ## 2. App Store (macOS + iOS)
 
-Submission runs through a manual GitHub Actions workflow,
-`.github/workflows/deploy.yml` ("Deploy to App Store"). It is **upload + submit
-only** — you build and **sign locally**, attach the binary to a *draft* GitHub
-release, then dispatch the workflow to upload and (optionally) submit for review.
+iOS TestFlight builds are built, signed, validated, and optionally uploaded by
+`.github/workflows/build-ios-testflight.yml` (**Build Signed iOS IPA and Upload
+to TestFlight**). This path builds directly from the selected branch and uploads
+the IPA as a workflow artifact; it does not require a GitHub Release.
+
+The older `.github/workflows/deploy.yml` (**Deploy to App Store**) remains
+available for uploading an already-signed iOS or macOS binary from a draft
+GitHub Release and optionally submitting it for App Store review.
 
 ### Secrets (set once, encrypted, write-only)
 
@@ -61,6 +65,21 @@ release, then dispatch the workflow to upload and (optionally) submit for review
 | `ASC_ISSUER_ID` | the team's API issuer id |
 | `ASC_PY_B64` | base64 of `scripts/appstore/asc.py` (so CI runs the private deploy script without it living in the repo) |
 
+The signed iOS workflow uses these additional secrets:
+
+| Secret | Required | Contents |
+|---|---|---|
+| `IOS_DISTRIBUTION_CERTIFICATE_P12_BASE64` | Every signed build | Base64-encoded Apple Distribution `.p12` |
+| `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD` | Every signed build | Password used when exporting that `.p12` |
+| `IOS_APP_PROVISIONING_PROFILE_BASE64` | Every signed build | Base64 App Store profile for `com.davidpovarsky.httrail` |
+| `IOS_PACKET_TUNNEL_PROVISIONING_PROFILE_BASE64` | Every signed build | Base64 App Store profile for `com.davidpovarsky.httrail.PacketTunnel` |
+| `ASC_KEY_P8` | TestFlight upload only | Base64-encoded App Store Connect API key `.p8` |
+| `ASC_KEY_ID` | TestFlight upload only | App Store Connect API key ID |
+| `ASC_ISSUER_ID` | TestFlight upload only | App Store Connect API issuer ID |
+
+`ASC_PY_B64` is not needed by the signed iOS/TestFlight workflow. It remains a
+requirement only for the older review-submission workflow.
+
 Set/rotate them with `gh secret set <NAME> --repo anusoft/htrail`. **Re-sync
 `ASC_PY_B64` whenever `asc.py` changes** (it is vendored as a secret, not checked out):
 
@@ -68,12 +87,25 @@ Set/rotate them with `gh secret set <NAME> --repo anusoft/htrail`. **Re-sync
 base64 -i scripts/appstore/asc.py | gh secret set ASC_PY_B64 --repo anusoft/htrail
 ```
 
-### Release & dispatch
+### Signed iOS/TestFlight build
+
+In GitHub Actions, run **Build Signed iOS IPA and Upload to TestFlight** from the
+branch to distribute. Leave `upload_to_testflight` enabled to validate and
+upload automatically, or disable it to produce and retain only the signed IPA
+artifact. CI derives `CFBundleVersion` as `GITHUB_RUN_NUMBER * 100 +
+GITHUB_RUN_ATTEMPT`, so reruns have a distinct TestFlight build number.
+
+The workflow decodes signing assets only into runner-temporary storage, imports
+the certificate into a temporary keychain, installs both provisioning profiles,
+and deletes those assets at the end of the job. Never add decoded signing files
+to the repository.
+
+### Existing release-based upload & dispatch
 
 ```bash
 # macOS — sandboxed Mac App Store variant:
 DISTRIBUTION=1 ./scripts/make_mas.sh        # -> dist/mas/HTTrail.pkg
-# iOS — xcodegen + xcodebuild archive/export -> HTTrailiOS.ipa  (see docs/appstore runbook)
+# iOS can also use an already-signed IPA from another trusted build path.
 
 # stage the signed binary on a DRAFT release (not publicly visible; the Actions
 # token can still read it):
@@ -91,11 +123,10 @@ gh workflow run deploy.yml --repo anusoft/htrail \
 With `submit=true` the workflow waits for Apple processing, attaches the build,
 and submits for review via `asc.py`.
 
-### What CI does *not* do
+### Existing deploy workflow limitations
 
-- **Signing.** The API key authenticates upload/metadata/submit only. Full
-  in-CI signing would need the distribution `.p12` + provisioning profile added
-  as secrets and imported into a temp keychain — not wired up.
+- **Signing.** `deploy.yml` still does upload/submit only. Use the signed iOS
+  workflow above for end-to-end iOS CI signing and TestFlight delivery.
 - `altool` can exit non-zero on a benign post-upload precheck note; the step
   warns instead of failing — confirm the build appears in App Store Connect.
 

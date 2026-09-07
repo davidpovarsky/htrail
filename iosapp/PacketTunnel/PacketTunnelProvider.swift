@@ -2,7 +2,7 @@ import NetworkExtension
 import HTTrailCore
 import os.log
 
-private let tunnelLog = Logger(subsystem: "com.1moby.httrail.PacketTunnel", category: "capture")
+private let tunnelLog = Logger(subsystem: "com.davidpovarsky.httrail.PacketTunnel", category: "capture")
 
 /// HTTrail's iOS capture engine. `NETransparentProxyProvider` is macOS-only, so
 /// on iOS we use a `NEPacketTunnelProvider` whose job is to (a) run the HTTrail
