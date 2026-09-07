@@ -128,6 +128,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
 
         let flowID = UUID()
         let clientChannel = context.channel
+        let clientEventLoop = context.eventLoop
         let started = startedAt
         let secure = target.tls
         let keepAlive = self.keepAlive
@@ -140,21 +141,26 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
                     await relay(channel: clientChannel, allocator: clientChannel.allocator,
                                 response: response, keepAlive: false)
                 }
+                clientEventLoop.execute { self.finishStreamingUploadState() }
                 return
             }
             capture.replaceMetadata(with: finalRequest)
             if throttle.delayMS > 0 {
                 try? await Task.sleep(nanoseconds: UInt64(throttle.delayMS) * 1_000_000)
             }
-            self.connectStreamingUpload(
-                context: context, target: finalTarget, capture: capture,
-                flowID: flowID, startedAt: started, secure: secure,
-                keepAlive: keepAlive, initialBody: initialBody
-            )
+            clientEventLoop.execute {
+                self.connectStreamingUpload(
+                    clientChannel: clientChannel, clientEventLoop: clientEventLoop,
+                    target: finalTarget, capture: capture,
+                    flowID: flowID, startedAt: started, secure: secure,
+                    keepAlive: keepAlive, initialBody: initialBody
+                )
+            }
         }
     }
 
-    private func connectStreamingUpload(context: ChannelHandlerContext, target: UpstreamTarget,
+    private func connectStreamingUpload(clientChannel: Channel, clientEventLoop: EventLoop,
+                                        target: UpstreamTarget,
                                         capture: StreamingRequestCapture, flowID: UUID,
                                         startedAt: Date, secure: Bool, keepAlive: Bool,
                                         initialBody: ByteBuffer?) {
@@ -168,8 +174,8 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         headers.replaceOrAdd(name: "Connection", value: "close")
         head.headers = headers
         let handler = StreamingProxyHandler(
-            clientChannel: context.channel, requestHead: head,
-            requestBody: initialBody ?? context.channel.allocator.buffer(capacity: 0),
+            clientChannel: clientChannel, requestHead: head,
+            requestBody: initialBody ?? clientChannel.allocator.buffer(capacity: 0),
             captured: request, flowID: flowID, startedAt: startedAt, secure: secure,
             keepAlive: keepAlive, captureCap: captureBodyCap, sink: sink,
             completeRequestOnActive: false, capturedRequestProvider: { capture.snapshot() },
@@ -193,7 +199,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
                     return channel.pipeline.addHandlers(handlers)
                 } catch { return channel.eventLoop.makeFailedFuture(error) }
             }
-            .connect(host: target.host, port: target.port).hop(to: context.eventLoop)
+            .connect(host: target.host, port: target.port).hop(to: clientEventLoop)
             .whenComplete { result in
                 switch result {
                 case .success(let upstream):
@@ -208,8 +214,8 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
                         return
                     }
                     upstream.flush()
-                    _ = context.channel.setOption(ChannelOptions.autoRead, value: true)
-                    context.read()
+                    _ = clientChannel.setOption(ChannelOptions.autoRead, value: true)
+                    clientChannel.read()
                 case .failure(let error):
                     self.runtimeEventHandler?(ProxyFailureClassifier.event(
                         error: error, host: target.host, tls: target.tls
@@ -218,7 +224,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
                     self.sink.record(Flow(id: flowID, request: capture.snapshot(), response: nil,
                                           state: .failed, error: String(describing: error),
                                           startedAt: startedAt, endedAt: Date(), secure: secure))
-                    self.respondError(channel: context.channel, status: .badGateway, message: "Upstream error")
+                    self.respondError(channel: clientChannel, status: .badGateway, message: "Upstream error")
                 }
             }
     }

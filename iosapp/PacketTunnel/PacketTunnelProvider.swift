@@ -1,6 +1,5 @@
 import NetworkExtension
 import HTTrailCore
-import PurelineSupport
 import os.log
 
 private let tunnelLog = Logger(subsystem: "com.davidpovarsky.pureline.PacketTunnel", category: "capture")

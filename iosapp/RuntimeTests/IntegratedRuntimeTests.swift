@@ -1,7 +1,6 @@
 import Darwin
 import Foundation
 @testable import ImageFilterCore
-import PurelineSupport
 import XCTest
 
 final class IntegratedRuntimeTests: XCTestCase {

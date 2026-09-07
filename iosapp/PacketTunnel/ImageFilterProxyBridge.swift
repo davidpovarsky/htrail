@@ -2,7 +2,6 @@ import Foundation
 import HTTrailCore
 import ImageFilterCore
 import OSLog
-import PurelineSupport
 
 /// Downstream adapter between HTTrail's existing response-breakpoint seam and
 /// the vendored image-safety pipeline. No loopback HTTP request is made here.

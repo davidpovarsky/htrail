@@ -1,7 +1,6 @@
 import SwiftUI
 import UIKit
 import HTTrailCore
-import PurelineSupport
 
 /// On-device capture (VPN + CA) provisioning, sharing for other devices, device
 /// info, HAR export and capture guidance.

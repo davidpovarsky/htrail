@@ -248,6 +248,7 @@ final class StreamingProxyHandler: ChannelInboundHandler {
             headers: capturedHeaders, body: inspectionBuffer, timestamp: Date()
         )
         let request = capturedRequestProvider?() ?? captured
+        let upstreamChannel = context.channel
         Task {
             let output: CapturedResponse
             do { output = try await inspector(request, original) ?? original }
@@ -255,7 +256,7 @@ final class StreamingProxyHandler: ChannelInboundHandler {
             self.sendInspected(output)
             self.sink.record(Flow(id: self.flowID, request: request, response: self.captureVersion(output),
                                   state: .completed, startedAt: self.startedAt, endedAt: Date(), secure: self.secure))
-            context.channel.close(promise: nil)
+            upstreamChannel.close(promise: nil)
         }
     }
 

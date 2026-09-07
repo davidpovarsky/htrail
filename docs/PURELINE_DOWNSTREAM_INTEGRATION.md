@@ -93,7 +93,7 @@ NudeNet pipeline, diagnostics, and tests remain intact.
 - `iosapp/ImageFilterIntegration/Core/ExtensionSafeDiagnosticLogService.swift`: unchanged; remains the app-extension-safe implementation expected by vendor source compiled into `ImageFilterCore`.
 - `iosapp/Sources/SetupView.swift`: exports the bounded PacketTunnel diagnostic ZIP.
 - `iosapp/RuntimeTests/IntegratedRuntimeTests.swift`: downstream tests for diagnostics, capture budgets, persistence, fail-open limits, model selection, lazy preparation, and full vendor-pipeline availability.
-- `iosapp/project.yml`: adds the static `PurelineSupport` target and removes MobileCLIP model resources from PacketTunnel only. Main-app resources, identifiers, entitlements, signing, profiles, and vendor targets are unchanged.
+- `iosapp/project.yml`: compiles shared Pureline sources directly into the app/extension (avoiding an extension framework), and removes MobileCLIP model resources from PacketTunnel only. Main-app resources, identifiers, entitlements, signing, profiles, and vendor targets are unchanged.
 
 # Runtime policy summary
 

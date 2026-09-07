@@ -11,22 +11,6 @@ packages:
     url: https://github.com/swhitty/FlyingFox.git
     from: 0.27.0
 targets:
-  PurelineSupport:
-    type: library.static
-    platform: iOS
-    sources:
-      - path: PurelineIntegration
-    dependencies:
-      - package: HTTrail
-        product: HTTrailCore
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.Support
-        GENERATE_INFOPLIST_FILE: YES
-        SWIFT_VERSION: "5.0"
-        IPHONEOS_DEPLOYMENT_TARGET: "26.5"
-        APPLICATION_EXTENSION_API_ONLY: YES
-
   EmbeddedImageFilter:
     type: framework
     platform: iOS
@@ -103,6 +87,7 @@ targets:
     platform: iOS
     sources:
       - path: Sources
+      - path: PurelineIntegration
       - path: ../Resources/Fonts/JetBrainsMono.ttf
         buildPhase: resources
       - path: ../Resources/Localizations
@@ -124,7 +109,6 @@ targets:
     dependencies:
       - package: HTTrail
         product: HTTrailCore
-      - target: PurelineSupport
       - target: EmbeddedImageFilter
         embed: true
       - target: ImageFilterCore
@@ -202,12 +186,12 @@ targets:
     platform: iOS
     sources:
       - path: PacketTunnel
+      - path: PurelineIntegration
       - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/NudeNet320n.mlpackage
         buildPhase: resources
     dependencies:
       - package: HTTrail
         product: HTTrailCore
-      - target: PurelineSupport
       - target: ImageFilterCore
         embed: false
     info:
@@ -279,12 +263,14 @@ targets:
     platform: iOS
     sources:
       - path: RuntimeTests
+      - path: PurelineIntegration
       - path: ../Vendor/AI-Image-Classifier/Screenshots/ClassificationImageSelected.png
         buildPhase: resources
     dependencies:
       - target: ImageFilterRuntimeHost
       - target: ImageFilterCore
-      - target: PurelineSupport
+      - package: HTTrail
+        product: HTTrailCore
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.RuntimeTests
