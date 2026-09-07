@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+import HTTrailCore
 @testable import ImageFilterCore
 import XCTest
 
