@@ -5,6 +5,19 @@ import PurelineSupport
 import XCTest
 
 final class IntegratedRuntimeTests: XCTestCase {
+    func testPersistentCompatibilityBypassRoundTripAndExpiry() {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("bypass-\(UUID().uuidString).json")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let store = PurelineCompatibilityBypassStore(url: url)
+        let now = Date()
+        let active = PinnedHostInfo(host: "pinned.test", expiresAt: now.addingTimeInterval(60))
+        let expired = PinnedHostInfo(host: "old.test", expiresAt: now.addingTimeInterval(-1))
+        store.save([active, expired], now: now)
+        let loaded = store.load(now: now)
+        XCTAssertEqual(loaded.active, [active])
+        XCTAssertTrue(loaded.expired.isEmpty, "expired entries are pruned on save")
+    }
+
     func testBoundedCaptureNeverExceedsPreviewOrAggregateBudgets() {
         let limits = PurelineCaptureLimits(
             requestPreviewBytes: 16, responsePreviewBytes: 24,

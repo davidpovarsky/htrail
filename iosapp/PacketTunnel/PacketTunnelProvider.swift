@@ -20,6 +20,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     private let engine = InterceptEngine()
     private let configStore = SharedConfigStore()
     private let diagnostics = PurelinePacketTunnelDiagnostics.shared
+    private let bypassStore = PurelineCompatibilityBypassStore()
     private var configSyncTask: Task<Void, Never>?
 
     override func startTunnel(options: [String: NSObject]?,
@@ -30,6 +31,13 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         // load here (and keep polling) so interception actually takes effect.
         let config = configStore.load() ?? SharedConfig()
         let port = config.proxyPort
+        configurePinningDiagnostics()
+        applyRuntimeConfig(config)
+        let restored = bypassStore.load()
+        engine.restoreDetectedPinnedHosts(restored.active)
+        for entry in restored.expired {
+            diagnostics.record(category: "tls", event: "compatibility bypass expired", details: ["host": entry.host])
+        }
 
         // Remote target: forward to a Mac's proxy on the LAN — do NOT run a local
         // proxy; the Mac decrypts and records. Otherwise capture on-device.
@@ -43,7 +51,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             return
         }
 
-        ImageFilterProxyBridge.apply(config: config, to: engine)
         diagnostics.record(category: "proxy", event: "local proxy starting", details: [
             "port": String(port), "startCount": String(startCount)
         ])
@@ -101,8 +108,10 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 try? await Task.sleep(nanoseconds: 1_500_000_000)
                 guard let self else { break }
                 let config = self.configStore.load() ?? SharedConfig()
-                ImageFilterProxyBridge.apply(config: config, to: self.engine)
-                let pinned = self.engine.detectedPinnedHosts().map(\.host)
+                self.applyRuntimeConfig(config)
+                let pinnedInfo = self.engine.detectedPinnedHosts()
+                self.bypassStore.save(pinnedInfo)
+                let pinned = pinnedInfo.map(\.host)
                 self.configStore.savePinnedHosts(pinned)
                 // Publish what the engine is actually running so the app can show it.
                 var status = EngineStatus()
@@ -112,6 +121,44 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 status.port = config.proxyPort
                 status.updatedAt = Date()
                 self.configStore.saveEngineStatus(status)
+            }
+        }
+    }
+
+    private func applyRuntimeConfig(_ config: SharedConfig) {
+        ImageFilterProxyBridge.apply(config: config, to: engine)
+        var pinning = PinningConfig(enabled: config.pinningEnabled)
+        pinning.failureThreshold = 1
+        pinning.ttl = 24 * 60 * 60
+        pinning.requirePriorSuccess = true
+        engine.setPinningConfig(pinning)
+    }
+
+    private func configurePinningDiagnostics() {
+        engine.pinningEventHandler = { [weak self] event in
+            guard let self else { return }
+            switch event {
+            case .mitmAttempted(let host):
+                self.diagnostics.record(category: "tls", event: "MITM attempted", details: ["host": host])
+            case .mitmHandshakeSucceeded(let host):
+                self.diagnostics.record(category: "tls", event: "MITM handshake succeeded", details: ["host": host])
+                self.bypassStore.save(self.engine.detectedPinnedHosts())
+            case .mitmHandshakeFailed(let host):
+                self.diagnostics.record(category: "tls", event: "MITM handshake failed", details: ["host": host])
+            case .compatibilitySuspected(let info):
+                self.bypassStore.save(self.engine.detectedPinnedHosts())
+                self.diagnostics.record(category: "tls", event: "compatibility/pinning suspected; host persisted", details: [
+                    "host": info.host, "expiresAt": ISO8601DateFormatter().string(from: info.expiresAt)
+                ])
+            case .restored(let info):
+                self.diagnostics.record(category: "tls", event: "persisted bypass restored", details: ["host": info.host])
+            case .expired(let info):
+                self.bypassStore.save(self.engine.detectedPinnedHosts())
+                self.diagnostics.record(category: "tls", event: "compatibility bypass expired", details: ["host": info.host])
+            case .blindTunneled(let host):
+                self.diagnostics.record(category: "tls", event: "host blind-tunneled", details: ["host": host])
+            case .forceDecryptOverride(let host):
+                self.diagnostics.record(category: "tls", event: "force-decrypt override", details: ["host": host])
             }
         }
     }

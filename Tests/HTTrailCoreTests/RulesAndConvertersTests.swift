@@ -2,6 +2,40 @@ import XCTest
 import NIOPosix
 @testable import HTTrailCore
 
+final class PersistentPinningSeamTests: XCTestCase {
+    func testRestoredHostIsBlindTunneledWithoutMITMAttempt() {
+        let engine = InterceptEngine()
+        let info = PinnedHostInfo(host: "pinned.test", expiresAt: Date().addingTimeInterval(60))
+        var events: [PinningEvent] = []
+        let lock = NSLock()
+        engine.pinningEventHandler = { event in lock.lock(); events.append(event); lock.unlock() }
+        engine.restoreDetectedPinnedHosts([info])
+        XCTAssertFalse(engine.shouldDecrypt(host: "pinned.test"))
+        lock.lock(); let snapshot = events; lock.unlock()
+        XCTAssertTrue(snapshot.contains(.restored(info)))
+        XCTAssertTrue(snapshot.contains(.blindTunneled(host: "pinned.test")))
+        XCTAssertFalse(snapshot.contains(.mitmAttempted(host: "pinned.test")))
+    }
+
+    func testRestoredBypassExpiresAndForceDecryptStillOverrides() {
+        let engine = InterceptEngine()
+        engine.restoreDetectedPinnedHosts([
+            PinnedHostInfo(host: "expired.test", expiresAt: Date().addingTimeInterval(-1)),
+            PinnedHostInfo(host: "forced.test", expiresAt: Date().addingTimeInterval(60))
+        ])
+        XCTAssertTrue(engine.shouldDecrypt(host: "expired.test"))
+        engine.setForcedDecryptHosts(["forced.test"])
+        XCTAssertTrue(engine.shouldDecrypt(host: "forced.test"))
+    }
+
+    func testProxyDefaultsRemainUnchangedWithoutPurelineOptIn() throws {
+        let proxy = ProxyServer(port: 0, certificateAuthority: try CertificateAuthority.create(), sink: CollectingSink())
+        XCTAssertFalse(proxy.streamRequestBodies)
+        XCTAssertFalse(proxy.verifyUpstreamCertificates)
+        XCTAssertEqual(proxy.captureBodyCap, ProxyTuning.defaultCaptureBodyCap)
+    }
+}
+
 final class InterceptRuleProxyTests: XCTestCase {
     /// A block rule should short-circuit the request with the configured status,
     /// proving the engine runs inside the live MITM path.

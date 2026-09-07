@@ -81,13 +81,26 @@ public struct PinningConfig: Sendable {
 }
 
 /// A host that auto-detection has put into tunnel mode.
-public struct PinnedHostInfo: Sendable, Identifiable, Equatable {
+public struct PinnedHostInfo: Sendable, Identifiable, Equatable, Codable {
     public var id: String { host }
     public let host: String
     public let expiresAt: Date
     public init(host: String, expiresAt: Date) {
         self.host = host; self.expiresAt = expiresAt
     }
+}
+
+/// Generic observability events for pinning/compatibility decisions. Callers
+/// decide whether and where to persist or log them.
+public enum PinningEvent: Sendable, Equatable {
+    case mitmAttempted(host: String)
+    case mitmHandshakeSucceeded(host: String)
+    case mitmHandshakeFailed(host: String)
+    case compatibilitySuspected(PinnedHostInfo)
+    case restored(PinnedHostInfo)
+    case expired(PinnedHostInfo)
+    case blindTunneled(host: String)
+    case forceDecryptOverride(host: String)
 }
 
 /// What the engine decided to do with an outgoing request.
@@ -140,6 +153,7 @@ public final class InterceptEngine: @unchecked Sendable {
 
     /// Provided by the UI to handle breakpoints interactively.
     public var breakpointHandler: (@Sendable (BreakpointEvent) async -> BreakpointEdit?)?
+    public var pinningEventHandler: (@Sendable (PinningEvent) -> Void)?
 
     public init() {}
 
@@ -171,15 +185,25 @@ public final class InterceptEngine: @unchecked Sendable {
     }
 
     public func shouldDecrypt(host: String) -> Bool {
-        lock.lock(); defer { lock.unlock() }
+        lock.lock()
         // A user-forced host is always decrypted, overriding pinning + allowlist.
-        if forceDecryptHosts.contains(host) { return true }
-        // Auto-detected pinned hosts tunnel until their entry expires.
-        if pinningConfig.enabled, let expiry = autoPinned[host], expiry > Date() {
-            return false
+        if forceDecryptHosts.contains(host) {
+            lock.unlock(); pinningEventHandler?(.forceDecryptOverride(host: host)); return true
         }
-        guard !sslAllowlist.isEmpty else { return true }
-        return sslAllowlist.contains { Glob.match($0, host) }
+        // Auto-detected pinned hosts tunnel until their entry expires.
+        if pinningConfig.enabled, let expiry = autoPinned[host] {
+            if expiry > Date() {
+                lock.unlock(); pinningEventHandler?(.blindTunneled(host: host)); return false
+            }
+            autoPinned[host] = nil
+            lock.unlock(); pinningEventHandler?(.expired(PinnedHostInfo(host: host, expiresAt: expiry)))
+            return shouldDecrypt(host: host)
+        }
+        let decrypt = sslAllowlist.isEmpty || sslAllowlist.contains { Glob.match($0, host) }
+        lock.unlock()
+        if decrypt { pinningEventHandler?(.mitmAttempted(host: host)) }
+        else { pinningEventHandler?(.blindTunneled(host: host)) }
+        return decrypt
     }
 
     // MARK: Pinning detection
@@ -191,10 +215,12 @@ public final class InterceptEngine: @unchecked Sendable {
     /// Called when a MITM handshake with the client completes — the client
     /// accepted our forged leaf, so the CA is trusted and this host isn't pinned.
     public func recordMITMHandshakeSuccess(host: String) {
-        lock.lock(); defer { lock.unlock() }
+        lock.lock()
         globalMITMSucceeded = true
         pinFailureStreak[host] = nil
         autoPinned[host] = nil
+        lock.unlock()
+        pinningEventHandler?(.mitmHandshakeSucceeded(host: host))
     }
 
     /// Called when a MITM handshake dies before completing (fatal TLS alert or an
@@ -202,16 +228,32 @@ public final class InterceptEngine: @unchecked Sendable {
     /// should be tunneled on its next connection.
     @discardableResult
     public func recordMITMHandshakeFailure(host: String) -> Bool {
-        lock.lock(); defer { lock.unlock() }
-        guard pinningConfig.enabled else { return false }
+        lock.lock()
+        guard pinningConfig.enabled else { lock.unlock(); return false }
         let streak = (pinFailureStreak[host] ?? 0) + 1
         pinFailureStreak[host] = streak
         // Hold off until the CA is proven trusted; otherwise an untrusted-CA
         // failure (identical on the wire) would blind every host it touches.
-        if pinningConfig.requirePriorSuccess && !globalMITMSucceeded { return false }
-        guard streak >= pinningConfig.failureThreshold else { return false }
-        autoPinned[host] = Date().addingTimeInterval(pinningConfig.ttl)
+        guard !pinningConfig.requirePriorSuccess || globalMITMSucceeded,
+              streak >= pinningConfig.failureThreshold else {
+            lock.unlock(); pinningEventHandler?(.mitmHandshakeFailed(host: host)); return false
+        }
+        let info = PinnedHostInfo(host: host, expiresAt: Date().addingTimeInterval(pinningConfig.ttl))
+        autoPinned[host] = info.expiresAt
+        lock.unlock()
+        pinningEventHandler?(.mitmHandshakeFailed(host: host))
+        pinningEventHandler?(.compatibilitySuspected(info))
         return true
+    }
+
+    /// Restores unexpired auto-detected entries before a constrained proxy begins
+    /// accepting traffic. Forced-decrypt hosts still override restored entries.
+    public func restoreDetectedPinnedHosts(_ entries: [PinnedHostInfo], now: Date = Date()) {
+        for entry in entries {
+            if entry.expiresAt <= now { pinningEventHandler?(.expired(entry)); continue }
+            lock.lock(); autoPinned[entry.host] = entry.expiresAt; lock.unlock()
+            pinningEventHandler?(.restored(entry))
+        }
     }
 
     /// Hosts currently in auto-detected tunnel mode (expired entries pruned).
