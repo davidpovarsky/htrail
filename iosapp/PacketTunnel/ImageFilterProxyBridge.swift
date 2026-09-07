@@ -11,7 +11,7 @@ enum ImageFilterProxyBridge {
         subsystem: "com.davidpovarsky.pureline.PacketTunnel",
         category: "direct-image-filter"
     )
-    static let maximumImageBytes = 4 * 1024 * 1024
+    static let maximumImageBytes = PurelineRuntimePolicy.imageInspectionBytes
 
     static func apply(config: SharedConfig, to engine: InterceptEngine) {
         engine.breakpointHandler = nil
@@ -25,9 +25,12 @@ enum ImageFilterProxyBridge {
                   Self.isPlausibleRaster(request: request, metadata: metadata) else { return nil }
             if let encoding = metadata.header("Content-Encoding")?.lowercased(),
                !encoding.isEmpty, encoding != "identity" { return nil }
-            if let length = metadata.header("Content-Length").flatMap(Int.init), length > maximumImageBytes {
+            let length = metadata.header("Content-Length").flatMap(Int.init)
+            guard PurelineRuntimePolicy.imageDisposition(contentLength: length) == .inspect else {
                 diagnostics.record(category: "image-filter", event: "image filtering skipped because payload exceeded limits", details: [
-                    "host": request.host, "contentLength": String(length), "limit": String(maximumImageBytes)
+                    "host": request.host, "contentLength": length.map(String.init) ?? "unknown",
+                    "limit": String(maximumImageBytes),
+                    "availableMemoryBytes": String(PurelineRuntimePolicy.currentAvailableMemoryBytes())
                 ])
                 return nil
             }

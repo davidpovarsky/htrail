@@ -8,10 +8,10 @@ public struct PurelineCaptureLimits: Sendable, Equatable {
     public var flowCount: Int
 
     public init(
-        requestPreviewBytes: Int = 256 * 1024,
-        responsePreviewBytes: Int = 512 * 1024,
-        totalBodyBytes: Int = 8 * 1024 * 1024,
-        flowCount: Int = 200
+        requestPreviewBytes: Int = PurelineRuntimePolicy.requestPreviewBytes,
+        responsePreviewBytes: Int = PurelineRuntimePolicy.responsePreviewBytes,
+        totalBodyBytes: Int = PurelineRuntimePolicy.totalCaptureBodyBytes,
+        flowCount: Int = PurelineRuntimePolicy.recentFlowCount
     ) {
         self.requestPreviewBytes = max(0, requestPreviewBytes)
         self.responsePreviewBytes = max(0, responsePreviewBytes)
@@ -41,6 +41,7 @@ public final class PurelineBoundedFlowSink: FlowSink, @unchecked Sendable {
     private var retainedBodyBytes = 0
     private var truncatedRequestCount = 0
     private var truncatedResponseCount = 0
+    private var recordCount = 0
     public var onSnapshot: (@Sendable (PurelineCaptureSnapshot) -> Void)?
 
     public init(limits: PurelineCaptureLimits, store: SharedFlowStore?) {
@@ -82,7 +83,8 @@ public final class PurelineBoundedFlowSink: FlowSink, @unchecked Sendable {
             retainedBodyBytes += bodyBytes(bounded)
         }
         store?.record(bounded)
-        onSnapshot?(snapshotLocked())
+        recordCount += 1
+        if recordCount == 1 || recordCount.isMultiple(of: 20) { onSnapshot?(snapshotLocked()) }
     }
 
     public func snapshot() -> PurelineCaptureSnapshot {

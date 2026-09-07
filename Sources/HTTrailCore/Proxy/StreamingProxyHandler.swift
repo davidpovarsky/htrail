@@ -46,6 +46,9 @@ final class StreamingProxyHandler: ChannelInboundHandler {
     private let completeRequestOnActive: Bool
     private let responseInspectionPolicy: StreamingResponseInspectionPolicy?
     private let responseInspector: StreamingResponseInspector?
+    private let targetHost: String?
+    private let targetUsesTLS: Bool
+    private let runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)?
     private let flowID: UUID
     private let startedAt: Date
     private let secure: Bool
@@ -73,7 +76,9 @@ final class StreamingProxyHandler: ChannelInboundHandler {
          completeRequestOnActive: Bool = true,
          capturedRequestProvider: (() -> CapturedRequest)? = nil,
          responseInspectionPolicy: StreamingResponseInspectionPolicy? = nil,
-         responseInspector: StreamingResponseInspector? = nil) {
+         responseInspector: StreamingResponseInspector? = nil,
+         targetHost: String? = nil, targetUsesTLS: Bool = false,
+         runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)? = nil) {
         self.clientChannel = clientChannel
         self.requestHead = requestHead
         self.requestBody = requestBody
@@ -82,6 +87,9 @@ final class StreamingProxyHandler: ChannelInboundHandler {
         self.completeRequestOnActive = completeRequestOnActive
         self.responseInspectionPolicy = responseInspectionPolicy
         self.responseInspector = responseInspector
+        self.targetHost = targetHost
+        self.targetUsesTLS = targetUsesTLS
+        self.runtimeEventHandler = runtimeEventHandler
         self.flowID = flowID
         self.startedAt = startedAt
         self.secure = secure
@@ -113,6 +121,12 @@ final class StreamingProxyHandler: ChannelInboundHandler {
             version = head.version
             capturedHeaders = head.headers.map { HeaderPair(name: $0.name, value: $0.value) }
             upstreamHead = head
+            if head.status.code >= 400 {
+                runtimeEventHandler?(ProxyRuntimeEvent(
+                    kind: .originHTTPStatus, host: targetHost,
+                    detail: head.status.reasonPhrase, statusCode: Int(head.status.code)
+                ))
+            }
             let metadata = StreamingResponseMetadata(
                 statusCode: Int(head.status.code), reasonPhrase: head.status.reasonPhrase,
                 httpVersion: "HTTP/\(head.version.major).\(head.version.minor)", headers: capturedHeaders
@@ -186,6 +200,7 @@ final class StreamingProxyHandler: ChannelInboundHandler {
     }
 
     func errorCaught(context: ChannelHandlerContext, error: Error) {
+        runtimeEventHandler?(ProxyFailureClassifier.event(error: error, host: targetHost, tls: targetUsesTLS))
         finish(context: context, success: false)
     }
 

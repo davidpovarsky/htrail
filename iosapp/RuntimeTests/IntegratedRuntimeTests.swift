@@ -5,6 +5,20 @@ import PurelineSupport
 import XCTest
 
 final class IntegratedRuntimeTests: XCTestCase {
+    func testFailOpenPolicySkipsOversizedImagesAndResourcePressure() {
+        XCTAssertEqual(
+            PurelineRuntimePolicy.imageDisposition(
+                contentLength: PurelineRuntimePolicy.imageInspectionBytes + 1,
+                availableMemoryBytes: UInt64.max
+            ), .passThrough
+        )
+        XCTAssertEqual(
+            PurelineRuntimePolicy.imageDisposition(contentLength: 100, availableMemoryBytes: 1),
+            .passThrough
+        )
+        XCTAssertEqual(PurelineRuntimePolicy.classifierConcurrency, 1)
+    }
+
     func testPersistentCompatibilityBypassRoundTripAndExpiry() {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("bypass-\(UUID().uuidString).json")
         defer { try? FileManager.default.removeItem(at: url) }

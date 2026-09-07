@@ -74,11 +74,25 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         let sink: FlowSink = boundedSink ?? NullFlowSink()
         let server = ProxyServer(port: port, certificateAuthority: ca, sink: sink, engine: engine)
         server.bindHost = "127.0.0.1"
+        server.verifyUpstreamCertificates = true
         server.captureBodyCap = PurelineCaptureLimits.packetTunnel.responsePreviewBytes
         server.streamRequestBodies = true
-        server.requestInspectionBodyCap = 1024 * 1024
+        server.requestInspectionBodyCap = PurelineRuntimePolicy.requestInspectionBytes
         server.requestCaptureBodyCap = PurelineCaptureLimits.packetTunnel.requestPreviewBytes
         ImageFilterProxyBridge.configure(server: server, diagnostics: diagnostics)
+        server.runtimeEventHandler = { [diagnostics] event in
+            let details = [
+                "host": event.host ?? "unknown",
+                "detail": event.detail,
+                "statusCode": event.statusCode.map(String.init) ?? ""
+            ]
+            if event.kind == .originHTTPStatus {
+                diagnostics.record(category: "origin", event: "normal origin HTTP status", details: details)
+            } else {
+                diagnostics.record(category: "proxy", event: event.kind.rawValue, details: details)
+            }
+        }
+        diagnostics.record(category: "tls", event: "upstream certificate verification enabled")
         self.proxy = server
         startConfigSync()
 
@@ -105,6 +119,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     private func startConfigSync() {
         configSyncTask?.cancel()
         configSyncTask = Task { [weak self] in
+            var heartbeat = 0
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: 1_500_000_000)
                 guard let self else { break }
@@ -122,6 +137,14 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 status.port = config.proxyPort
                 status.updatedAt = Date()
                 self.configStore.saveEngineStatus(status)
+                heartbeat += 1
+                if heartbeat.isMultiple(of: 20) {
+                    self.diagnostics.record(category: "resources", event: "PacketTunnel resource counters", details: [
+                        "availableMemoryBytes": String(PurelineRuntimePolicy.currentAvailableMemoryBytes()),
+                        "pinnedHosts": String(pinned.count),
+                        "activeRules": String(status.ruleCount)
+                    ])
+                }
             }
         }
     }
@@ -130,7 +153,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         ImageFilterProxyBridge.apply(config: config, to: engine)
         var pinning = PinningConfig(enabled: config.pinningEnabled)
         pinning.failureThreshold = 1
-        pinning.ttl = 24 * 60 * 60
+        pinning.ttl = PurelineRuntimePolicy.compatibilityBypassTTL
         pinning.requirePriorSuccess = true
         engine.setPinningConfig(pinning)
     }

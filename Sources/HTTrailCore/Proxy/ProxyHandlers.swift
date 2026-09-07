@@ -110,6 +110,7 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
     private let requestCaptureBodyCap: Int
     private let responseInspectionPolicy: StreamingResponseInspectionPolicy?
     private let responseInspector: StreamingResponseInspector?
+    private let runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)?
     private let idleTimeout: TimeAmount
     private let connectTimeout: TimeAmount
     private var connectTarget: (host: String, port: Int)?
@@ -123,6 +124,7 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
          requestCaptureBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
          responseInspectionPolicy: StreamingResponseInspectionPolicy? = nil,
          responseInspector: StreamingResponseInspector? = nil,
+         runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)? = nil,
          idleTimeout: TimeAmount = ProxyTuning.defaultIdleTimeout,
          connectTimeout: TimeAmount = ProxyTuning.defaultConnectTimeout) {
         self.ca = ca
@@ -136,6 +138,7 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
         self.requestCaptureBodyCap = requestCaptureBodyCap
         self.responseInspectionPolicy = responseInspectionPolicy
         self.responseInspector = responseInspector
+        self.runtimeEventHandler = runtimeEventHandler
         self.idleTimeout = idleTimeout
         self.connectTimeout = connectTimeout
     }
@@ -171,7 +174,8 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
                                           requestInspectionBodyCap: requestInspectionBodyCap,
                                           requestCaptureBodyCap: requestCaptureBodyCap,
                                           responseInspectionPolicy: responseInspectionPolicy,
-                                          responseInspector: responseInspector)
+                                          responseInspector: responseInspector,
+                                          runtimeEventHandler: runtimeEventHandler)
         let pipeline = context.pipeline
         _ = pipeline.addHandler(proxy, position: .after(self)).flatMap { () -> EventLoopFuture<Void> in
             // Re-deliver the head we already consumed, then retire ourselves so
@@ -225,7 +229,8 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
                         requestInspectionBodyCap: self.requestInspectionBodyCap,
                         requestCaptureBodyCap: self.requestCaptureBodyCap,
                         responseInspectionPolicy: self.responseInspectionPolicy,
-                        responseInspector: self.responseInspector
+                        responseInspector: self.responseInspector,
+                        runtimeEventHandler: self.runtimeEventHandler
                     )
                     let sensor = TLSHandshakeSensor(host: host, engine: self.engine)
                     // tls then sensor at the head, in order, so the sensor sits
@@ -248,7 +253,12 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
                 // ClientHello now flows through the TLS handler.
                 channel.setOption(ChannelOptions.autoRead, value: true).map { channel.read() }
             }
-            .whenFailure { _ in channel.close(promise: nil) }
+            .whenFailure { error in
+                self.runtimeEventHandler?(ProxyRuntimeEvent(
+                    kind: .parserOrProtocolFailure, host: host, detail: String(describing: error)
+                ))
+                channel.close(promise: nil)
+            }
     }
 
     /// For allowlist-excluded hosts: raw TCP relay with no TLS interception, so
@@ -293,7 +303,12 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
                         upstream.read()
                     }
             }
-            .whenFailure { _ in channel.close(promise: nil) }
+            .whenFailure { error in
+                self.runtimeEventHandler?(ProxyRuntimeEvent(
+                    kind: .blindTunnelFailure, host: host, detail: String(describing: error)
+                ))
+                channel.close(promise: nil)
+            }
     }
 
     private func parseAuthority(_ uri: String) -> (host: String, port: Int) {

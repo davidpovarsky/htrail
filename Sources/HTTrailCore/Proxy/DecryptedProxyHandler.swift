@@ -26,6 +26,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
     private let requestCaptureBodyCap: Int
     private let responseInspectionPolicy: StreamingResponseInspectionPolicy?
     private let responseInspector: StreamingResponseInspector?
+    private let runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)?
 
     private var requestHead: HTTPRequestHead?
     private var requestBody = ByteBuffer()
@@ -46,7 +47,8 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
          requestInspectionBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
          requestCaptureBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
          responseInspectionPolicy: StreamingResponseInspectionPolicy? = nil,
-         responseInspector: StreamingResponseInspector? = nil) {
+         responseInspector: StreamingResponseInspector? = nil,
+         runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)? = nil) {
         self.fixedTarget = fixedTarget
         self.sink = sink
         self.group = group
@@ -60,6 +62,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         self.requestCaptureBodyCap = requestCaptureBodyCap
         self.responseInspectionPolicy = responseInspectionPolicy
         self.responseInspector = responseInspector
+        self.runtimeEventHandler = runtimeEventHandler
     }
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
@@ -171,7 +174,9 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             keepAlive: keepAlive, captureCap: captureBodyCap, sink: sink,
             completeRequestOnActive: false, capturedRequestProvider: { capture.snapshot() },
             responseInspectionPolicy: responseInspectionPolicy,
-            responseInspector: responseInspector
+            responseInspector: responseInspector,
+            targetHost: target.host, targetUsesTLS: target.tls,
+            runtimeEventHandler: runtimeEventHandler
         )
         let verify = verifyUpstream
         let idleTimeout = self.idleTimeout
@@ -206,6 +211,9 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
                     _ = context.channel.setOption(ChannelOptions.autoRead, value: true)
                     context.read()
                 case .failure(let error):
+                    self.runtimeEventHandler?(ProxyFailureClassifier.event(
+                        error: error, host: target.host, tls: target.tls
+                    ))
                     self.streamingUpload = false
                     self.sink.record(Flow(id: flowID, request: capture.snapshot(), response: nil,
                                           state: .failed, error: String(describing: error),
@@ -313,6 +321,9 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
                     await self.relay(channel: channel, allocator: allocator, response: response,
                                      keepAlive: keepAlive, throttle: throttle)
                 } catch {
+                    self.runtimeEventHandler?(ProxyFailureClassifier.event(
+                        error: error, host: finalTarget.host, tls: finalTarget.tls
+                    ))
                     sink.record(Flow(id: flowID, request: finalRequest, response: nil, state: .failed,
                                      error: "\(error)", startedAt: started, endedAt: Date(), secure: secure))
                     self.respondError(channel: channel, status: .badGateway, message: "Upstream error: \(error)")
@@ -399,7 +410,9 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             captured: request, flowID: flowID, startedAt: startedAt, secure: secure,
             keepAlive: keepAlive, captureCap: captureBodyCap, sink: sink,
             responseInspectionPolicy: responseInspectionPolicy,
-            responseInspector: responseInspector)
+            responseInspector: responseInspector,
+            targetHost: target.host, targetUsesTLS: target.tls,
+            runtimeEventHandler: runtimeEventHandler)
 
         let verify = verifyUpstream
         let idleTimeout = self.idleTimeout
@@ -427,6 +440,9 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             }
 
         bootstrap.connect(host: target.host, port: target.port).whenFailure { error in
+            self.runtimeEventHandler?(ProxyFailureClassifier.event(
+                error: error, host: target.host, tls: target.tls
+            ))
             // Never connected: record the failure and tell the client 502.
             sink.record(Flow(id: flowID, request: request, response: nil, state: .failed,
                              error: "\(error)", startedAt: startedAt, endedAt: Date(), secure: secure))
@@ -534,6 +550,14 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             return (String(value[..<colon]), port)
         }
         return (value, defaultPort)
+    }
+
+    func errorCaught(context: ChannelHandlerContext, error: Error) {
+        runtimeEventHandler?(ProxyRuntimeEvent(
+            kind: .parserOrProtocolFailure, host: fixedTarget?.host,
+            detail: String(describing: error)
+        ))
+        context.close(promise: nil)
     }
 }
 

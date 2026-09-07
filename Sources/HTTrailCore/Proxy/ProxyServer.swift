@@ -87,6 +87,7 @@ public final class ProxyServer: @unchecked Sendable {
     /// the maximum body bytes that may be held; nil streams immediately.
     public var streamingResponseInspectionPolicy: StreamingResponseInspectionPolicy?
     public var streamingResponseInspector: StreamingResponseInspector?
+    public var runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)?
     public var upstreamIdleTimeout: TimeAmount = ProxyTuning.defaultIdleTimeout
     public var upstreamConnectTimeout: TimeAmount = ProxyTuning.defaultConnectTimeout
 
@@ -139,6 +140,7 @@ public final class ProxyServer: @unchecked Sendable {
         let requestCaptureBodyCap = self.requestCaptureBodyCap
         let responseInspectionPolicy = self.streamingResponseInspectionPolicy
         let responseInspector = self.streamingResponseInspector
+        let runtimeEventHandler = self.runtimeEventHandler
         let idleTimeout = self.upstreamIdleTimeout
         let connectTimeout = self.upstreamConnectTimeout
 
@@ -158,6 +160,7 @@ public final class ProxyServer: @unchecked Sendable {
                                                   requestCaptureBodyCap: requestCaptureBodyCap,
                                                   responseInspectionPolicy: responseInspectionPolicy,
                                                   responseInspector: responseInspector,
+                                                  runtimeEventHandler: runtimeEventHandler,
                                                   idleTimeout: idleTimeout,
                                                   connectTimeout: connectTimeout)
                 return channel.pipeline.addHandler(encoder, name: ProxyHandlerName.httpEncoder)
