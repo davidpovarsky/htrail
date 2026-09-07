@@ -39,6 +39,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.EmbeddedImageFilter
         GENERATE_INFOPLIST_FILE: YES
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: "6.0"
         SWIFT_APPROACHABLE_CONCURRENCY: YES
         SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
@@ -70,6 +72,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.ImageFilterCore
         GENERATE_INFOPLIST_FILE: YES
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: "6.0"
         SWIFT_APPROACHABLE_CONCURRENCY: YES
         SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
@@ -105,6 +109,9 @@ targets:
       - package: HTTrail
         product: HTTrailCore
       - target: EmbeddedImageFilter
+        embed: true
+      - target: ImageFilterCore
+        link: false
         embed: true
       - target: PacketTunnel
         embed: true
@@ -190,7 +197,7 @@ targets:
       - package: HTTrail
         product: HTTrailCore
       - target: ImageFilterCore
-        embed: true
+        embed: false
     info:
       path: PacketTunnel/Info.plist
       properties:
@@ -217,6 +224,7 @@ targets:
         CURRENT_PROJECT_VERSION: "8"
         SWIFT_VERSION: "5.0"
         IPHONEOS_DEPLOYMENT_TARGET: "26.5"
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../../Frameworks"
         ENABLE_USER_SCRIPT_SANDBOXING: NO
         APPLICATION_EXTENSION_API_ONLY: YES
 
