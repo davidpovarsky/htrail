@@ -6,12 +6,11 @@ final class PersistentPinningSeamTests: XCTestCase {
     func testRestoredHostIsBlindTunneledWithoutMITMAttempt() {
         let engine = InterceptEngine()
         let info = PinnedHostInfo(host: "pinned.test", expiresAt: Date().addingTimeInterval(60))
-        var events: [PinningEvent] = []
-        let lock = NSLock()
-        engine.pinningEventHandler = { event in lock.lock(); events.append(event); lock.unlock() }
+        let events = LockedPinningEvents()
+        engine.pinningEventHandler = { event in events.append(event) }
         engine.restoreDetectedPinnedHosts([info])
         XCTAssertFalse(engine.shouldDecrypt(host: "pinned.test"))
-        lock.lock(); let snapshot = events; lock.unlock()
+        let snapshot = events.snapshot
         XCTAssertTrue(snapshot.contains(.restored(info)))
         XCTAssertTrue(snapshot.contains(.blindTunneled(host: "pinned.test")))
         XCTAssertFalse(snapshot.contains(.mitmAttempted(host: "pinned.test")))
@@ -34,6 +33,13 @@ final class PersistentPinningSeamTests: XCTestCase {
         XCTAssertFalse(proxy.verifyUpstreamCertificates)
         XCTAssertEqual(proxy.captureBodyCap, ProxyTuning.defaultCaptureBodyCap)
     }
+}
+
+private final class LockedPinningEvents: @unchecked Sendable {
+    private let lock = NSLock()
+    private var events: [PinningEvent] = []
+    func append(_ event: PinningEvent) { lock.lock(); events.append(event); lock.unlock() }
+    var snapshot: [PinningEvent] { lock.lock(); defer { lock.unlock() }; return events }
 }
 
 final class InterceptRuleProxyTests: XCTestCase {

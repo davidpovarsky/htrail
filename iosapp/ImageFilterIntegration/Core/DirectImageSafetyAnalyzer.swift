@@ -44,7 +44,7 @@ public actor DirectImageSafetyAnalyzer {
     /// Prepares only NudeNet. PacketTunnel never calls this while direct filtering
     /// is disabled and otherwise defers it until the first inspectable image.
     public func prepare() async {
-        try? await prepareIfNeeded()
+        _ = try? await prepareIfNeeded()
     }
 
     @discardableResult
