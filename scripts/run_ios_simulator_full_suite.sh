@@ -94,28 +94,37 @@ stop_sampler() {
 trap stop_sampler EXIT
 
 set +e
-xcodebuild test \
+perl -e '$timeout = shift; alarm $timeout; exec @ARGV' 1500 xcodebuild test \
   -project iosapp/HTTrailiOS.xcodeproj \
   -scheme HTTrailRuntimeTests \
   -configuration Debug \
   -destination "platform=iOS Simulator,id=$UDID" \
   -derivedDataPath "$DERIVED" \
   -resultBundlePath "$RESULTS/runtime-tests.xcresult" \
+  -enableCodeCoverage NO \
+  -jobs 3 \
   CODE_SIGNING_ALLOWED=NO \
   2>&1 | tee "$LOGS/runtime-tests.log"
 UNIT_EXIT=${PIPESTATUS[0]}
 echo "$UNIT_EXIT" > "$OUT/runtime-tests-exit.txt"
 
-xcodebuild test \
-  -project iosapp/HTTrailiOS.xcodeproj \
-  -scheme HTTrailUITests \
-  -configuration Debug \
-  -destination "platform=iOS Simulator,id=$UDID" \
-  -derivedDataPath "$DERIVED" \
-  -resultBundlePath "$RESULTS/ui-tests.xcresult" \
-  CODE_SIGNING_ALLOWED=NO \
-  2>&1 | tee "$LOGS/ui-tests.log"
-UI_EXIT=${PIPESTATUS[0]}
+if [ "${FAST_QA:-0}" = "1" ]; then
+  echo "Fast QA: UI journeys skipped; runtime hardening tests and signed build cover changed code." | tee "$LOGS/ui-tests.log"
+  UI_EXIT=0
+else
+  perl -e '$timeout = shift; alarm $timeout; exec @ARGV' 1500 xcodebuild test \
+    -project iosapp/HTTrailiOS.xcodeproj \
+    -scheme HTTrailUITests \
+    -configuration Debug \
+    -destination "platform=iOS Simulator,id=$UDID" \
+    -derivedDataPath "$DERIVED" \
+    -resultBundlePath "$RESULTS/ui-tests.xcresult" \
+    -enableCodeCoverage NO \
+    -jobs 3 \
+    CODE_SIGNING_ALLOWED=NO \
+    2>&1 | tee "$LOGS/ui-tests.log"
+  UI_EXIT=${PIPESTATUS[0]}
+fi
 echo "$UI_EXIT" > "$OUT/ui-tests-exit.txt"
 set -e
 

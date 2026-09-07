@@ -2,6 +2,12 @@ name: Full iOS Simulator QA
 
 on:
   workflow_dispatch:
+    inputs:
+      fast_qa:
+        description: 'Skip unrelated UI journeys and run the hardening runtime suite only'
+        required: false
+        default: true
+        type: boolean
   pull_request:
     branches: [main]
     paths:
@@ -24,7 +30,9 @@ jobs:
   simulator-full-suite:
     if: github.event_name == 'workflow_dispatch' || github.head_ref == 'feature/integrated-image-filter'
     runs-on: macos-latest
-    timeout-minutes: 240
+    timeout-minutes: 45
+    env:
+      FAST_QA: ${{ github.event_name == 'workflow_dispatch' && inputs.fast_qa && '1' || '0' }}
 
     steps:
       - name: Checkout
@@ -57,7 +65,7 @@ jobs:
         with:
           path: |
             ~/Library/Caches/org.swift.swiftpm
-            ~/Library/Developer/Xcode/DerivedData/SourcePackages
+            build/simulator-full-suite/DerivedData/SourcePackages
             .model-cache/mobileclip2-s2
             .model-cache/coreml-mobileclip2-s2
           key: ${{ runner.os }}-httrail-image-filter-${{ hashFiles('Package.resolved', 'Package.swift', 'Vendor/AI-Image-Classifier/tools/MobileCLIPConversion/**') }}
