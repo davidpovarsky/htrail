@@ -63,6 +63,20 @@ enum ImageFilterProxyBridge {
         }
 
         do {
+            let preparedNow = try await analyzer.prepareIfNeeded()
+            if preparedNow {
+                diagnostics.record(category: "image-filter", event: "model preparation completed", details: [
+                    "model": "NudeNet320n"
+                ])
+            }
+        } catch {
+            diagnostics.record(category: "image-filter", event: "model load failure; fail open", details: [
+                "model": "NudeNet320n", "error": String(describing: error)
+            ])
+            return nil
+        }
+
+        do {
             diagnostics.record(category: "image-filter", event: "inference start", details: [
                 "host": request.host, "bytes": String(response.body.count)
             ])

@@ -1,9 +1,9 @@
 import Foundation
 
 /// Public, extension-safe facade over the exact image-safety pipeline vendored
-/// from AI-Image-Classifier. This is the direct bridge used by HTTrail's proxy;
-/// it deliberately bypasses the loopback HTTP server while running the same
-/// MobileCLIP2 + NudeNet pipeline.
+/// from AI-Image-Classifier. The Packet Tunnel's current block decision is the
+/// vendor NudeNet policy, so this facade deliberately avoids loading MobileCLIP.
+/// The main app continues to use the vendor's complete pipeline unchanged.
 public nonisolated struct DirectImageSafetyDecision: Sendable {
     public let allowed: Bool
     public let risk: String
@@ -31,47 +31,44 @@ public nonisolated struct DirectImageSafetyDecision: Sendable {
 
 public actor DirectImageSafetyAnalyzer {
     public static let shared = DirectImageSafetyAnalyzer()
+    public nonisolated static let packetTunnelUsesMobileCLIP = false
+    public nonisolated static let packetTunnelUsesNudeNet = true
 
-    private let pipeline = ImageSafetyPipelineService.shared
+    private let nudeNet = NudeNetService.shared
     private let nudityPolicy = NudityFilterPolicy()
+    private var prepared = false
 
     public init() {}
 
-    /// Loads the same two models used by the original app. Callers may choose to
-    /// defer this until the first intercepted image to avoid changing the Packet
-    /// Tunnel's baseline memory footprint while direct filtering is disabled.
+    /// Prepares only NudeNet. PacketTunnel never calls this while direct filtering
+    /// is disabled and otherwise defers it until the first inspectable image.
     public func prepare() async {
-        await pipeline.prepare()
+        try? await prepareIfNeeded()
     }
 
-    /// Runs the complete original image-safety pipeline. The current blocking
-    /// decision intentionally uses the classifier app's existing standard
-    /// NudeNet policy only; MobileCLIP2 still runs and its evidence is returned,
-    /// but no new woman-score threshold is invented by the integration layer.
-    public func classify(imageData: Data, mimeType: String) async throws -> DirectImageSafetyDecision {
-        let response = try await pipeline.classify(
-            imageData: imageData,
-            mimeType: mimeType,
-            requestID: UUID()
-        )
+    @discardableResult
+    public func prepareIfNeeded() async throws -> Bool {
+        guard !prepared else { return false }
+        try await nudeNet.warmUp()
+        prepared = true
+        return true
+    }
 
-        let detections = response.nudity.mergedDetections.map { detection in
-            NudeDetection(
-                classId: NudeNetLabels.classId(for: detection.rawLabel) ?? -1,
-                label: detection.rawLabel,
-                confidence: detection.confidence,
-                boundingBox: detection.boundingBox
-            )
-        }
-        let policy = nudityPolicy.evaluate(detections)
+    /// Runs the exact vendor NudeNet detector and standard policy. The actor and
+    /// NudeNet service serialize expensive inference.
+    public func classify(imageData: Data, mimeType: String) async throws -> DirectImageSafetyDecision {
+        _ = mimeType
+        try await prepareIfNeeded()
+        let batch = try await nudeNet.detect(imageData: imageData)
+        let policy = nudityPolicy.evaluate(batch.detections)
 
         return DirectImageSafetyDecision(
             allowed: policy.allowed,
             risk: policy.risk,
             confidence: policy.confidence,
             triggeredClass: policy.triggeredClass,
-            personCount: response.summary.personCount,
-            highestWomanScore: response.summary.highestWomanScore
+            personCount: 0,
+            highestWomanScore: nil
         )
     }
 }

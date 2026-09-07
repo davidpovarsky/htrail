@@ -140,6 +140,11 @@ final class IntegratedRuntimeTests: XCTestCase {
         print("HTTRAIL_RUNTIME_STEP direct_image_filter=pass")
     }
 
+    func testPacketTunnelDirectDecisionUsesOnlyNudeNet() {
+        XCTAssertFalse(DirectImageSafetyAnalyzer.packetTunnelUsesMobileCLIP)
+        XCTAssertTrue(DirectImageSafetyAnalyzer.packetTunnelUsesNudeNet)
+    }
+
     private static func milliseconds(since start: ContinuousClock.Instant) -> Int {
         let duration = start.duration(to: .now)
         return Int(duration.components.seconds * 1_000)
