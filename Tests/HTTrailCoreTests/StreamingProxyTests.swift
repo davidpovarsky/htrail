@@ -205,6 +205,73 @@ final class StreamingProxyTests: XCTestCase {
         XCTAssertEqual(result.body, "ORIGINAL")
     }
 
+    func testBoundedPoolReusesSequentialSameOriginConnections() async throws {
+        let origin = TestOrigin()
+        let originPort = try origin.start(bodyString: "REUSED")
+        defer { origin.stop() }
+        let events = LockedEvents()
+        let (proxy, _) = try await makeProxy {
+            $0.upstreamConnectionPoolConfiguration = UpstreamConnectionPoolConfiguration(
+                maximumConnectionsPerOrigin: 1, maximumConnectionsTotal: 2, idleTimeout: 5
+            )
+            $0.runtimeEventHandler = { events.append($0) }
+        }
+        defer { Task { try? await proxy.stop() } }
+        let url = "http://127.0.0.1:\(originPort)/"
+        guard curlThroughProxy(proxyPort: proxy.boundPort, url: url) != nil else { throw XCTSkip("curl unavailable") }
+        try await Task.sleep(nanoseconds: 100_000_000)
+        guard curlThroughProxy(proxyPort: proxy.boundPort, url: url) != nil else { throw XCTSkip("curl unavailable") }
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 1)
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolHit }.count, 1)
+        XCTAssertTrue(events.values.contains { $0.kind == .upstreamTiming && $0.detail.contains("reused=true") })
+    }
+
+    func testPoolDoesNotCrossOriginsAndHonorsConnectionClose() async throws {
+        let first = TestOrigin(), second = TestOrigin()
+        let firstPort = try first.start(bodyString: "ONE", closeResponse: true)
+        let secondPort = try second.start(bodyString: "TWO")
+        defer { first.stop(); second.stop() }
+        let events = LockedEvents()
+        let (proxy, _) = try await makeProxy {
+            $0.upstreamConnectionPoolConfiguration = .init(maximumConnectionsPerOrigin: 1, maximumConnectionsTotal: 2, idleTimeout: 5)
+            $0.runtimeEventHandler = { events.append($0) }
+        }
+        defer { Task { try? await proxy.stop() } }
+        guard curlThroughProxy(proxyPort: proxy.boundPort, url: "http://127.0.0.1:\(firstPort)/") != nil,
+              curlThroughProxy(proxyPort: proxy.boundPort, url: "http://127.0.0.1:\(firstPort)/") != nil,
+              curlThroughProxy(proxyPort: proxy.boundPort, url: "http://127.0.0.1:\(secondPort)/") != nil else {
+            throw XCTSkip("curl unavailable")
+        }
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolHit }.count, 0)
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 3)
+        XCTAssertTrue(events.values.contains { $0.kind == .upstreamPoolEviction && $0.detail == "origin-connection-close" })
+    }
+
+    func testTemporaryCompatibilityBypassExpiresAndForceDecryptWins() {
+        let engine = InterceptEngine()
+        let now = Date()
+        engine.installCompatibilityBypass(.init(host: "challenge.test", reason: "antiBotIncompatible", expiresAt: now.addingTimeInterval(60)), now: now)
+        XCTAssertFalse(engine.shouldDecrypt(host: "challenge.test"))
+        engine.setForcedDecryptHosts(["challenge.test"])
+        XCTAssertTrue(engine.shouldDecrypt(host: "challenge.test"))
+        engine.setForcedDecryptHosts([])
+        engine.installCompatibilityBypass(.init(host: "expired.test", reason: "test", expiresAt: now.addingTimeInterval(-1)), now: now)
+        XCTAssertTrue(engine.shouldDecrypt(host: "expired.test"))
+    }
+
+    func testTimeoutFailureCategoriesAreDistinct() {
+        XCTAssertEqual(
+            ProxyFailureClassifier.event(error: NSError(domain: "test", code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "connect timeout"]), host: "a", tls: true).kind,
+            .upstreamConnectTimeout
+        )
+        XCTAssertEqual(
+            ProxyFailureClassifier.event(error: NSError(domain: "test", code: 2,
+                userInfo: [NSLocalizedDescriptionKey: "TLS handshake timed out"]), host: "a", tls: true).kind,
+            .upstreamTLSHandshakeTimeout
+        )
+    }
+
     // MARK: - Helpers
 
     private func makeProxy(engine: InterceptEngine = InterceptEngine(),
@@ -270,7 +337,7 @@ final class TestOrigin {
     private var channel: Channel?
 
     func start(bodyString: String? = nil, bodyByteCount: Int? = nil,
-               hang: Bool = false, chunked: Bool = false) throws -> Int {
+               hang: Bool = false, chunked: Bool = false, closeResponse: Bool = false) throws -> Int {
         let body: [UInt8]
         if let bodyString { body = Array(bodyString.utf8) }
         else if let bodyByteCount { body = Array(repeating: UInt8(ascii: "x"), count: bodyByteCount) }
@@ -280,7 +347,7 @@ final class TestOrigin {
             .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
             .childChannelInitializer { channel in
                 channel.pipeline.configureHTTPServerPipeline().flatMap {
-                    channel.pipeline.addHandler(OriginHandler(body: body, hang: hang, chunked: chunked))
+                    channel.pipeline.addHandler(OriginHandler(body: body, hang: hang, chunked: chunked, closeResponse: closeResponse))
                 }
             }
         let ch = try bootstrap.bind(host: "127.0.0.1", port: 0).wait()
@@ -301,8 +368,9 @@ private final class OriginHandler: ChannelInboundHandler {
     private let body: [UInt8]
     private let hang: Bool
     private let chunked: Bool
-    init(body: [UInt8], hang: Bool, chunked: Bool) {
-        self.body = body; self.hang = hang; self.chunked = chunked
+    private let closeResponse: Bool
+    init(body: [UInt8], hang: Bool, chunked: Bool, closeResponse: Bool) {
+        self.body = body; self.hang = hang; self.chunked = chunked; self.closeResponse = closeResponse
     }
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
@@ -312,12 +380,14 @@ private final class OriginHandler: ChannelInboundHandler {
         if chunked { headers.add(name: "Transfer-Encoding", value: "chunked") }
         else { headers.add(name: "Content-Length", value: "\(body.count)") }
         headers.add(name: "Content-Type", value: "text/plain")
+        if closeResponse { headers.add(name: "Connection", value: "close") }
         let head = HTTPResponseHead(version: .http1_1, status: .ok, headers: headers)
         context.write(wrapOutboundOut(.head(head)), promise: nil)
         var buffer = context.channel.allocator.buffer(capacity: body.count)
         buffer.writeBytes(body)
         context.write(wrapOutboundOut(.body(.byteBuffer(buffer))), promise: nil)
-        context.writeAndFlush(wrapOutboundOut(.end(nil)), promise: nil)
+        let end = context.writeAndFlush(wrapOutboundOut(.end(nil)))
+        if closeResponse { end.whenComplete { _ in context.close(promise: nil) } }
     }
 }
 
@@ -326,6 +396,13 @@ private final class LockedCounter: @unchecked Sendable {
     private var count = 0
     func increment() { lock.lock(); count += 1; lock.unlock() }
     var value: Int { lock.lock(); defer { lock.unlock() }; return count }
+}
+
+private final class LockedEvents: @unchecked Sendable {
+    private let lock = NSLock()
+    private var storage: [ProxyRuntimeEvent] = []
+    func append(_ event: ProxyRuntimeEvent) { lock.lock(); storage.append(event); lock.unlock() }
+    var values: [ProxyRuntimeEvent] { lock.lock(); defer { lock.unlock() }; return storage }
 }
 
 private final class UploadOrigin {
