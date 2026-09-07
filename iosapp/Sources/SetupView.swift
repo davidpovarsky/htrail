@@ -1,6 +1,7 @@
 import SwiftUI
 import UIKit
 import HTTrailCore
+import PurelineSupport
 
 /// On-device capture (VPN + CA) provisioning, sharing for other devices, device
 /// info, HAR export and capture guidance.
@@ -392,6 +393,14 @@ struct SetupView: View {
             Text("Browse and export past sessions in the Capture tab.")
                 .font(.caption2).foregroundStyle(Theme.color.textFaint)
                 .listRowBackground(rowBackground)
+            Button {
+                shareURL = try? PurelineDiagnosticArchive.export()
+            } label: {
+                Label("Export Pureline diagnostics (ZIP)", systemImage: "waveform.path.ecg.rectangle")
+                    .font(.system(size: 12.5, weight: .semibold))
+                    .foregroundStyle(Theme.color.textSoft)
+            }
+            .listRowBackground(rowBackground)
         } header: {
             HTEyebrow("Capture")
         }

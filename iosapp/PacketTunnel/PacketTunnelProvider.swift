@@ -1,5 +1,6 @@
 import NetworkExtension
 import HTTrailCore
+import PurelineSupport
 import os.log
 
 private let tunnelLog = Logger(subsystem: "com.davidpovarsky.pureline.PacketTunnel", category: "capture")
@@ -18,10 +19,12 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     private var proxy: ProxyServer?
     private let engine = InterceptEngine()
     private let configStore = SharedConfigStore()
+    private let diagnostics = PurelinePacketTunnelDiagnostics.shared
     private var configSyncTask: Task<Void, Never>?
 
     override func startTunnel(options: [String: NSObject]?,
                              completionHandler: @escaping (Error?) -> Void) {
+        let startCount = diagnostics.beginRun()
         // The app and this extension are separate processes; the app writes the
         // rules / SSL allowlist / port / pinning into the shared config, which we
         // load here (and keep polling) so interception actually takes effect.
@@ -33,14 +36,21 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         if let remoteHost = config.remoteProxyHost {
             let remotePort = config.remoteProxyPort ?? port
             tunnelLog.log("startTunnel: remote target \(remoteHost):\(remotePort)")
+            diagnostics.record(category: "proxy", event: "remote proxy selected", details: [
+                "host": remoteHost, "port": String(remotePort), "startCount": String(startCount)
+            ])
             applyNetworkSettings(proxyHost: remoteHost, port: remotePort, completionHandler: completionHandler)
             return
         }
 
         ImageFilterProxyBridge.apply(config: config, to: engine)
+        diagnostics.record(category: "proxy", event: "local proxy starting", details: [
+            "port": String(port), "startCount": String(startCount)
+        ])
         tunnelLog.log("startTunnel: on-device port=\(port) rules=\(config.rules.filter { $0.enabled }.count) allowlist=\(config.sslAllowlist.count)")
 
         guard let ca = try? CertificateAuthority.loadOrCreate(in: AppPaths.certificatesDirectory) else {
+            diagnostics.record(category: "proxy", event: "local proxy start failure", details: ["reason": "CA unavailable"])
             completionHandler(NSError(domain: "HTTrail", code: 1,
                 userInfo: [NSLocalizedDescriptionKey: "Could not load HTTrail CA from the App Group."]))
             return
@@ -55,9 +65,15 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             do {
                 try await server.start()
             } catch {
+                self.diagnostics.record(category: "proxy", event: "local proxy start failure", details: [
+                    "error": String(describing: error)
+                ])
                 completionHandler(error)
                 return
             }
+            self.diagnostics.record(category: "proxy", event: "local proxy start success", details: [
+                "listenerPort": String(server.boundPort)
+            ])
             self.applyNetworkSettings(proxyHost: "127.0.0.1", port: port, completionHandler: completionHandler)
         }
     }
@@ -109,6 +125,15 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         settings.proxySettings = proxy
 
         setTunnelNetworkSettings(settings) { error in
+            if let error {
+                self.diagnostics.record(category: "network", event: "tunnel network settings failure", details: [
+                    "error": String(describing: error)
+                ])
+            } else {
+                self.diagnostics.record(category: "network", event: "tunnel network settings applied", details: [
+                    "proxyHost": proxyHost, "proxyPort": String(port)
+                ])
+            }
             completionHandler(error)
             if error == nil { self.drainPackets() }
         }
@@ -124,6 +149,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     override func stopTunnel(with reason: NEProviderStopReason,
                             completionHandler: @escaping () -> Void) {
+        diagnostics.endRun(stopReason: reason.rawValue)
         configSyncTask?.cancel()
         configSyncTask = nil
         let server = proxy

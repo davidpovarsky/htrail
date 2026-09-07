@@ -1,9 +1,34 @@
 import Darwin
 import Foundation
 import ImageFilterCore
+import PurelineSupport
 import XCTest
 
 final class IntegratedRuntimeTests: XCTestCase {
+    func testPacketTunnelDiagnosticsRingBufferIsBoundedAndUnexpectedRunIsAccurate() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let first = PurelinePacketTunnelDiagnostics(directory: directory, maximumEvents: 8, maximumBytes: 4096)
+        _ = first.beginRun()
+        for index in 0..<40 { first.record(category: "test", event: "event-\(index)") }
+        XCTAssertLessThanOrEqual(first.events().count, 8)
+
+        let second = PurelinePacketTunnelDiagnostics(directory: directory, maximumEvents: 8, maximumBytes: 4096)
+        _ = second.beginRun()
+        let events = second.events()
+        XCTAssertTrue(events.contains { $0.event == PurelinePacketTunnelDiagnostics.unexpectedTerminationMessage })
+        XCTAssertFalse(events.contains { $0.event.localizedCaseInsensitiveContains("jetsam") })
+        second.endRun(stopReason: 0)
+    }
+
+    func testPacketTunnelDiagnosticsRedactsSensitiveValues() {
+        let value = PurelinePacketTunnelDiagnostics.sanitizeText(
+            "https://example.test/path?token=secret&ok=yes Authorization: Bearer abc.def"
+        )
+        XCTAssertFalse(value.contains("secret"))
+        XCTAssertFalse(value.contains("abc.def"))
+    }
+
     private func fixtureData() throws -> Data {
         guard let url = Bundle(for: Self.self).url(
             forResource: "ClassificationImageSelected",

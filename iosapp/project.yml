@@ -11,6 +11,22 @@ packages:
     url: https://github.com/swhitty/FlyingFox.git
     from: 0.27.0
 targets:
+  PurelineSupport:
+    type: library.static
+    platform: iOS
+    sources:
+      - path: PurelineIntegration
+    dependencies:
+      - package: HTTrail
+        product: HTTrailCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.Support
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "5.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "26.5"
+        APPLICATION_EXTENSION_API_ONLY: YES
+
   EmbeddedImageFilter:
     type: framework
     platform: iOS
@@ -108,6 +124,7 @@ targets:
     dependencies:
       - package: HTTrail
         product: HTTrailCore
+      - target: PurelineSupport
       - target: EmbeddedImageFilter
         embed: true
       - target: ImageFilterCore
@@ -196,6 +213,7 @@ targets:
     dependencies:
       - package: HTTrail
         product: HTTrailCore
+      - target: PurelineSupport
       - target: ImageFilterCore
         embed: false
     info:
@@ -272,6 +290,7 @@ targets:
     dependencies:
       - target: ImageFilterRuntimeHost
       - target: ImageFilterCore
+      - target: PurelineSupport
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.RuntimeTests
