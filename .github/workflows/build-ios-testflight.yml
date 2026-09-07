@@ -1,0 +1,375 @@
+# Builds and signs HTTrail iOS directly from source; no GitHub Release is needed.
+#
+# Required repository secrets for every run:
+#   APPLE_CERTIFICATE_P12_B64                 base64-encoded Apple Distribution .p12
+#   APPLE_CERTIFICATE_PASSWORD                plain-text password for the .p12
+#   APPLE_MAIN_PROVISIONING_PROFILE_B64       base64 App Store profile for com.davidpovarsky.httrail
+#   APPLE_TUNNEL_PROVISIONING_PROFILE_B64     base64 App Store profile for com.davidpovarsky.httrail.PacketTunnel
+#   APPLE_TEAM_ID                              plain-text Apple Developer Team ID
+# Required only when upload_to_testflight is enabled:
+#   ASC_KEY_P8                                base64-encoded App Store Connect API .p8
+#   ASC_KEY_ID                                App Store Connect API key ID
+#   ASC_ISSUER_ID                             App Store Connect API issuer ID
+name: Build Signed iOS IPA and Upload to TestFlight
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload_to_testflight:
+        description: Validate and upload the exported IPA to App Store Connect/TestFlight
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: signed-ios-testflight
+  cancel-in-progress: false
+
+jobs:
+  build-and-distribute:
+    runs-on: macos-latest
+    timeout-minutes: 240
+    env:
+      TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      APP_BUNDLE_ID: com.davidpovarsky.httrail
+      TUNNEL_BUNDLE_ID: com.davidpovarsky.httrail.PacketTunnel
+      APP_GROUP_ID: group.com.davidpovarsky.httrail
+      BUILD_DIR: ${{ github.workspace }}/build/signed-ios
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Verify pinned classifier source
+        run: test "$(git -C Vendor/AI-Image-Classifier rev-parse HEAD)" = "5291eedb9b46fa978e36ccec4f5504b017afe809"
+
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode.app
+          xcodebuild -version
+          swift --version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Set up model conversion Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: Vendor/AI-Image-Classifier/tools/MobileCLIPConversion/requirements.txt
+
+      - name: Restore App Store Connect API key
+        if: ${{ inputs.upload_to_testflight }}
+        shell: bash
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_ID_VALUE: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID_VALUE: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -Eeuo pipefail
+          test -n "$ASC_KEY_P8"
+          test -n "$ASC_KEY_ID_VALUE"
+          test -n "$ASC_ISSUER_ID_VALUE"
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          key_path="$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID_VALUE}.p8"
+          printf '%s' "$ASC_KEY_P8" | base64 --decode > "$key_path"
+          chmod 600 "$key_path"
+          echo "ASC_KEY_ID=$ASC_KEY_ID_VALUE" >> "$GITHUB_ENV"
+          echo "ASC_ISSUER_ID=$ASC_ISSUER_ID_VALUE" >> "$GITHUB_ENV"
+          echo "ASC_KEY_PATH=$key_path" >> "$GITHUB_ENV"
+
+      - name: Verify App Store Connect app record exists
+        if: ${{ inputs.upload_to_testflight }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python -m pip install --quiet 'PyJWT[crypto]==2.10.1'
+          python - <<'PY'
+          import json
+          import os
+          import sys
+          import time
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+
+          import jwt
+
+          bundle_id = os.environ["APP_BUNDLE_ID"]
+          with open(os.environ["ASC_KEY_PATH"], "rb") as key_file:
+              private_key = key_file.read()
+          now = int(time.time())
+          token = jwt.encode(
+              {"iss": os.environ["ASC_ISSUER_ID"], "iat": now, "exp": now + 600, "aud": "appstoreconnect-v1"},
+              private_key,
+              algorithm="ES256",
+              headers={"kid": os.environ["ASC_KEY_ID"], "typ": "JWT"},
+          )
+          query = urllib.parse.urlencode({"filter[bundleId]": bundle_id, "fields[apps]": "name,bundleId,sku"})
+          request = urllib.request.Request(
+              f"https://api.appstoreconnect.apple.com/v1/apps?{query}",
+              headers={"Authorization": f"Bearer {token}"},
+          )
+          try:
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  apps = json.load(response).get("data", [])
+          except urllib.error.HTTPError as error:
+              print(f"::error::App Store Connect app-record preflight failed with HTTP {error.code}. Check ASC API key access.")
+              sys.exit(1)
+          if not apps:
+              print(f"::error::No App Store Connect app record exists for {bundle_id}.")
+              print("::error::Create the iOS app record in App Store Connect before rerunning. Use Bundle ID "
+                    f"{bundle_id}; App Store Connect also requires an app name, primary language, SKU, and user access choice.")
+              sys.exit(1)
+          attributes = apps[0].get("attributes", {})
+          print(f"Found App Store Connect app record: {attributes.get('name', '<unnamed>')} ({bundle_id})")
+          PY
+
+      - name: Cache SwiftPM and converted MobileCLIP
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/org.swift.swiftpm
+            ~/Library/Developer/Xcode/DerivedData/SourcePackages
+            .model-cache/mobileclip2-s2
+            .model-cache/coreml-mobileclip2-s2
+          key: ${{ runner.os }}-httrail-image-filter-${{ hashFiles('Package.resolved', 'Package.swift', 'Vendor/AI-Image-Classifier/tools/MobileCLIPConversion/**') }}
+          restore-keys: |
+            ${{ runner.os }}-httrail-image-filter-
+            ${{ runner.os }}-swiftpm-
+
+      - name: Prepare verified image-filter models
+        shell: bash
+        run: |
+          chmod +x scripts/prepare_image_filter_models.sh
+          scripts/prepare_image_filter_models.sh
+
+      - name: Compute unique build number
+        shell: bash
+        run: |
+          build_number=$((GITHUB_RUN_NUMBER * 100 + GITHUB_RUN_ATTEMPT))
+          echo "BUILD_NUMBER=$build_number" >> "$GITHUB_ENV"
+          echo "Using CFBundleVersion $build_number"
+
+      - name: Import distribution certificate and profiles
+        shell: bash
+        env:
+          APPLE_CERTIFICATE_P12_B64: ${{ secrets.APPLE_CERTIFICATE_P12_B64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_MAIN_PROVISIONING_PROFILE_B64: ${{ secrets.APPLE_MAIN_PROVISIONING_PROFILE_B64 }}
+          APPLE_TUNNEL_PROVISIONING_PROFILE_B64: ${{ secrets.APPLE_TUNNEL_PROVISIONING_PROFILE_B64 }}
+        run: |
+          set -Eeuo pipefail
+          if [ -z "${TEAM_ID:-}" ]; then
+            echo "::error::Required repository secret APPLE_TEAM_ID is empty"
+            exit 1
+          fi
+          for required in APPLE_CERTIFICATE_P12_B64 APPLE_CERTIFICATE_PASSWORD APPLE_MAIN_PROVISIONING_PROFILE_B64 APPLE_TUNNEL_PROVISIONING_PROFILE_B64; do
+            if [ -z "${!required:-}" ]; then
+              echo "::error::Required signing secret $required is empty"
+              exit 1
+            fi
+          done
+
+          keychain="$RUNNER_TEMP/httrail-signing.keychain-db"
+          keychain_password="$(openssl rand -hex 24)"
+          certificate="$RUNNER_TEMP/apple-distribution.p12"
+          app_profile="$RUNNER_TEMP/HTTrailiOS.mobileprovision"
+          tunnel_profile="$RUNNER_TEMP/PacketTunnel.mobileprovision"
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+
+          printf '%s' "$APPLE_CERTIFICATE_P12_B64" | base64 --decode > "$certificate"
+          printf '%s' "$APPLE_MAIN_PROVISIONING_PROFILE_B64" | base64 --decode > "$app_profile"
+          printf '%s' "$APPLE_TUNNEL_PROVISIONING_PROFILE_B64" | base64 --decode > "$tunnel_profile"
+
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$certificate" -P "$APPLE_CERTIFICATE_PASSWORD" -A -f pkcs12 -k "$keychain"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_password" "$keychain"
+          security list-keychains -d user -s "$keychain"
+          security default-keychain -d user -s "$keychain"
+          security find-identity -v -p codesigning "$keychain" | grep 'Apple Distribution'
+
+          validate_profile() {
+            local profile="$1" expected_bundle_id="$2" output="$3"
+            security cms -D -i "$profile" > "$output"
+            local uuid name team app_identifier get_task_allow groups network_extensions
+            uuid=$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$output")
+            name=$(/usr/libexec/PlistBuddy -c 'Print :Name' "$output")
+            team=$(/usr/libexec/PlistBuddy -c 'Print :TeamIdentifier:0' "$output")
+            app_identifier=$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$output")
+            get_task_allow=$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:get-task-allow' "$output")
+            groups=$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:com.apple.security.application-groups' "$output")
+            network_extensions=$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:com.apple.developer.networking.networkextension' "$output")
+            test "$team" = "$TEAM_ID"
+            case "$app_identifier" in
+              *."$expected_bundle_id") ;;
+              *) echo "::error::Profile $name is for $app_identifier, expected $expected_bundle_id"; exit 1 ;;
+            esac
+            test "$get_task_allow" = false
+            grep -Fq "$APP_GROUP_ID" <<< "$groups"
+            grep -Fq packet-tunnel-provider <<< "$network_extensions"
+            if /usr/libexec/PlistBuddy -c 'Print :ProvisionedDevices' "$output" >/dev/null 2>&1; then
+              echo "::error::Profile $name is device-limited, not an App Store distribution profile"
+              exit 1
+            fi
+            if /usr/libexec/PlistBuddy -c 'Print :ProvisionsAllDevices' "$output" >/dev/null 2>&1; then
+              echo "::error::Profile $name is an enterprise profile, not an App Store distribution profile"
+              exit 1
+            fi
+            cp "$profile" "$HOME/Library/MobileDevice/Provisioning Profiles/$uuid.mobileprovision"
+            printf '%s\t%s\n' "$name" "$uuid"
+          }
+
+          IFS=$'\t' read -r app_profile_name app_profile_uuid < <(validate_profile "$app_profile" "$APP_BUNDLE_ID" "$RUNNER_TEMP/app-profile.plist")
+          IFS=$'\t' read -r tunnel_profile_name tunnel_profile_uuid < <(validate_profile "$tunnel_profile" "$TUNNEL_BUNDLE_ID" "$RUNNER_TEMP/tunnel-profile.plist")
+          echo "APP_PROFILE_SPECIFIER=$app_profile_name" >> "$GITHUB_ENV"
+          echo "APP_PROFILE_UUID=$app_profile_uuid" >> "$GITHUB_ENV"
+          echo "TUNNEL_PROFILE_SPECIFIER=$tunnel_profile_name" >> "$GITHUB_ENV"
+          echo "TUNNEL_PROFILE_UUID=$tunnel_profile_uuid" >> "$GITHUB_ENV"
+          echo "SIGNING_KEYCHAIN=$keychain" >> "$GITHUB_ENV"
+
+      - name: Generate project and inspect signing settings
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p "$BUILD_DIR/logs"
+          cd iosapp
+          xcodegen generate
+          xcodebuild -project HTTrailiOS.xcodeproj -scheme HTTrailiOS \
+            -configuration Release -destination 'generic/platform=iOS' \
+            DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual \
+            HTTRAIL_APP_PROFILE_SPECIFIER="$APP_PROFILE_SPECIFIER" \
+            HTTRAIL_PACKET_TUNNEL_PROFILE_SPECIFIER="$TUNNEL_PROFILE_SPECIFIER" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            -showBuildSettings | tee "$BUILD_DIR/logs/signing-build-settings.log"
+          grep -F "PRODUCT_BUNDLE_IDENTIFIER = $APP_BUNDLE_ID" "$BUILD_DIR/logs/signing-build-settings.log"
+          grep -F "PRODUCT_BUNDLE_IDENTIFIER = $TUNNEL_BUNDLE_ID" "$BUILD_DIR/logs/signing-build-settings.log"
+          grep -F "DEVELOPMENT_TEAM = $TEAM_ID" "$BUILD_DIR/logs/signing-build-settings.log"
+          grep -F "PROVISIONING_PROFILE_SPECIFIER = $APP_PROFILE_SPECIFIER" "$BUILD_DIR/logs/signing-build-settings.log"
+          grep -F "PROVISIONING_PROFILE_SPECIFIER = $TUNNEL_PROFILE_SPECIFIER" "$BUILD_DIR/logs/signing-build-settings.log"
+
+      - name: Archive signed app
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          xcodebuild -resolvePackageDependencies \
+            -project iosapp/HTTrailiOS.xcodeproj -scheme HTTrailiOS \
+            -derivedDataPath "$BUILD_DIR/DerivedData"
+          xcodebuild archive \
+            -project iosapp/HTTrailiOS.xcodeproj -scheme HTTrailiOS \
+            -configuration Release -destination 'generic/platform=iOS' \
+            -archivePath "$BUILD_DIR/HTTrailiOS.xcarchive" \
+            -derivedDataPath "$BUILD_DIR/DerivedData" \
+            DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY='Apple Distribution' \
+            HTTRAIL_APP_PROFILE_SPECIFIER="$APP_PROFILE_SPECIFIER" \
+            HTTRAIL_PACKET_TUNNEL_PROFILE_SPECIFIER="$TUNNEL_PROFILE_SPECIFIER" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            | tee "$BUILD_DIR/logs/archive.log"
+
+      - name: Export App Store Connect IPA
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          export_options="$RUNNER_TEMP/ExportOptions.plist"
+          cat > "$export_options" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>export</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>signingCertificate</key><string>Apple Distribution</string>
+            <key>teamID</key><string>$TEAM_ID</string>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+            <key>stripSwiftSymbols</key><true/>
+            <key>uploadSymbols</key><true/>
+            <key>provisioningProfiles</key><dict>
+              <key>$APP_BUNDLE_ID</key><string>$APP_PROFILE_SPECIFIER</string>
+              <key>$TUNNEL_BUNDLE_ID</key><string>$TUNNEL_PROFILE_SPECIFIER</string>
+            </dict>
+          </dict></plist>
+          PLIST
+          plutil -lint "$export_options"
+          mkdir -p "$BUILD_DIR/export"
+          xcodebuild -exportArchive \
+            -archivePath "$BUILD_DIR/HTTrailiOS.xcarchive" \
+            -exportPath "$BUILD_DIR/export" \
+            -exportOptionsPlist "$export_options" \
+            | tee "$BUILD_DIR/logs/export.log"
+          ipa=$(find "$BUILD_DIR/export" -maxdepth 1 -type f -name '*.ipa' -print -quit)
+          test -n "$ipa"
+          test -s "$ipa"
+          echo "IPA_PATH=$ipa" >> "$GITHUB_ENV"
+          shasum -a 256 "$ipa" | tee "$BUILD_DIR/export/HTTrailiOS.ipa.sha256"
+
+      - name: Validate signed app and Packet Tunnel extension
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          verify_dir="$RUNNER_TEMP/verify-ipa"
+          ditto -x -k "$IPA_PATH" "$verify_dir"
+          app=$(find "$verify_dir/Payload" -maxdepth 1 -type d -name '*.app' -print -quit)
+          tunnel="$app/PlugIns/PacketTunnel.appex"
+          test -d "$app"
+          test -d "$tunnel"
+          codesign --verify --deep --strict --verbose=2 "$app"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Info.plist")" = "$APP_BUNDLE_ID"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Info.plist")" = "$BUILD_NUMBER"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$tunnel/Info.plist")" = "$TUNNEL_BUNDLE_ID"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$tunnel/Info.plist")" = "$BUILD_NUMBER"
+
+          verify_entitlements() {
+            local bundle="$1" expected_bundle_id="$2" output="$3"
+            codesign --display --entitlements - --xml "$bundle" > "$output"
+            test "$(/usr/libexec/PlistBuddy -c 'Print :com.apple.developer.team-identifier' "$output")" = "$TEAM_ID"
+            case "$(/usr/libexec/PlistBuddy -c 'Print :application-identifier' "$output")" in
+              *."$expected_bundle_id") ;;
+              *) echo "::error::Signed application-identifier does not match $expected_bundle_id"; exit 1 ;;
+            esac
+            /usr/libexec/PlistBuddy -c 'Print :com.apple.security.application-groups' "$output" | grep -Fq "$APP_GROUP_ID"
+            /usr/libexec/PlistBuddy -c 'Print :com.apple.developer.networking.networkextension' "$output" | grep -Fq packet-tunnel-provider
+          }
+          verify_entitlements "$app" "$APP_BUNDLE_ID" "$BUILD_DIR/logs/app-entitlements.plist"
+          verify_entitlements "$tunnel" "$TUNNEL_BUNDLE_ID" "$BUILD_DIR/logs/tunnel-entitlements.plist"
+          codesign -dvvv "$app" 2> "$BUILD_DIR/logs/app-codesign.txt"
+          codesign -dvvv "$tunnel" 2> "$BUILD_DIR/logs/tunnel-codesign.txt"
+
+      - name: Validate with App Store Connect
+        if: ${{ inputs.upload_to_testflight }}
+        run: xcrun altool --validate-app -f "$IPA_PATH" -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+
+      - name: Upload to App Store Connect and TestFlight
+        if: ${{ inputs.upload_to_testflight }}
+        run: xcrun altool --upload-app -f "$IPA_PATH" -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+
+      - name: Upload signed IPA
+        if: success() || (failure() && env.IPA_PATH != '')
+        uses: actions/upload-artifact@v4
+        with:
+          name: HTTrail-signed-ipa-${{ env.BUILD_NUMBER }}
+          path: |
+            ${{ env.IPA_PATH }}
+            build/signed-ios/export/HTTrailiOS.ipa.sha256
+            build/signed-ios/HTTrailiOS.xcarchive/dSYMs
+            build/signed-ios/logs
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Remove temporary signing material
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${SIGNING_KEYCHAIN:-}" ]; then
+            security delete-keychain "$SIGNING_KEYCHAIN" || true
+          fi
+          rm -f "$HOME/Library/MobileDevice/Provisioning Profiles/${APP_PROFILE_UUID:-missing}.mobileprovision"
+          rm -f "$HOME/Library/MobileDevice/Provisioning Profiles/${TUNNEL_PROFILE_UUID:-missing}.mobileprovision"
+          rm -f "${ASC_KEY_PATH:-$RUNNER_TEMP/missing-asc-key}"
