@@ -68,6 +68,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         let server = ProxyServer(port: port, certificateAuthority: ca, sink: sink, engine: engine)
         server.bindHost = "127.0.0.1"
         server.captureBodyCap = PurelineCaptureLimits.packetTunnel.responsePreviewBytes
+        server.streamRequestBodies = true
+        server.requestInspectionBodyCap = 1024 * 1024
+        server.requestCaptureBodyCap = PurelineCaptureLimits.packetTunnel.requestPreviewBytes
         self.proxy = server
         startConfigSync()
 

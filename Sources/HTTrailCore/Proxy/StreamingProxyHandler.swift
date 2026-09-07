@@ -42,6 +42,8 @@ final class StreamingProxyHandler: ChannelInboundHandler {
     private let requestHead: HTTPRequestHead
     private let requestBody: ByteBuffer
     private let captured: CapturedRequest
+    private let capturedRequestProvider: (() -> CapturedRequest)?
+    private let completeRequestOnActive: Bool
     private let flowID: UUID
     private let startedAt: Date
     private let secure: Bool
@@ -62,11 +64,15 @@ final class StreamingProxyHandler: ChannelInboundHandler {
 
     init(clientChannel: Channel, requestHead: HTTPRequestHead, requestBody: ByteBuffer,
          captured: CapturedRequest, flowID: UUID, startedAt: Date, secure: Bool,
-         keepAlive: Bool, captureCap: Int, sink: FlowSink) {
+         keepAlive: Bool, captureCap: Int, sink: FlowSink,
+         completeRequestOnActive: Bool = true,
+         capturedRequestProvider: (() -> CapturedRequest)? = nil) {
         self.clientChannel = clientChannel
         self.requestHead = requestHead
         self.requestBody = requestBody
         self.captured = captured
+        self.capturedRequestProvider = capturedRequestProvider
+        self.completeRequestOnActive = completeRequestOnActive
         self.flowID = flowID
         self.startedAt = startedAt
         self.secure = secure
@@ -81,7 +87,11 @@ final class StreamingProxyHandler: ChannelInboundHandler {
         if requestBody.readableBytes > 0 {
             context.write(wrapOutboundOut(.body(.byteBuffer(requestBody))), promise: nil)
         }
-        context.writeAndFlush(wrapOutboundOut(.end(nil)), promise: nil)
+        if completeRequestOnActive {
+            context.writeAndFlush(wrapOutboundOut(.end(nil)), promise: nil)
+        } else {
+            context.flush()
+        }
         // autoRead is off (set on the bootstrap); start the response read loop.
         context.read()
     }
@@ -181,7 +191,7 @@ final class StreamingProxyHandler: ChannelInboundHandler {
             headers: capturedHeaders, body: captureBuffer, timestamp: Date(),
             bodyTruncated: truncated ? true : nil
         ) : nil
-        sink.record(Flow(id: flowID, request: captured, response: response,
+        sink.record(Flow(id: flowID, request: capturedRequestProvider?() ?? captured, response: response,
                          state: failed ? .failed : .completed, error: error,
                          startedAt: startedAt, endedAt: Date(), secure: secure))
     }

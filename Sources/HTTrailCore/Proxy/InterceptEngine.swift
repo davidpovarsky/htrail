@@ -250,6 +250,14 @@ public final class InterceptEngine: @unchecked Sendable {
     // MARK: Request side
 
     public func processRequest(_ request: CapturedRequest, target: UpstreamTarget) async -> RequestOutcome {
+        await processRequest(request, target: target, inspectBody: true)
+    }
+
+    /// Generic fail-open seam for streaming callers. When `inspectBody` is false,
+    /// body-dependent rewrite/breakpoint work is skipped while header-only rules
+    /// and routing behavior continue normally.
+    public func processRequest(_ request: CapturedRequest, target: UpstreamTarget,
+                               inspectBody: Bool) async -> RequestOutcome {
         var current = request
         var currentTarget = target
         var throttle = ThrottleConfig()
@@ -273,14 +281,14 @@ public final class InterceptEngine: @unchecked Sendable {
                     current.scheme = rule.remoteTLS ? "https" : "http"
                 }
             case .rewriteRequest:
-                current = applyRewrite(to: current, rule: rule)
+                current = applyRewrite(to: current, rule: rule, inspectBody: inspectBody)
             case .throttle:
                 throttle.delayMS = max(throttle.delayMS, rule.throttleMS)
                 if rule.bytesPerSecond > 0 {
                     throttle.bytesPerSecond = throttle.bytesPerSecond == 0
                         ? rule.bytesPerSecond : min(throttle.bytesPerSecond, rule.bytesPerSecond)
                 }
-            case .breakpoint where rule.breakRequest:
+            case .breakpoint where rule.breakRequest && inspectBody:
                 if let handler = breakpointHandler {
                     let edit = await handler(BreakpointEvent(phase: .request, request: current, response: nil))
                     if let edited = edit?.request { current = edited }
@@ -290,6 +298,15 @@ public final class InterceptEngine: @unchecked Sendable {
             }
         }
         return .forward(current, currentTarget, throttle)
+    }
+
+    /// True only when a matching request rule needs complete body bytes.
+    public func requiresBufferedRequest(for request: CapturedRequest) -> Bool {
+        activeRules().contains { rule in
+            guard Glob.match(rule.urlPattern.isEmpty ? "*" : rule.urlPattern, request.url) else { return false }
+            return (rule.kind == .breakpoint && rule.breakRequest)
+                || (rule.kind == .rewriteRequest && !rule.findText.isEmpty)
+        }
     }
 
     // MARK: Response side
@@ -330,7 +347,8 @@ public final class InterceptEngine: @unchecked Sendable {
 
     // MARK: Mutation helpers
 
-    private func applyRewrite(to request: CapturedRequest, rule: InterceptRule) -> CapturedRequest {
+    private func applyRewrite(to request: CapturedRequest, rule: InterceptRule,
+                              inspectBody: Bool = true) -> CapturedRequest {
         var req = request
         var headers = req.headers.filter { h in !rule.removeHeaders.contains { $0.caseInsensitiveCompare(h.name) == .orderedSame } }
         for item in rule.setHeaders where item.enabled && !item.name.isEmpty {
@@ -338,7 +356,7 @@ public final class InterceptEngine: @unchecked Sendable {
             headers.append(HeaderPair(name: item.name, value: item.value))
         }
         req.headers = headers
-        if !rule.findText.isEmpty, let body = String(data: req.body, encoding: .utf8) {
+        if inspectBody, !rule.findText.isEmpty, let body = String(data: req.body, encoding: .utf8) {
             req.body = Data(body.replacingOccurrences(of: rule.findText, with: rule.replaceText).utf8)
         }
         return req

@@ -40,6 +40,21 @@ final class StreamingProxyTests: XCTestCase {
         XCTAssertFalse(engine.requiresBufferedResponse(for: req))
     }
 
+    func testRequiresBufferedRequestOnlyForBodyConsumingRules() {
+        let engine = InterceptEngine()
+        let request = CapturedRequest(method: "POST", url: "https://api.test/x", scheme: "https",
+                                      host: "api.test", port: 443, path: "/x", httpVersion: "HTTP/1.1",
+                                      headers: [], body: Data(), timestamp: Date())
+        XCTAssertFalse(engine.requiresBufferedRequest(for: request))
+        var headerRewrite = InterceptRule(); headerRewrite.kind = .rewriteRequest
+        headerRewrite.setHeaders = [KeyValueItem(name: "X-Test", value: "yes")]
+        engine.setRules([headerRewrite])
+        XCTAssertFalse(engine.requiresBufferedRequest(for: request))
+        headerRewrite.findText = "secret"
+        engine.setRules([headerRewrite])
+        XCTAssertTrue(engine.requiresBufferedRequest(for: request))
+    }
+
     // MARK: Model backward-compat
 
     func testCapturedResponseDecodesWithoutBodyTruncatedKey() throws {
@@ -133,6 +148,31 @@ final class StreamingProxyTests: XCTestCase {
         XCTAssertEqual(result.body, "value=REWRITTEN", "rewriteResponse must still mutate the body")
     }
 
+    func testLargeRequestStreamsCompletelyWithBoundedCapturePreview() async throws {
+        let origin = UploadOrigin()
+        let originPort = try origin.start()
+        defer { origin.stop() }
+        let previewCap = 64 * 1024
+        let payloadBytes = 2 * 1024 * 1024
+        let (proxy, sink) = try await makeProxy {
+            $0.streamRequestBodies = true
+            $0.requestCaptureBodyCap = previewCap
+            $0.requestInspectionBodyCap = 128 * 1024
+        }
+        defer { Task { try? await proxy.stop() } }
+
+        guard let result = curlUploadThroughProxy(
+            proxyPort: proxy.boundPort,
+            url: "http://127.0.0.1:\(originPort)/upload",
+            byteCount: payloadBytes
+        ) else { throw XCTSkip("curl unavailable") }
+        XCTAssertEqual(result.code, "200")
+        XCTAssertEqual(result.body, String(payloadBytes), "origin must receive the complete upload")
+        let flow = try await waitForFlow(sink)
+        XCTAssertEqual(flow.request.body.count, previewCap)
+        XCTAssertEqual(flow.request.bodyTruncated, true)
+    }
+
     // MARK: - Helpers
 
     private func makeProxy(engine: InterceptEngine = InterceptEngine(),
@@ -172,6 +212,22 @@ final class StreamingProxyTests: XCTestCase {
         let code = (String(data: codeData, encoding: .utf8) ?? "").trimmingCharacters(in: .whitespaces)
         let body = (try? String(contentsOf: bodyFile, encoding: .utf8)) ?? ""
         return (code, body)
+    }
+
+    private func curlUploadThroughProxy(proxyPort: Int, url: String, byteCount: Int) -> (code: String, body: String)? {
+        let input = FileManager.default.temporaryDirectory.appendingPathComponent("htrail-upload-\(UUID().uuidString)")
+        let output = FileManager.default.temporaryDirectory.appendingPathComponent("htrail-upload-result-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: input); try? FileManager.default.removeItem(at: output) }
+        try? Data(repeating: 0x5a, count: byteCount).write(to: input)
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/curl")
+        process.arguments = ["-sS", "-x", "http://127.0.0.1:\(proxyPort)", "--max-time", "20",
+                             "--data-binary", "@\(input.path)", "-o", output.path, "-w", "%{http_code}", url]
+        let pipe = Pipe(); process.standardOutput = pipe; process.standardError = Pipe()
+        do { try process.run() } catch { return nil }
+        let codeData = pipe.fileHandleForReading.readDataToEndOfFile(); process.waitUntilExit()
+        let code = (String(data: codeData, encoding: .utf8) ?? "").trimmingCharacters(in: .whitespaces)
+        return (code, (try? String(contentsOf: output, encoding: .utf8)) ?? "")
     }
 }
 
@@ -225,5 +281,48 @@ private final class OriginHandler: ChannelInboundHandler {
         buffer.writeBytes(body)
         context.write(wrapOutboundOut(.body(.byteBuffer(buffer))), promise: nil)
         context.writeAndFlush(wrapOutboundOut(.end(nil)), promise: nil)
+    }
+}
+
+private final class UploadOrigin {
+    private let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+    private var channel: Channel?
+
+    func start() throws -> Int {
+        let bootstrap = ServerBootstrap(group: group)
+            .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
+            .childChannelInitializer { channel in
+                channel.pipeline.configureHTTPServerPipeline().flatMap {
+                    channel.pipeline.addHandler(UploadOriginHandler())
+                }
+            }
+        let channel = try bootstrap.bind(host: "127.0.0.1", port: 0).wait()
+        self.channel = channel
+        return channel.localAddress?.port ?? 0
+    }
+
+    func stop() {
+        try? channel?.close().wait()
+        try? group.syncShutdownGracefully()
+    }
+}
+
+private final class UploadOriginHandler: ChannelInboundHandler {
+    typealias InboundIn = HTTPServerRequestPart
+    typealias OutboundOut = HTTPServerResponsePart
+    private var received = 0
+
+    func channelRead(context: ChannelHandlerContext, data: NIOAny) {
+        switch unwrapInboundIn(data) {
+        case .body(let buffer): received += buffer.readableBytes
+        case .end:
+            let response = String(received)
+            var headers = HTTPHeaders(); headers.add(name: "Content-Length", value: String(response.utf8.count))
+            context.write(wrapOutboundOut(.head(HTTPResponseHead(version: .http1_1, status: .ok, headers: headers))), promise: nil)
+            var buffer = context.channel.allocator.buffer(capacity: response.utf8.count); buffer.writeString(response)
+            context.write(wrapOutboundOut(.body(.byteBuffer(buffer))), promise: nil)
+            context.writeAndFlush(wrapOutboundOut(.end(nil)), promise: nil)
+        default: break
+        }
     }
 }

@@ -59,6 +59,13 @@ public final class ProxyServer: @unchecked Sendable {
 
     /// Reliability tuning (see ``ProxyTuning``). Read at `start()`.
     public var captureBodyCap: Int = ProxyTuning.defaultCaptureBodyCap
+    /// Opt-in request streaming for constrained runtimes. Disabled by default to
+    /// preserve HTTrail's existing rule-processing behavior.
+    public var streamRequestBodies: Bool = false
+    /// Maximum body that an opt-in streaming caller will buffer for a rule that
+    /// genuinely needs complete request content.
+    public var requestInspectionBodyCap: Int = ProxyTuning.defaultCaptureBodyCap
+    public var requestCaptureBodyCap: Int = ProxyTuning.defaultCaptureBodyCap
     public var upstreamIdleTimeout: TimeAmount = ProxyTuning.defaultIdleTimeout
     public var upstreamConnectTimeout: TimeAmount = ProxyTuning.defaultConnectTimeout
 
@@ -106,6 +113,9 @@ public final class ProxyServer: @unchecked Sendable {
         let verify = self.verifyUpstreamCertificates
         let engine = self.engine
         let captureBodyCap = self.captureBodyCap
+        let streamRequestBodies = self.streamRequestBodies
+        let requestInspectionBodyCap = self.requestInspectionBodyCap
+        let requestCaptureBodyCap = self.requestCaptureBodyCap
         let idleTimeout = self.upstreamIdleTimeout
         let connectTimeout = self.upstreamConnectTimeout
 
@@ -120,6 +130,9 @@ public final class ProxyServer: @unchecked Sendable {
                 let connect = ProxyConnectHandler(ca: ca, sink: sink, group: group,
                                                   verifyUpstream: verify, engine: engine,
                                                   captureBodyCap: captureBodyCap,
+                                                  streamRequestBodies: streamRequestBodies,
+                                                  requestInspectionBodyCap: requestInspectionBodyCap,
+                                                  requestCaptureBodyCap: requestCaptureBodyCap,
                                                   idleTimeout: idleTimeout,
                                                   connectTimeout: connectTimeout)
                 return channel.pipeline.addHandler(encoder, name: ProxyHandlerName.httpEncoder)

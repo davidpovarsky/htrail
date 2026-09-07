@@ -21,17 +21,28 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
     private let captureBodyCap: Int
     private let idleTimeout: TimeAmount
     private let connectTimeout: TimeAmount
+    private let streamRequestBodies: Bool
+    private let requestInspectionBodyCap: Int
+    private let requestCaptureBodyCap: Int
 
     private var requestHead: HTTPRequestHead?
     private var requestBody = ByteBuffer()
     private var startedAt = Date()
     private var keepAlive = true
+    private var streamingUpload = false
+    private var streamingUpstream: Channel?
+    private var streamingCapture: StreamingRequestCapture?
+    private var pendingUploadChunks: [ByteBuffer] = []
+    private var streamingEndPending = false
 
     init(fixedTarget: UpstreamTarget?, sink: FlowSink, group: EventLoopGroup,
          verifyUpstream: Bool, engine: InterceptEngine,
          captureBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
          idleTimeout: TimeAmount = ProxyTuning.defaultIdleTimeout,
-         connectTimeout: TimeAmount = ProxyTuning.defaultConnectTimeout) {
+         connectTimeout: TimeAmount = ProxyTuning.defaultConnectTimeout,
+         streamRequestBodies: Bool = false,
+         requestInspectionBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
+         requestCaptureBodyCap: Int = ProxyTuning.defaultCaptureBodyCap) {
         self.fixedTarget = fixedTarget
         self.sink = sink
         self.group = group
@@ -40,6 +51,9 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         self.captureBodyCap = captureBodyCap
         self.idleTimeout = idleTimeout
         self.connectTimeout = connectTimeout
+        self.streamRequestBodies = streamRequestBodies
+        self.requestInspectionBodyCap = requestInspectionBodyCap
+        self.requestCaptureBodyCap = requestCaptureBodyCap
     }
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
@@ -49,13 +63,171 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             requestBody = context.channel.allocator.buffer(capacity: 0)
             startedAt = Date()
             keepAlive = head.isKeepAlive
+            if streamRequestBodies, let provisional = makeRequest(head: head, body: ByteBuffer()),
+               !engine.requiresBufferedRequest(for: provisional) {
+                startStreamingUpload(context: context, head: head, initialBody: nil, inspectBody: true)
+            }
         case .body(var chunk):
+            if streamingUpload {
+                streamUploadChunk(context: context, chunk: chunk)
+                return
+            }
             requestBody.writeBuffer(&chunk)
+            if streamRequestBodies, requestBody.readableBytes > requestInspectionBodyCap,
+               let head = requestHead {
+                startStreamingUpload(context: context, head: head, initialBody: requestBody, inspectBody: false)
+                requestBody = context.channel.allocator.buffer(capacity: 0)
+            }
         case .end:
+            if streamingUpload {
+                if let upstream = streamingUpstream {
+                    upstream.writeAndFlush(NIOAny(HTTPClientRequestPart.end(nil)), promise: nil)
+                    finishStreamingUploadState()
+                } else {
+                    streamingEndPending = true
+                }
+                return
+            }
             guard let head = requestHead else { return }
             forward(context: context, head: head, body: requestBody)
             requestHead = nil
         }
+    }
+
+    private func makeRequest(head: HTTPRequestHead, body: ByteBuffer) -> CapturedRequest? {
+        guard let target = resolveTarget(head) else { return nil }
+        let scheme = target.tls ? "https" : "http"
+        let path = originForm(head.uri)
+        let url = "\(scheme)://\(target.host)\(target.port == (target.tls ? 443 : 80) ? "" : ":\(target.port)")\(path)"
+        return CapturedRequest(
+            method: head.method.rawValue, url: url, scheme: scheme, host: target.host,
+            port: target.port, path: path,
+            httpVersion: "HTTP/\(head.version.major).\(head.version.minor)",
+            headers: head.headers.map { HeaderPair(name: $0.name, value: $0.value) },
+            body: Data(body.readableBytesView), timestamp: startedAt
+        )
+    }
+
+    private func startStreamingUpload(context: ChannelHandlerContext, head: HTTPRequestHead,
+                                      initialBody: ByteBuffer?, inspectBody: Bool) {
+        guard let target = resolveTarget(head), let request = makeRequest(head: head, body: ByteBuffer()) else { return }
+        streamingUpload = true
+        _ = context.channel.setOption(ChannelOptions.autoRead, value: false)
+        let capture = StreamingRequestCapture(request: request, cap: requestCaptureBodyCap)
+        streamingCapture = capture
+        if var initialBody { capture.append(initialBody) }
+
+        let flowID = UUID()
+        let clientChannel = context.channel
+        let started = startedAt
+        let secure = target.tls
+        let keepAlive = self.keepAlive
+        Task {
+            let outcome = await engine.processRequest(request, target: target, inspectBody: inspectBody)
+            guard case .forward(let finalRequest, let finalTarget, let throttle) = outcome else {
+                if case .respond(let response) = outcome {
+                    sink.record(Flow(id: flowID, request: capture.snapshot(), response: response,
+                                     state: .completed, startedAt: started, endedAt: Date(), secure: secure))
+                    await relay(channel: clientChannel, allocator: clientChannel.allocator,
+                                response: response, keepAlive: false)
+                }
+                return
+            }
+            capture.replaceMetadata(with: finalRequest)
+            if throttle.delayMS > 0 {
+                try? await Task.sleep(nanoseconds: UInt64(throttle.delayMS) * 1_000_000)
+            }
+            self.connectStreamingUpload(
+                context: context, target: finalTarget, capture: capture,
+                flowID: flowID, startedAt: started, secure: secure,
+                keepAlive: keepAlive, initialBody: initialBody
+            )
+        }
+    }
+
+    private func connectStreamingUpload(context: ChannelHandlerContext, target: UpstreamTarget,
+                                        capture: StreamingRequestCapture, flowID: UUID,
+                                        startedAt: Date, secure: Bool, keepAlive: Bool,
+                                        initialBody: ByteBuffer?) {
+        let request = capture.snapshot()
+        var head = HTTPRequestHead(version: .http1_1, method: HTTPMethod(rawValue: request.method), uri: request.path)
+        var headers = HTTPHeaders()
+        for header in request.headers where header.name.caseInsensitiveCompare("Proxy-Connection") != .orderedSame {
+            headers.add(name: header.name, value: header.value)
+        }
+        headers.replaceOrAdd(name: "Host", value: hostHeader(target))
+        headers.replaceOrAdd(name: "Connection", value: "close")
+        head.headers = headers
+        let handler = StreamingProxyHandler(
+            clientChannel: context.channel, requestHead: head,
+            requestBody: initialBody ?? context.channel.allocator.buffer(capacity: 0),
+            captured: request, flowID: flowID, startedAt: startedAt, secure: secure,
+            keepAlive: keepAlive, captureCap: captureBodyCap, sink: sink,
+            completeRequestOnActive: false, capturedRequestProvider: { capture.snapshot() }
+        )
+        let verify = verifyUpstream
+        let idleTimeout = self.idleTimeout
+        ClientBootstrap(group: group)
+            .connectTimeout(connectTimeout)
+            .channelOption(ChannelOptions.autoRead, value: false)
+            .channelInitializer { channel in
+                do {
+                    var handlers: [ChannelHandler] = [IdleStateHandler(readTimeout: idleTimeout), IdleCloseHandler()]
+                    if target.tls { handlers.append(try ProxyTLS.clientHandler(host: target.host, verify: verify)) }
+                    handlers.append(HTTPRequestEncoder())
+                    handlers.append(ByteToMessageHandler(HTTPResponseDecoder(leftOverBytesStrategy: .dropBytes)))
+                    handlers.append(handler)
+                    return channel.pipeline.addHandlers(handlers)
+                } catch { return channel.eventLoop.makeFailedFuture(error) }
+            }
+            .connect(host: target.host, port: target.port).hop(to: context.eventLoop)
+            .whenComplete { result in
+                switch result {
+                case .success(let upstream):
+                    self.streamingUpstream = upstream
+                    for chunk in self.pendingUploadChunks {
+                        upstream.write(NIOAny(HTTPClientRequestPart.body(.byteBuffer(chunk))), promise: nil)
+                    }
+                    self.pendingUploadChunks.removeAll(keepingCapacity: false)
+                    if self.streamingEndPending {
+                        upstream.writeAndFlush(NIOAny(HTTPClientRequestPart.end(nil)), promise: nil)
+                        self.finishStreamingUploadState()
+                        return
+                    }
+                    upstream.flush()
+                    _ = context.channel.setOption(ChannelOptions.autoRead, value: true)
+                    context.read()
+                case .failure(let error):
+                    self.streamingUpload = false
+                    self.sink.record(Flow(id: flowID, request: capture.snapshot(), response: nil,
+                                          state: .failed, error: String(describing: error),
+                                          startedAt: startedAt, endedAt: Date(), secure: secure))
+                    self.respondError(channel: context.channel, status: .badGateway, message: "Upstream error")
+                }
+            }
+    }
+
+    private func streamUploadChunk(context: ChannelHandlerContext, chunk: ByteBuffer) {
+        streamingCapture?.append(chunk)
+        guard let upstream = streamingUpstream else {
+            pendingUploadChunks.append(chunk)
+            return
+        }
+        _ = context.channel.setOption(ChannelOptions.autoRead, value: false)
+        upstream.writeAndFlush(NIOAny(HTTPClientRequestPart.body(.byteBuffer(chunk))))
+            .hop(to: context.eventLoop).whenComplete { result in
+                if case .success = result { context.read() }
+                else { context.close(promise: nil) }
+            }
+    }
+
+    private func finishStreamingUploadState() {
+        streamingUpload = false
+        streamingUpstream = nil
+        streamingCapture = nil
+        streamingEndPending = false
+        pendingUploadChunks.removeAll(keepingCapacity: false)
+        requestHead = nil
     }
 
     private func forward(context: ChannelHandlerContext, head: HTTPRequestHead, body: ByteBuffer) {
@@ -353,6 +525,34 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         }
         return (value, defaultPort)
     }
+}
+
+private final class StreamingRequestCapture: @unchecked Sendable {
+    private let lock = NSLock()
+    private let cap: Int
+    private var request: CapturedRequest
+    private var totalBytes = 0
+
+    init(request: CapturedRequest, cap: Int) { self.request = request; self.cap = max(0, cap) }
+
+    func append(_ buffer: ByteBuffer) {
+        lock.lock(); defer { lock.unlock() }
+        let available = buffer.readableBytes
+        let room = max(0, cap - request.body.count)
+        if room > 0, let bytes = buffer.getBytes(at: buffer.readerIndex, length: min(room, available)) {
+            request.body.append(contentsOf: bytes)
+        }
+        totalBytes += available
+        if totalBytes > request.body.count { request.bodyTruncated = true }
+    }
+
+    func replaceMetadata(with value: CapturedRequest) {
+        lock.lock(); defer { lock.unlock() }
+        let body = request.body, truncated = request.bodyTruncated
+        request = value; request.body = body; request.bodyTruncated = truncated
+    }
+
+    func snapshot() -> CapturedRequest { lock.lock(); defer { lock.unlock() }; return request }
 }
 
 /// Drives a single upstream request: sends head+body on connect, accumulates the
