@@ -1,6 +1,6 @@
 import Darwin
 import Foundation
-import ImageFilterCore
+@testable import ImageFilterCore
 import PurelineSupport
 import XCTest
 
@@ -157,6 +157,16 @@ final class IntegratedRuntimeTests: XCTestCase {
     func testPacketTunnelDirectDecisionUsesOnlyNudeNet() {
         XCTAssertFalse(DirectImageSafetyAnalyzer.packetTunnelUsesMobileCLIP)
         XCTAssertTrue(DirectImageSafetyAnalyzer.packetTunnelUsesNudeNet)
+    }
+
+    func testDisabledDirectFilteringDoesNotPrepareClassifier() async {
+        let analyzer = DirectImageSafetyAnalyzer()
+        let attempts = await analyzer.preparationAttemptCount()
+        XCTAssertEqual(attempts, 0)
+    }
+
+    func testOriginalFullVendorPipelineRemainsAvailable() async {
+        _ = await ImageSafetyPipelineService.shared.readiness()
     }
 
     private static func milliseconds(since start: ContinuousClock.Instant) -> Int {

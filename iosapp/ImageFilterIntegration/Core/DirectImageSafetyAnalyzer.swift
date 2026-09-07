@@ -37,6 +37,7 @@ public actor DirectImageSafetyAnalyzer {
     private let nudeNet = NudeNetService.shared
     private let nudityPolicy = NudityFilterPolicy()
     private var prepared = false
+    private var preparationAttempts = 0
 
     public init() {}
 
@@ -49,10 +50,13 @@ public actor DirectImageSafetyAnalyzer {
     @discardableResult
     public func prepareIfNeeded() async throws -> Bool {
         guard !prepared else { return false }
+        preparationAttempts += 1
         try await nudeNet.warmUp()
         prepared = true
         return true
     }
+
+    public func preparationAttemptCount() -> Int { preparationAttempts }
 
     /// Runs the exact vendor NudeNet detector and standard policy. The actor and
     /// NudeNet service serialize expensive inference.
