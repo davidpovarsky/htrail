@@ -420,7 +420,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             headers.add(name: header.name, value: header.value)
         }
         headers.replaceOrAdd(name: "Host", value: hostHeader(target))
-        headers.replaceOrAdd(name: "Connection", value: "close")
+        headers.replaceOrAdd(name: "Connection", value: upstreamPool == nil ? "close" : "keep-alive")
         headers.replaceOrAdd(name: "Content-Length", value: "\(request.body.count)")
         head.headers = headers
 
