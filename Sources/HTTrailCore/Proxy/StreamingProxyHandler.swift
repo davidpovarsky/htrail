@@ -334,11 +334,13 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             return
         }
         channel.pipeline.removeHandler(self).whenComplete { result in
-            switch result {
-            case .success: pool.release(channel, target: target, events: self.runtimeEventHandler)
-            case .failure: pool.discard(channel, target: target, reason: "handler-removal-failure", events: self.runtimeEventHandler)
+            channel.eventLoop.execute {
+                switch result {
+                case .success: pool.release(channel, target: target, events: self.runtimeEventHandler)
+                case .failure: pool.discard(channel, target: target, reason: "handler-removal-failure", events: self.runtimeEventHandler)
+                }
+                completion()
             }
-            completion()
         }
     }
 
