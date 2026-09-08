@@ -86,8 +86,10 @@ public final class PurelineFilterConfigurationStore: @unchecked Sendable {
         // readers therefore observe either the old or complete new document.
         try data.write(to: activeURL, options: .atomic)
         try data.write(to: lastGoodURL, options: .atomic)
-        try encoder.encode(revision).write(to: revisionURL, options: .atomic)
-        return PurelineFilterConfigurationSnapshot(configuration: configuration, revision: revision)
+        let revisionData = try encoder.encode(revision)
+        try revisionData.write(to: revisionURL, options: .atomic)
+        let persistedRevision = try decoder.decode(PurelineFilterRevision.self, from: revisionData)
+        return PurelineFilterConfigurationSnapshot(configuration: configuration, revision: persistedRevision)
     }
 
     private func loadActiveLocked() throws -> PurelineFilterConfigurationSnapshot? {

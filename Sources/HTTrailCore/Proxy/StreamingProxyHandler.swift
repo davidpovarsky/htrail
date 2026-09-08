@@ -257,11 +257,15 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         completed = true
 
         if success && headSent {
-            let endFuture = clientChannel.writeAndFlush(NIOAny(HTTPServerResponsePart.end(nil)))
-            if !keepAlive {
-                endFuture.whenComplete { [clientChannel] _ in clientChannel.close(promise: nil) }
-            }
+            let clientKeepAlive = keepAlive
             recordFlow(failed: false, error: nil)
+            finishUpstream(context: context, reusable: responseEnded) { [clientChannel] in
+                let endFuture = clientChannel.writeAndFlush(NIOAny(HTTPServerResponsePart.end(nil)))
+                if !clientKeepAlive {
+                    endFuture.whenComplete { [clientChannel] _ in clientChannel.close(promise: nil) }
+                }
+            }
+            return
         } else if headSent {
             // Failure mid-stream: we already committed a response head, so we
             // can't synthesise an error status — just drop the client connection
@@ -273,7 +277,7 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             sendBadGateway()
             recordFlow(failed: true, error: "Upstream did not respond")
         }
-        finishUpstream(context: context, reusable: success && responseEnded)
+        finishUpstream(context: context, reusable: false)
     }
 
     private func finishInspection(context: ChannelHandlerContext) {
@@ -293,11 +297,12 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             let output: CapturedResponse
             do { output = try await inspector(request, original) ?? original }
             catch { output = original }
-            self.sendInspected(output)
             self.sink.record(Flow(id: self.flowID, request: request, response: self.captureVersion(output),
                                   state: .completed, startedAt: self.startedAt, endedAt: Date(), secure: self.secure))
             self.responseObserver?(request, self.captureVersion(output))
-            self.finishUpstream(channel: upstreamChannel, reusable: true)
+            self.finishUpstream(channel: upstreamChannel, reusable: true) {
+                self.sendInspected(output)
+            }
         }
     }
 
@@ -309,11 +314,13 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         return !head.isKeepAlive // close-delimited HTTP/1.x body completes at peer close
     }
 
-    private func finishUpstream(context: ChannelHandlerContext, reusable: Bool) {
-        finishUpstream(channel: context.channel, reusable: reusable)
+    private func finishUpstream(context: ChannelHandlerContext, reusable: Bool,
+                                completion: @escaping () -> Void = {}) {
+        finishUpstream(channel: context.channel, reusable: reusable, completion: completion)
     }
 
-    private func finishUpstream(channel: Channel, reusable: Bool) {
+    private func finishUpstream(channel: Channel, reusable: Bool,
+                                completion: @escaping () -> Void = {}) {
         let elapsed = (DispatchTime.now().uptimeNanoseconds - requestStarted) / 1_000_000
         runtimeEventHandler?(ProxyRuntimeEvent(kind: .upstreamTiming, host: targetHost,
                                                detail: "totalMs=\(elapsed) protocol=http/1.1 reused=\(reused)"))
@@ -323,6 +330,7 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
                 let reason = responseAllowsReuse ? "response-not-reusable" : "origin-connection-close"
                 pool.discard(channel, target: target, reason: reason, events: runtimeEventHandler)
             } else { channel.close(promise: nil) }
+            completion()
             return
         }
         channel.pipeline.removeHandler(self).whenComplete { result in
@@ -330,6 +338,7 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             case .success: pool.release(channel, target: target, events: self.runtimeEventHandler)
             case .failure: pool.discard(channel, target: target, reason: "handler-removal-failure", events: self.runtimeEventHandler)
             }
+            completion()
         }
     }
 
