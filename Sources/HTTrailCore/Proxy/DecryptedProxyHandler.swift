@@ -175,7 +175,8 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         var headers = HTTPHeaders()
         for header in request.headers
         where header.name.caseInsensitiveCompare("Proxy-Connection") != .orderedSame
-            && header.name.caseInsensitiveCompare("Connection") != .orderedSame {
+            && header.name.caseInsensitiveCompare("Connection") != .orderedSame
+            && header.name.caseInsensitiveCompare("Host") != .orderedSame {
             headers.add(name: header.name, value: header.value)
         }
         headers.replaceOrAdd(name: "Host", value: hostHeader(target))
@@ -359,7 +360,10 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         var headers = HTTPHeaders()
         for header in request.headers
         where header.name.caseInsensitiveCompare("Proxy-Connection") != .orderedSame
-            && header.name.caseInsensitiveCompare("Connection") != .orderedSame {
+            && header.name.caseInsensitiveCompare("Connection") != .orderedSame
+            && header.name.caseInsensitiveCompare("Host") != .orderedSame
+            && header.name.caseInsensitiveCompare("Content-Length") != .orderedSame
+            && header.name.caseInsensitiveCompare("Transfer-Encoding") != .orderedSame {
             headers.add(name: header.name, value: header.value)
         }
         headers.replaceOrAdd(name: "Host", value: hostHeader(target))
@@ -411,7 +415,10 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         var headers = HTTPHeaders()
         for header in request.headers
         where header.name.caseInsensitiveCompare("Proxy-Connection") != .orderedSame
-            && header.name.caseInsensitiveCompare("Connection") != .orderedSame {
+            && header.name.caseInsensitiveCompare("Connection") != .orderedSame
+            && header.name.caseInsensitiveCompare("Host") != .orderedSame
+            && header.name.caseInsensitiveCompare("Content-Length") != .orderedSame
+            && header.name.caseInsensitiveCompare("Transfer-Encoding") != .orderedSame {
             headers.add(name: header.name, value: header.value)
         }
         headers.replaceOrAdd(name: "Host", value: hostHeader(target))
