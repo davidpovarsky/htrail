@@ -368,9 +368,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         }
         headers.replaceOrAdd(name: "Host", value: hostHeader(target))
         headers.replaceOrAdd(name: "Connection", value: upstreamPool == nil ? "close" : "keep-alive")
-        if !request.body.isEmpty {
-            headers.replaceOrAdd(name: "Content-Length", value: "\(request.body.count)")
-        }
+        headers.replaceOrAdd(name: "Content-Length", value: "\(request.body.count)")
         head.headers = headers
 
         var bodyBuffer = allocator.buffer(capacity: request.body.count)
@@ -423,9 +421,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         }
         headers.replaceOrAdd(name: "Host", value: hostHeader(target))
         headers.replaceOrAdd(name: "Connection", value: "close")
-        if !request.body.isEmpty {
-            headers.replaceOrAdd(name: "Content-Length", value: "\(request.body.count)")
-        }
+        headers.replaceOrAdd(name: "Content-Length", value: "\(request.body.count)")
         head.headers = headers
 
         var bodyBuffer = clientChannel.allocator.buffer(capacity: request.body.count)
