@@ -132,6 +132,10 @@ public nonisolated enum PurelineFilterConfigurationValidator {
     public struct ValidationError: Error, Codable, Equatable, Sendable, CustomStringConvertible {
         public let path: String
         public let message: String
+        public init(path: String, message: String) {
+            self.path = path
+            self.message = message
+        }
         public var description: String { "\(path): \(message)" }
     }
 

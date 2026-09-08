@@ -318,9 +318,9 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         runtimeEventHandler?(ProxyRuntimeEvent(kind: .upstreamTiming, host: targetHost,
                                                detail: "totalMs=\(elapsed) protocol=http/1.1 reused=\(reused)"))
         guard reusable, let pool = upstreamPool, let target = upstreamTarget,
-              upstreamHead?.isKeepAlive == true, requestHead.isKeepAlive else {
+              responseAllowsReuse, requestAllowsReuse else {
             if let pool = upstreamPool, let target = upstreamTarget {
-                let reason = upstreamHead?.isKeepAlive == false ? "origin-connection-close" : "response-not-reusable"
+                let reason = responseAllowsReuse ? "response-not-reusable" : "origin-connection-close"
                 pool.discard(channel, target: target, reason: reason, events: runtimeEventHandler)
             } else { channel.close(promise: nil) }
             return
@@ -331,6 +331,22 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             case .failure: pool.discard(channel, target: target, reason: "handler-removal-failure", events: self.runtimeEventHandler)
             }
         }
+    }
+
+    private var responseAllowsReuse: Bool {
+        guard let head = upstreamHead else { return false }
+        return permitsPersistentConnection(version: head.version, headers: head.headers)
+    }
+
+    private var requestAllowsReuse: Bool {
+        permitsPersistentConnection(version: requestHead.version, headers: requestHead.headers)
+    }
+
+    private func permitsPersistentConnection(version: HTTPVersion, headers: HTTPHeaders) -> Bool {
+        let connectionTokens = headers[canonicalForm: "connection"].map { $0.lowercased() }
+        if connectionTokens.contains("close") { return false }
+        if version.major > 1 || (version.major == 1 && version.minor >= 1) { return true }
+        return connectionTokens.contains("keep-alive")
     }
 
     private func isUncleanShutdown(_ error: Error) -> Bool {
