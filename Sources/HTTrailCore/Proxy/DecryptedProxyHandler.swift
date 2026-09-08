@@ -432,7 +432,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         if let reused = upstreamPool?.checkout(target: target, events: runtimeEventHandler) {
             handler.markReused()
             reused.pipeline.addHandler(handler).whenFailure { error in
-                upstreamPool?.discard(reused, target: target, reason: "handler-install-failure", events: self.runtimeEventHandler)
+                self.upstreamPool?.discard(reused, target: target, reason: "handler-install-failure", events: self.runtimeEventHandler)
                 self.runtimeEventHandler?(ProxyFailureClassifier.event(error: error, host: target.host, tls: target.tls))
             }
             return

@@ -67,6 +67,7 @@ targets:
       - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/NudityFilterPolicy.swift
       - path: ../Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/PersonCropService.swift
       - path: ImageFilterIntegration/Core/ExtensionSafeDiagnosticLogService.swift
+      - path: ImageFilterIntegration/Core/PurelineFilterConfiguration.swift
       - path: ImageFilterIntegration/Core/DirectImageSafetyAnalyzer.swift
     settings:
       base:
