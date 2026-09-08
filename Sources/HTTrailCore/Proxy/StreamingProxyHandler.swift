@@ -323,7 +323,7 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
                                 completion: @escaping () -> Void = {}) {
         let elapsed = (DispatchTime.now().uptimeNanoseconds - requestStarted) / 1_000_000
         runtimeEventHandler?(ProxyRuntimeEvent(kind: .upstreamTiming, host: targetHost,
-                                               detail: "totalMs=\(elapsed) protocol=http/1.1 reused=\(reused)"))
+                                               detail: "totalMs=\(elapsed) bytes=\(responseBytes) protocol=http/1.1 reused=\(reused)"))
         guard reusable, let pool = upstreamPool, let target = upstreamTarget,
               responseAllowsReuse else {
             if let pool = upstreamPool, let target = upstreamTarget {

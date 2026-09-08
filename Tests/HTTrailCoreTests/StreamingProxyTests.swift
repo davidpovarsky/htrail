@@ -178,7 +178,7 @@ final class StreamingProxyTests: XCTestCase {
         let originPort = try origin.start(bodyByteCount: 5000, chunked: true)
         defer { origin.stop() }
         let calls = LockedCounter()
-        let (proxy, _) = try await makeProxy {
+        let (proxy, sink) = try await makeProxy {
             $0.streamingResponseInspectionPolicy = { _, _ in 1000 }
             $0.streamingResponseInspector = { _, response in calls.increment(); return response }
         }
@@ -210,7 +210,7 @@ final class StreamingProxyTests: XCTestCase {
         let originPort = try origin.start(bodyString: "REUSED")
         defer { origin.stop() }
         let events = LockedEvents()
-        let (proxy, _) = try await makeProxy {
+        let (proxy, sink) = try await makeProxy {
             $0.upstreamConnectionPoolConfiguration = UpstreamConnectionPoolConfiguration(
                 maximumConnectionsPerOrigin: 1, maximumConnectionsTotal: 2, idleTimeout: 5
             )
@@ -221,9 +221,9 @@ final class StreamingProxyTests: XCTestCase {
         guard let first = curlThroughProxy(proxyPort: proxy.boundPort, url: url) else { throw XCTSkip("curl unavailable") }
         try await Task.sleep(nanoseconds: 100_000_000)
         guard let second = curlThroughProxy(proxyPort: proxy.boundPort, url: url) else { throw XCTSkip("curl unavailable") }
-        XCTAssertEqual(first.body, "REUSED")
-        XCTAssertEqual(second.body, "REUSED")
         let eventSummary = events.values.map { "\($0.kind.rawValue)[\($0.host ?? "-")]:\($0.detail)" }.joined(separator: " | ")
+        XCTAssertEqual(first.body, "REUSED")
+        XCTAssertEqual(second.body, "REUSED", "\(eventSummary) | captured=\(sink.flows.map { $0.response?.body.count ?? -1 })")
         XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 1, eventSummary)
         XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolHit }.count, 1, eventSummary)
         XCTAssertTrue(events.values.contains { $0.kind == .upstreamTiming && $0.detail.contains("reused=true") }, eventSummary)
