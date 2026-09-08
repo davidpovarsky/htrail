@@ -221,9 +221,10 @@ final class StreamingProxyTests: XCTestCase {
         guard curlThroughProxy(proxyPort: proxy.boundPort, url: url) != nil else { throw XCTSkip("curl unavailable") }
         try await Task.sleep(nanoseconds: 100_000_000)
         guard curlThroughProxy(proxyPort: proxy.boundPort, url: url) != nil else { throw XCTSkip("curl unavailable") }
-        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 1)
-        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolHit }.count, 1)
-        XCTAssertTrue(events.values.contains { $0.kind == .upstreamTiming && $0.detail.contains("reused=true") })
+        let eventSummary = events.values.map { "\($0.kind.rawValue)[\($0.host ?? "-")]:\($0.detail)" }.joined(separator: " | ")
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 1, eventSummary)
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolHit }.count, 1, eventSummary)
+        XCTAssertTrue(events.values.contains { $0.kind == .upstreamTiming && $0.detail.contains("reused=true") }, eventSummary)
     }
 
     func testPoolDoesNotCrossOriginsAndHonorsConnectionClose() async throws {
