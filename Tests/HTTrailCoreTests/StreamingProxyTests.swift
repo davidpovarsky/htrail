@@ -207,7 +207,8 @@ final class StreamingProxyTests: XCTestCase {
 
     func testBoundedPoolReusesSequentialSameOriginConnections() async throws {
         let origin = TestOrigin()
-        let originPort = try origin.start(bodyString: "REUSED")
+        let wire = LockedStrings()
+        let originPort = try origin.start(bodyString: "REUSED", wireRecorder: wire)
         defer { origin.stop() }
         let events = LockedEvents()
         let (proxy, sink) = try await makeProxy {
@@ -223,7 +224,8 @@ final class StreamingProxyTests: XCTestCase {
         guard let second = curlThroughProxy(proxyPort: proxy.boundPort, url: url) else { throw XCTSkip("curl unavailable") }
         let eventSummary = events.values.map { "\($0.kind.rawValue)[\($0.host ?? "-")]:\($0.detail)" }.joined(separator: " | ")
         XCTAssertEqual(first.body, "REUSED")
-        XCTAssertEqual(second.body, "REUSED", "\(eventSummary) | captured=\(sink.flows.map { $0.response?.body.count ?? -1 })")
+        let wireSummary = wire.values.joined().replacingOccurrences(of: "\r", with: "\\r").replacingOccurrences(of: "\n", with: "\\n")
+        XCTAssertEqual(second.body, "REUSED", "\(eventSummary) | captured=\(sink.flows.map { $0.response?.body.count ?? -1 }) | wire=\(wireSummary)")
         XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 1, eventSummary)
         XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolHit }.count, 1, eventSummary)
         XCTAssertTrue(events.values.contains { $0.kind == .upstreamTiming && $0.detail.contains("reused=true") }, eventSummary)
@@ -383,8 +385,9 @@ final class TestOrigin {
     private let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
     private var channel: Channel?
 
-    func start(bodyString: String? = nil, bodyByteCount: Int? = nil,
-               hang: Bool = false, chunked: Bool = false, closeResponse: Bool = false) throws -> Int {
+    fileprivate func start(bodyString: String? = nil, bodyByteCount: Int? = nil,
+               hang: Bool = false, chunked: Bool = false, closeResponse: Bool = false,
+               wireRecorder: LockedStrings? = nil) throws -> Int {
         let body: [UInt8]
         if let bodyString { body = Array(bodyString.utf8) }
         else if let bodyByteCount { body = Array(repeating: UInt8(ascii: "x"), count: bodyByteCount) }
@@ -393,7 +396,9 @@ final class TestOrigin {
         let bootstrap = ServerBootstrap(group: group)
             .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
             .childChannelInitializer { channel in
-                channel.pipeline.configureHTTPServerPipeline().flatMap {
+                let recorder = wireRecorder.map { channel.pipeline.addHandler(RawRequestRecorder(storage: $0)) }
+                    ?? channel.eventLoop.makeSucceededVoidFuture()
+                return recorder.flatMap { channel.pipeline.configureHTTPServerPipeline() }.flatMap {
                     channel.pipeline.addHandler(OriginHandler(body: body, hang: hang, chunked: chunked, closeResponse: closeResponse))
                 }
             }
@@ -406,6 +411,23 @@ final class TestOrigin {
         try? channel?.close().wait()
         try? group.syncShutdownGracefully()
     }
+}
+
+private final class RawRequestRecorder: ChannelInboundHandler {
+    typealias InboundIn = ByteBuffer
+    private let storage: LockedStrings
+    init(storage: LockedStrings) { self.storage = storage }
+    func channelRead(context: ChannelHandlerContext, data: NIOAny) {
+        storage.append(String(buffer: unwrapInboundIn(data)))
+        context.fireChannelRead(data)
+    }
+}
+
+private final class LockedStrings: @unchecked Sendable {
+    private let lock = NSLock()
+    private var storage: [String] = []
+    func append(_ value: String) { lock.lock(); storage.append(value); lock.unlock() }
+    var values: [String] { lock.lock(); defer { lock.unlock() }; return storage }
 }
 
 private final class OriginHandler: ChannelInboundHandler {
