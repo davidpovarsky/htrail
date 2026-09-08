@@ -218,13 +218,59 @@ final class StreamingProxyTests: XCTestCase {
         }
         defer { Task { try? await proxy.stop() } }
         let url = "http://127.0.0.1:\(originPort)/"
-        guard curlThroughProxy(proxyPort: proxy.boundPort, url: url) != nil else { throw XCTSkip("curl unavailable") }
+        guard let first = curlThroughProxy(proxyPort: proxy.boundPort, url: url) else { throw XCTSkip("curl unavailable") }
         try await Task.sleep(nanoseconds: 100_000_000)
-        guard curlThroughProxy(proxyPort: proxy.boundPort, url: url) != nil else { throw XCTSkip("curl unavailable") }
+        guard let second = curlThroughProxy(proxyPort: proxy.boundPort, url: url) else { throw XCTSkip("curl unavailable") }
+        XCTAssertEqual(first.body, "REUSED")
+        XCTAssertEqual(second.body, "REUSED")
         let eventSummary = events.values.map { "\($0.kind.rawValue)[\($0.host ?? "-")]:\($0.detail)" }.joined(separator: " | ")
         XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 1, eventSummary)
         XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolHit }.count, 1, eventSummary)
         XCTAssertTrue(events.values.contains { $0.kind == .upstreamTiming && $0.detail.contains("reused=true") }, eventSummary)
+    }
+
+    func testPoolExpiresIdleConnections() async throws {
+        let origin = TestOrigin()
+        let originPort = try origin.start(bodyString: "IDLE")
+        defer { origin.stop() }
+        let events = LockedEvents()
+        let (proxy, _) = try await makeProxy {
+            $0.upstreamConnectionPoolConfiguration = .init(
+                maximumConnectionsPerOrigin: 1, maximumConnectionsTotal: 2, idleTimeout: 1
+            )
+            $0.runtimeEventHandler = { events.append($0) }
+        }
+        defer { Task { try? await proxy.stop() } }
+        let url = "http://127.0.0.1:\(originPort)/"
+        guard curlThroughProxy(proxyPort: proxy.boundPort, url: url) != nil else { throw XCTSkip("curl unavailable") }
+        try await Task.sleep(nanoseconds: 1_200_000_000)
+        guard curlThroughProxy(proxyPort: proxy.boundPort, url: url) != nil else { throw XCTSkip("curl unavailable") }
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 2)
+        XCTAssertTrue(events.values.contains { $0.kind == .upstreamPoolEviction && $0.detail == "idle-timeout" })
+    }
+
+    func testPoolEvictsOldestIdleConnectionAtGlobalBound() async throws {
+        let origins = [TestOrigin(), TestOrigin(), TestOrigin()]
+        let ports = try origins.map { try $0.start(bodyString: "BOUND") }
+        defer { origins.forEach { $0.stop() } }
+        let events = LockedEvents()
+        let (proxy, _) = try await makeProxy {
+            $0.upstreamConnectionPoolConfiguration = .init(
+                maximumConnectionsPerOrigin: 1, maximumConnectionsTotal: 2, idleTimeout: 5
+            )
+            $0.runtimeEventHandler = { events.append($0) }
+        }
+        defer { Task { try? await proxy.stop() } }
+        for port in ports {
+            guard curlThroughProxy(proxyPort: proxy.boundPort, url: "http://127.0.0.1:\(port)/") != nil else {
+                throw XCTSkip("curl unavailable")
+            }
+        }
+        guard curlThroughProxy(proxyPort: proxy.boundPort, url: "http://127.0.0.1:\(ports[0])/") != nil else {
+            throw XCTSkip("curl unavailable")
+        }
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 4)
+        XCTAssertTrue(events.values.contains { $0.kind == .upstreamPoolEviction && $0.detail == "bounded-capacity" })
     }
 
     func testPoolDoesNotCrossOriginsAndHonorsConnectionClose() async throws {

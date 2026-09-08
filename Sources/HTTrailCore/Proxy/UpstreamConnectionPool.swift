@@ -27,19 +27,24 @@ final class UpstreamConnectionPool: @unchecked Sendable {
 
     func checkout(target: UpstreamTarget, events: (@Sendable (ProxyRuntimeEvent) -> Void)?) -> Channel? {
         let key = Key(tls: target.tls, host: target.host.lowercased(), port: target.port)
-        var stale: [Channel] = []
+        var stale: [(Channel, String)] = []
         var selected: Channel?
         lock.lock()
         let now = Date()
         var candidates = entries.removeValue(forKey: key) ?? []
         while let entry = candidates.popLast() {
-            if now.timeIntervalSince(entry.returnedAt) > configuration.idleTimeout || !entry.channel.isActive {
-                stale.append(entry.channel)
+            if now.timeIntervalSince(entry.returnedAt) > configuration.idleTimeout {
+                stale.append((entry.channel, "idle-timeout"))
+            } else if !entry.channel.isActive {
+                stale.append((entry.channel, "inactive-on-checkout"))
             } else { selected = entry.channel; break }
         }
         if !candidates.isEmpty { entries[key] = candidates }
         lock.unlock()
-        stale.forEach { $0.close(promise: nil) }
+        stale.forEach { channel, reason in
+            channel.close(promise: nil)
+            events?(ProxyRuntimeEvent(kind: .upstreamPoolEviction, host: target.host, detail: reason))
+        }
         events?(ProxyRuntimeEvent(kind: selected == nil ? .upstreamPoolMiss : .upstreamPoolHit,
                                   host: target.host, detail: selected == nil ? "new connection required" : "HTTP/1.1 connection reused"))
         return selected

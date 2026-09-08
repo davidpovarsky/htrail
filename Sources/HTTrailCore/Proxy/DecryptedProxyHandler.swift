@@ -173,7 +173,9 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         let request = capture.snapshot()
         var head = HTTPRequestHead(version: .http1_1, method: HTTPMethod(rawValue: request.method), uri: request.path)
         var headers = HTTPHeaders()
-        for header in request.headers where header.name.caseInsensitiveCompare("Proxy-Connection") != .orderedSame {
+        for header in request.headers
+        where header.name.caseInsensitiveCompare("Proxy-Connection") != .orderedSame
+            && header.name.caseInsensitiveCompare("Connection") != .orderedSame {
             headers.add(name: header.name, value: header.value)
         }
         headers.replaceOrAdd(name: "Host", value: hostHeader(target))
@@ -355,7 +357,9 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         let method = HTTPMethod(rawValue: request.method)
         var head = HTTPRequestHead(version: .http1_1, method: method, uri: request.path)
         var headers = HTTPHeaders()
-        for header in request.headers where header.name.caseInsensitiveCompare("Proxy-Connection") != .orderedSame {
+        for header in request.headers
+        where header.name.caseInsensitiveCompare("Proxy-Connection") != .orderedSame
+            && header.name.caseInsensitiveCompare("Connection") != .orderedSame {
             headers.add(name: header.name, value: header.value)
         }
         headers.replaceOrAdd(name: "Host", value: hostHeader(target))
@@ -405,7 +409,9 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         let method = HTTPMethod(rawValue: request.method)
         var head = HTTPRequestHead(version: .http1_1, method: method, uri: request.path)
         var headers = HTTPHeaders()
-        for header in request.headers where header.name.caseInsensitiveCompare("Proxy-Connection") != .orderedSame {
+        for header in request.headers
+        where header.name.caseInsensitiveCompare("Proxy-Connection") != .orderedSame
+            && header.name.caseInsensitiveCompare("Connection") != .orderedSame {
             headers.add(name: header.name, value: header.value)
         }
         headers.replaceOrAdd(name: "Host", value: hostHeader(target))
