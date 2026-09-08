@@ -92,6 +92,10 @@ NudeNet pipeline, diagnostics, and tests remain intact.
 - `iosapp/PurelineIntegration/Capture/PurelineBoundedFlowSink.swift`: 200-flow, 8-MiB aggregate body budget with 256-KiB request and 512-KiB response previews. Depends on HTTrail `FlowSink`, `Flow`, and `SharedFlowStore`.
 - `iosapp/PurelineIntegration/TLS/PurelineCompatibilityBypassStore.swift`: persists host plus expiry in the App Group and prunes expired entries. Depends on generic HTTrail `PinnedHostInfo`.
 - `iosapp/PurelineIntegration/FailOpen/PurelineRuntimePolicy.swift`: single source of resource limits and pass-through decisions. Uses public `os_proc_available_memory` only.
+- `iosapp/ImageFilterIntegration/Core/PurelineFilterConfiguration.swift`: versioned Codable contract, built-in combined profile, semantic validation, hard ceilings, and SHA-256 revision identity shared with `ImageFilterCore`.
+- `iosapp/PurelineIntegration/Configuration/*`: atomic App-Group store, active/last-good/revision/acknowledgement files, JSON document import/export, UI state, and bundled default.
+- `iosapp/PurelineIntegration/ImageFiltering/PurelineInspectionAdmissionController.swift`: synchronous pre-buffer reservation plus bounded active/queued bytes and inference admission.
+- `iosapp/PurelineIntegration/Compatibility/PurelineAntiBotCompatibilityStore.swift`: separate expiring anti-bot evidence store and conservative strong-challenge detector.
 
 ## Existing integration files modified
 
@@ -100,6 +104,7 @@ NudeNet pipeline, diagnostics, and tests remain intact.
 - `iosapp/ImageFilterIntegration/Core/DirectImageSafetyAnalyzer.swift`: extension-safe two-model adapter. It reuses vendor Vision detection, person cropping, `MobileCLIPService`, and `NudeNetService`, while applying Pureline's downstream combined policy and short-circuiting only after a definitive block.
 - `iosapp/ImageFilterIntegration/Core/ExtensionSafeDiagnosticLogService.swift`: unchanged; remains the app-extension-safe implementation expected by vendor source compiled into `ImageFilterCore`.
 - `iosapp/Sources/SetupView.swift`: exports the bounded PacketTunnel diagnostic ZIP.
+- `iosapp/Sources/ImageFilterTabHostView.swift`: Pureline-owned configuration status/import/export/default controls above the untouched embedded vendor UI.
 - `iosapp/RuntimeTests/IntegratedRuntimeTests.swift`: downstream tests for diagnostics, capture budgets, persistence, fail-open limits, model selection, lazy preparation, and full vendor-pipeline availability.
 - `iosapp/project.yml`: compiles shared Pureline sources directly into the app/extension (avoiding another dynamic extension framework) and bundles both on-device model resources in PacketTunnel. Identifiers, entitlements, signing, profiles, and vendor targets are unchanged.
 

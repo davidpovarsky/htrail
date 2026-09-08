@@ -1,7 +1,7 @@
 import Foundation
 import ImageFilterCore
 
-public nonisolated struct PurelineInspectionAdmissionSnapshot: Equatable, Sendable {
+public struct PurelineInspectionAdmissionSnapshot: Equatable, Sendable {
     public let active: Int
     public let queued: Int
     public let inFlightBytes: Int
@@ -73,11 +73,16 @@ public final class PurelineInspectionAdmissionController: @unchecked Sendable {
     }
 
     public func acquireInference() async {
-        if locked({
-            if inferenceActive < maximumInference { inferenceActive += 1; return true }
-            return false
-        }) { return }
-        await withCheckedContinuation { continuation in locked { inferenceWaiters.append(continuation) } }
+        await withCheckedContinuation { continuation in
+            locked {
+                if inferenceActive < maximumInference {
+                    inferenceActive += 1
+                    continuation.resume()
+                } else {
+                    inferenceWaiters.append(continuation)
+                }
+            }
+        }
     }
 
     public func releaseInference() {

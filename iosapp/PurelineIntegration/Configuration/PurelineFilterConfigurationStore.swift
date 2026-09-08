@@ -2,7 +2,7 @@ import Foundation
 import HTTrailCore
 import ImageFilterCore
 
-public nonisolated struct PurelineFilterConfigurationSnapshot: Equatable, Sendable {
+public struct PurelineFilterConfigurationSnapshot: Equatable, Sendable {
     public let configuration: PurelineFilterConfiguration
     public let revision: PurelineFilterRevision
 }

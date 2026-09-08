@@ -141,9 +141,9 @@ public actor DirectImageSafetyAnalyzer {
     }
 
     public func preparationAttemptCount() async -> Int {
-        let mobile = await mobileLifecycle.snapshot().attempts
-        let nude = await nudeLifecycle.snapshot().attempts
-        return mobile + nude
+        let mobile = await mobileLifecycle.snapshot()
+        let nude = await nudeLifecycle.snapshot()
+        return mobile.attempts + nude.attempts
     }
 
     public func modelLifecycleSnapshots() async -> (mobileCLIP: (PurelineModelLifecycle.State, Int, Int), nudeNet: (PurelineModelLifecycle.State, Int, Int)) {
