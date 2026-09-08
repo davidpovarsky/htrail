@@ -325,7 +325,7 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         runtimeEventHandler?(ProxyRuntimeEvent(kind: .upstreamTiming, host: targetHost,
                                                detail: "totalMs=\(elapsed) protocol=http/1.1 reused=\(reused)"))
         guard reusable, let pool = upstreamPool, let target = upstreamTarget,
-              responseAllowsReuse, requestAllowsReuse else {
+              responseAllowsReuse else {
             if let pool = upstreamPool, let target = upstreamTarget {
                 let reason = responseAllowsReuse ? "response-not-reusable" : "origin-connection-close"
                 pool.discard(channel, target: target, reason: reason, events: runtimeEventHandler)
@@ -345,10 +345,6 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
     private var responseAllowsReuse: Bool {
         guard let head = upstreamHead else { return false }
         return permitsPersistentConnection(version: head.version, headers: head.headers)
-    }
-
-    private var requestAllowsReuse: Bool {
-        permitsPersistentConnection(version: requestHead.version, headers: requestHead.headers)
     }
 
     private func permitsPersistentConnection(version: HTTPVersion, headers: HTTPHeaders) -> Bool {
