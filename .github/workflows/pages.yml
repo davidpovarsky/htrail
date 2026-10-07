@@ -12,6 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   pages: write
   id-token: write
@@ -28,17 +29,49 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./site
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
