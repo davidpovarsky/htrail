@@ -9,7 +9,6 @@ on:
       - "Full iOS Simulator QA"
       - "Deploy site to GitHub Pages"
     types:
-      - requested
       - in_progress
       - completed
 
