@@ -21,6 +21,7 @@ on:
         default: true
 
 permissions:
+  actions: read
   contents: read
 
 concurrency:
@@ -39,23 +40,63 @@ jobs:
       BUILD_DIR: ${{ github.workspace }}/build/signed-ios
 
     steps:
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Verify pinned classifier source
         run: test "$(git -C Vendor/AI-Image-Classifier rev-parse HEAD)" = "5291eedb9b46fa978e36ccec4f5504b017afe809"
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Select Xcode
         run: |
           sudo xcode-select -s /Applications/Xcode.app
           xcodebuild -version
           swift --version
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Install XcodeGen
         run: brew install xcodegen
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Set up model conversion Python
         uses: actions/setup-python@v6
         with:
@@ -63,6 +104,15 @@ jobs:
           cache: pip
           cache-dependency-path: Vendor/AI-Image-Classifier/tools/MobileCLIPConversion/requirements.txt
 
+      - name: Live Activity · refresh
+        if: ${{ inputs.upload_to_testflight }}
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Restore App Store Connect API key
         if: ${{ inputs.upload_to_testflight }}
         shell: bash
@@ -83,6 +133,15 @@ jobs:
           echo "ASC_ISSUER_ID=$ASC_ISSUER_ID_VALUE" >> "$GITHUB_ENV"
           echo "ASC_KEY_PATH=$key_path" >> "$GITHUB_ENV"
 
+      - name: Live Activity · refresh
+        if: ${{ inputs.upload_to_testflight }}
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Verify App Store Connect app record exists
         if: ${{ inputs.upload_to_testflight }}
         shell: bash
@@ -130,6 +189,14 @@ jobs:
           print(f"Found App Store Connect app record: {attributes.get('name', '<unnamed>')} ({bundle_id})")
           PY
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Cache SwiftPM and converted MobileCLIP
         uses: actions/cache@v4
         with:
@@ -143,12 +210,28 @@ jobs:
             ${{ runner.os }}-httrail-image-filter-
             ${{ runner.os }}-swiftpm-
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Prepare verified image-filter models
         shell: bash
         run: |
           chmod +x scripts/prepare_image_filter_models.sh
           scripts/prepare_image_filter_models.sh
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Compute unique build number
         shell: bash
         run: |
@@ -156,6 +239,14 @@ jobs:
           echo "BUILD_NUMBER=$build_number" >> "$GITHUB_ENV"
           echo "Using CFBundleVersion $build_number"
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Import distribution certificate and profiles
         shell: bash
         env:
@@ -235,6 +326,14 @@ jobs:
           echo "TUNNEL_PROFILE_UUID=$tunnel_profile_uuid" >> "$GITHUB_ENV"
           echo "SIGNING_KEYCHAIN=$keychain" >> "$GITHUB_ENV"
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Generate project and inspect signing settings
         shell: bash
         run: |
@@ -263,6 +362,14 @@ jobs:
           grep -F "DEVELOPMENT_TEAM = $TEAM_ID" "$BUILD_DIR/logs/tunnel-signing-build-settings.log"
           grep -F "PROVISIONING_PROFILE_SPECIFIER = $TUNNEL_PROFILE_SPECIFIER" "$BUILD_DIR/logs/tunnel-signing-build-settings.log"
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Archive signed app
         shell: bash
         run: |
@@ -282,6 +389,14 @@ jobs:
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
             | tee "$BUILD_DIR/logs/archive.log"
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Export App Store Connect IPA
         shell: bash
         run: |
@@ -318,6 +433,14 @@ jobs:
           echo "IPA_PATH=$ipa" >> "$GITHUB_ENV"
           shasum -a 256 "$ipa" | tee "$BUILD_DIR/export/HTTrailiOS.ipa.sha256"
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Validate signed app and Packet Tunnel extension
         shell: bash
         run: |
@@ -350,14 +473,41 @@ jobs:
           codesign -dvvv "$app" 2> "$BUILD_DIR/logs/app-codesign.txt"
           codesign -dvvv "$tunnel" 2> "$BUILD_DIR/logs/tunnel-codesign.txt"
 
+      - name: Live Activity · refresh
+        if: ${{ inputs.upload_to_testflight }}
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Validate with App Store Connect
         if: ${{ inputs.upload_to_testflight }}
         run: xcrun altool --validate-app -f "$IPA_PATH" -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
 
+      - name: Live Activity · refresh
+        if: ${{ inputs.upload_to_testflight }}
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Upload to App Store Connect and TestFlight
         if: ${{ inputs.upload_to_testflight }}
         run: xcrun altool --upload-app -f "$IPA_PATH" -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
 
+      - name: Live Activity · refresh
+        if: success() || (failure() && env.IPA_PATH != '')
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Upload signed IPA
         if: success() || (failure() && env.IPA_PATH != '')
         uses: actions/upload-artifact@v4
@@ -371,6 +521,15 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Live Activity · refresh
+        if: always()
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Remove temporary signing material
         if: always()
         shell: bash
