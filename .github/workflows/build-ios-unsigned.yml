@@ -29,6 +29,7 @@ on:
       - '.github/workflows/build-ios-unsigned.yml'
 
 permissions:
+  actions: read
   contents: read
 
 jobs:
@@ -37,24 +38,64 @@ jobs:
     timeout-minutes: 240
 
     steps:
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Verify pinned classifier source
         run: |
           test "$(git -C Vendor/AI-Image-Classifier rev-parse HEAD)" = "5291eedb9b46fa978e36ccec4f5504b017afe809"
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Select Xcode
         run: |
           sudo xcode-select -s /Applications/Xcode.app
           xcodebuild -version
           swift --version
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Install XcodeGen
         run: brew install xcodegen
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Set up model conversion Python
         uses: actions/setup-python@v6
         with:
@@ -62,6 +103,14 @@ jobs:
           cache: pip
           cache-dependency-path: Vendor/AI-Image-Classifier/tools/MobileCLIPConversion/requirements.txt
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Cache SwiftPM and converted MobileCLIP
         uses: actions/cache@v4
         with:
@@ -75,21 +124,63 @@ jobs:
             ${{ runner.os }}-httrail-image-filter-
             ${{ runner.os }}-swiftpm-
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Prepare build scripts
         run: chmod +x scripts/prepare_image_filter_models.sh scripts/build_unsigned_ios.sh scripts/collect_ios_build_diagnostics.sh
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Prepare verified image-filter models
         shell: bash
         run: scripts/prepare_image_filter_models.sh
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Build unsigned IPA
         id: build
         run: scripts/build_unsigned_ios.sh
 
+      - name: Live Activity · refresh
+        if: always()
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Collect diagnostics
         if: always()
         run: scripts/collect_ios_build_diagnostics.sh
 
+      - name: Live Activity · refresh
+        if: success()
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Verify embedded classifier products
         if: success()
         shell: bash
@@ -104,12 +195,30 @@ jobs:
           test -s "$tunnel/MobileCLIP2S2PromptEmbeddings.json"
           find "$app" -maxdepth 3 \( -name 'EmbeddedImageFilter.framework' -o -name 'ImageFilterCore.framework' \) -print
 
+      - name: Live Activity · refresh
+        if: success()
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Verify unsigned IPA exists
         if: success()
         run: |
           test -s build/unsigned-ios/HTTrailiOS-unsigned.ipa
           shasum -a 256 build/unsigned-ios/HTTrailiOS-unsigned.ipa
 
+      - name: Live Activity · refresh
+        if: success()
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Upload unsigned IPA
         if: success()
         uses: actions/upload-artifact@v4
@@ -121,6 +230,15 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Live Activity · refresh
+        if: success()
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Upload app bundle and dSYMs
         if: success()
         uses: actions/upload-artifact@v4
@@ -133,6 +251,15 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Live Activity · refresh
+        if: always()
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Upload build diagnostics
         if: always()
         uses: actions/upload-artifact@v4
