@@ -1,0 +1,13 @@
+[Unit]
+Description=Pureline PoC inbound WireGuard UDP rule
+Before=pureline-poc.service
+PartOf=pureline-poc.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c '/usr/sbin/iptables -C INPUT -p udp --dport 51820 -j ACCEPT 2>/dev/null || /usr/sbin/iptables -I INPUT 2 -p udp --dport 51820 -j ACCEPT'
+ExecStop=/bin/sh -c '/usr/sbin/iptables -D INPUT -p udp --dport 51820 -j ACCEPT 2>/dev/null || true'
+
+[Install]
+WantedBy=multi-user.target
