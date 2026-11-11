@@ -1,0 +1,53 @@
+# Pureline research POC (single iPad). Values override the pinned packaged defaults.
+# IMPORTANT: The proxy actually runs in mitmproxy wireguard mode; this field retains
+# the package's valid "regular" CLI mode. The service invokes mitmdump directly.
+[proxy]
+mode = "regular"
+max_parallel_images = 2
+max_body_bytes = 4194304
+request_timeout_seconds = 18
+fail_action = "replace"
+ignore_hosts = ["localhost","127.0.0.1","::1"]
+
+[runtime]
+mock_models = false
+intra_op_threads = 1
+inter_op_threads = 1
+max_concurrent_inference = 2
+provider_priority = ["CPUExecutionProvider"]
+
+[models.mobileclip]
+path = "models/visual.onnx"
+prompt_embeddings_path = "models/mobileclip2_s2_prompt_embeddings.npz"
+input_name = "pixel_values"
+output_name = "image_embeddings"
+
+[models.person]
+path = "models/person_detector.onnx"
+
+[models.nudenet]
+path = "models/nudenet320n.onnx"
+labels_path = "models/nudenet_labels.json"
+
+[models.manifest]
+path = "models/runtime-manifest.json"
+
+[cache]
+enabled = true
+memory_entries = 256
+sqlite_path = "cache/decisions.sqlite3"
+ttl_seconds = 86400
+
+[diagnostics]
+enabled = true
+directory = "diagnostics"
+store_urls = false
+store_image_bytes = false
+store_crops = false
+max_jsonl_bytes = 5000000
+
+[processing]
+maximum_person_crops = 12
+maximum_dimension = 1536
+maximum_total_pixels = 4194304
+animated_image_mode = "replace"

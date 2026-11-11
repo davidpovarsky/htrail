@@ -1,0 +1,16 @@
+.venv/
+.admin-venv/
+models/
+wg-profile/
+delivery/
+*.conf
+*.pem
+*.p12
+*.cer
+*.onnx
+*.npz
+*.pt
+*.zip
+cache/
+diagnostics/
+*.log
