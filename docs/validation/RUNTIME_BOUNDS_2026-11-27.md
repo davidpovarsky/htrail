@@ -90,3 +90,13 @@ The final candidate is staged at `/mnt/development/projects/pureline-v5-browser-
 The lab-local `v5-stage-receipt.json` records source/vendor identity and four exact fixture paths. Its `fixtures` entries can be mapped to the existing fixture-origin loader's `filename`, `content_type` and `sha256` keys. The same normal filtering response hook still inspects those bytes. A synthetic fixture origin proves controlled integration only; it is not evidence about availability or latency of the original public origin.
 
 Remaining acceptance concerns include rendered animation playback, representative browser-page responsiveness, physical iPad behavior, origin-network stalls, service memory enforcement and authorized production promotion. They must be recorded from observed results rather than inferred from this runtime report.
+
+## Follow-up: immutable package with enabled stores
+
+The [enabled-cache receipt](../../tools/filter-quality/evidence/runtime-cache-enabled.json) records 12/12 real-model cases run as the deployment user `chatgpt-agent` (uid 1002) against the unchanged root-owned, read-only v5 package. Both workers produced initial misses and repeat hits for a known allow and a known blur. A new worker pool then returned SQLite-backed hits for both images in both slots. Blocked cache hits still produced decodable replacements.
+
+The two stores were `decisions-20261127-bounded-v5.worker-0.sqlite3` and `decisions-20261127-bounded-v5.worker-1.sqlite3`, each containing exactly the two expected content hashes. No unsuffixed shared database was created. Each `diagnostics/worker-N` directory recorded six events, two fresh inspections and four hits. Checked cache/diagnostic JSON contained no populated URL, credential or image-byte fields; no fixture image payloads or image files appeared in the temporary stores.
+
+All four test workers were killed/reaped on pool closure, the temporary stores were deleted, and the package's 304 files remained byte-identical without generated files. This verifies the read-only import/runtime arrangement with `PYTHONDONTWRITEBYTECODE=1`; mutable database/diagnostic parent directories must remain writable by the service user. The runtime source and v5 manifest were not changed by this check.
+
+`check_runtime_cache.py` accepts explicit `--package`, `--fixtures`, `--work` and `--report` paths, and verifies the exact candidate manifest before testing. It must run unprivileged with `PYTHONDONTWRITEBYTECODE=1`. It reuses the two existing public portrait fixtures and adds no independent accuracy samples.
