@@ -1,0 +1,50 @@
+{
+  "run_id": "chromium-bounded-v6-20261127",
+  "started_at": "2026-11-27T15:46:39.489Z",
+  "backend_revision": "a6bbb87f9ea665e51ae4f964c843483626195f76caaa57358a76d94b270e641d",
+  "route": "Chromium -> explicit CONNECT/HTTP -> wireguard-go netstack -> framed UDP/SSH carrier -> isolated Oracle WireGuard -> real candidate filter",
+  "scope": "Rendered controlled fixtures plus one public HTTPS SVG. Not a physical iOS, public UDP, independent accuracy or whole-article test.",
+  "proxy": "http://127.0.0.1:18530",
+  "platform": "darwin",
+  "arch": "arm64",
+  "playwright": "1.65.1",
+  "trust": {
+    "ignoreHTTPSErrors": false,
+    "ca_spki_sha256_base64": "+WxkqBkmofeBCsyUjFYRhpUMdqyPeSnuzwtTA2fJRcY=",
+    "global_trust_changes": false
+  },
+  "health_before": {
+    "bytes_down": 160,
+    "bytes_up": 0,
+    "connected": 1,
+    "errors": 0,
+    "requests": 1,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795794345",
+      "rx_bytes": "649",
+      "tx_bytes": "804"
+    }
+  },
+  "assets": [],
+  "failures": [],
+  "passed": false,
+  "error": "Error: browserType.launchPersistentContext: Executable doesn't exist at /Users/m1/builds/pureline-wireguard-lab-20261127/browsers/chromium_headless_shell-1255/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+  "health_after": {
+    "bytes_down": 160,
+    "bytes_up": 0,
+    "connected": 1,
+    "errors": 0,
+    "requests": 1,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795794345",
+      "rx_bytes": "649",
+      "tx_bytes": "804"
+    }
+  },
+  "finished_at": "2026-11-27T15:46:39.604Z",
+  "transport_verified": false
+}

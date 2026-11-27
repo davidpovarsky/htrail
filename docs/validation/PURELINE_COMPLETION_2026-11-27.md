@@ -3,9 +3,7 @@
 ## Delivery status and scope
 
 The native proxy/local-filter repairs and bounded remote-runtime revisions are
-implemented with versioned evidence. **Build 602 has passed signed archive,
-IPA verification and Apple validation. Upload and TestFlight processing remain
-pending.** Production activation and physical iPad acceptance remain open.
+implemented with versioned evidence. **Build 602 has passed signed archive, IPA verification, Apple validation, upload and Apple processing (VALID).** Its internal beta state is READY_FOR_BETA_TESTING. Tester-group membership could not be read through the current key (HTTP403); no group change or external beta submission was made. The frozen v6 production service is active and passed all nine same-process HTTPS/cache checks; physical iPad acceptance remains open.
 
 The published app source is
 `d89d53106d5db87aaa4c9356c9114dbe76daa839`, on the integrated branch in
@@ -21,7 +19,7 @@ matched four dSYM UUIDs to the signed binaries.
 | Exported build 602 IPA | 170,165,569 bytes; package/signature verification passed |
 | IPA SHA256 | `c08dd6284f13270b5a786d1a01c56f2417cc59f30e0cfc917c42df3a817b9c48` |
 | Apple validation | altool 27.0.5, exit 0, `VERIFY SUCCEEDED`, no errors |
-| Upload and processing | Pending; validation is not delivery confirmation |
+| Upload and processing | Successful; ASC build c99a9917-9a8b-4fad-9297-cb6a061b126a, VALID at2026-11-27 16:20:29UTC |
 
 ## Native repairs and model qualification
 
@@ -96,6 +94,7 @@ consequences and source-upgrade contract.
 | --- | --- |
 | Native core: 29 distinct cases | 27 streaming/socket cases plus two retained WebSocket cases; staged reruns are not additional cases |
 | Direct local runtime: 27 distinct cases | 25 unaffected passes, the repaired original smoke and one new Vision-policy assertion |
+| Production v6: 9/9 HTTPS requests | Verified TLS, fresh/cached allow and block in both workers, byte-exact SVG, unchanged profiles and service limits |
 | V6 real-network controls: 26/26 | Actual mitmdump/socket lifecycle with a deterministic classifier subprocess |
 | V6 process controls: 12/12 | Admission, remaining header budget, cancellation, kill/reap, recovery and overload |
 | V6 HTTP/hook controls: 11/11 | Final-source response serialization and lifecycle behavior |
@@ -119,20 +118,14 @@ loaded the SVG in 1,918 ms with decoded SHA256
 `211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95`.
 Thus five distinct cases have successful evidence **across runs**; this is not one
 clean 5/5 v6 run. The initial failure is retained, its cause remains unknown and
-unreproduced, and observer input-hash wiring is being corrected separately
-without changing the candidate. The earlier
+unreproduced. The observer wiring was corrected for transparent-host semantics; a final targeted1856ms SVG run proved identical parent input, renderer stdin and browser output hashes without changing the candidate. See the [v6 browser report](BROWSER_BOUNDED_V6_2026-11-27.md). The earlier
 [clean v5 browser run](BROWSER_BOUNDED_V5_2026-11-27.md) retains its own identity.
 
-The 310-file v6 production package is staged, root-owned and read-only; it has
-not been activated. Remaining gates are:
-
-- Supported production service control: `service_not_allowed` remains; no access
-  policy workaround was used. Preserve the [rollout/rollback plan](PRODUCTION_ROLLOUT_2026-11-27.md).
+The 310-file, root-owned/read-only v6 package was activated at16:46:43UTC through the registered SentinelX service operation. All nine verified-HTTPS requests passed with zero retries, both worker caches behaved correctly, all seven profile/CA files stayed byte-identical and the service retained its2GiB/128-task limits. Peak cgroup memory was about893MiB, with no OOM or limit events. See the [production rollout and retained rollback](PRODUCTION_ROLLOUT_2026-11-27.md). This same-process check does not establish client WireGuard or physical browsing acceptance. Remaining gates are:
 - Physical iPad availability and synchronized browsing/filtering, effective OFF
   configuration, reconnect, CA/network behavior, memory/termination evidence and
   soak. Simulator and Mac/Oracle transport results do not satisfy these gates.
-- Confirmed upload and processing of the validated IPA before claiming
-  TestFlight availability.
+- Confirm tester-group installation access separately from the uploaded/processed build. The current key returnedHTTP403 for the group relationship read.
 - The separate workflow-only commit `676d317039815f7b97131a35d96c3ab2c30701d7`
   remains preserved locally; OAuth workflow scope still blocks its publication.
 - Saved workspace usage/net-spend caps remain unverified. The supported SDK
@@ -141,6 +134,8 @@ not been activated. Remaining gates are:
   establish workspace caps. [Modal's budget documentation](https://modal.com/docs/guide/budgets)
   distinguishes these controls.
 
-No universal interception, flawless classification, physical VPN success or
-production deployment is inferred from the completed software and laboratory
-checks above.
+No universal interception, flawless classification or physical VPN success is inferred from the completed software, production smoke and laboratory checks above.
+
+## Signed release evidence
+
+[Complete release report](pureline-release-602-20261127/release-report.md) and [sanitized release receipts](pureline-release-602-20261127/release-receipts.json) preserve every archive/export/verification/upload phase, source attestations, signing failures and the separate group-access limitation. The [source manifest](pureline-release-602-20261127/source-manifest.json) binds the Mac inputs to the frozen Oracle commit.

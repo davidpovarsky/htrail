@@ -1,0 +1,17 @@
+{
+  "elapsed_ms": 726.75,
+  "fixture_bytes": 16160,
+  "fixture_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95",
+  "gid": 1002,
+  "home": "/root",
+  "png": true,
+  "returncode": 0,
+  "schema": 1,
+  "scope": "One renderer-only diagnostic of the cached exact public SVG; unchanged frozen v6 renderer and bounds; no network or models.",
+  "stderr": "",
+  "stdout_bytes": 27891,
+  "stdout_sha256": "75b2e0ce63caf7b597033cc9b6d44fb88abe85950e3df39eb55ca4c817f10ad1",
+  "timeout_seconds": 5,
+  "uid": 1002,
+  "worker_sha256": "6c7e4fc2c6ff1d109710f090b3e4eccf4b622566ed928c20019a00b41603b393"
+}

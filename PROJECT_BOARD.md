@@ -2,19 +2,21 @@
 
 ## Completion pass — 27 November 2026
 
-Intake: Asana project 1220424906877685 contains 47 tasks (19 complete, 28 open). Local CoreML and remote WireGuard/server acceptance remain separate.
+Intake: Asana project 1220424906877685 contained 47 tasks (19 complete, 28 open). Final task reconciliation is tracked below and in Asana; local CoreML, production HTTPS and physical-device acceptance remain separate.
 
-- Published base: f53ff65711af1b5f2552f44c5c24c8e5244a2cb0, on local product base 09dfa21d5b27557e77d181d7aa31888d749aa91c.
-- Native lane: final26 socket cases pass, including bodyless pooling and POST-to-next-GET progress. Bounded decode, strict fallback and lifecycle changes passed their downstream assertions; runtime26 is25/26 because the original real-model smoke failed in Vision human detection. Root cause is under investigation; signed release remains gated.
-- Runtime lane:26 format controls,11 process controls,11 HTTP hook controls,100 distinct-image delivery/parity and12 enabled-cache checks pass. Chromium v5 passed5/5. Independent review found pre-worker HTTP buffer/decompression and startup-readiness gaps: v5 is held, and a separately pinned v6 plus real-socket acceptance is in progress. No production activation.
-- Apple lane: existing signing identity and both profiles verified. Restored exact MobileCLIP resources passed all10 numerical fixtures with existing CPU_ONLY policy; the failed ALL control is preserved. Full simulator target builds; distribution602 awaits native acceptance and a source pin.
-- Integration owner alone accepts evidence, updates this board, merges, publishes and reconciles Asana.
+- Archived/published app source: d89d53106d5db87aaa4c9356c9114dbe76daa839, on product base 09dfa21d5b27557e77d181d7aa31888d749aa91c. Later evidence and lab diagnostics do not change the compiled app inputs.
+- Native: 29 distinct core cases and 27 distinct Direct local-runtime cases pass. Bodyless pooling, next-request progress, bounded inspection/decode, strict defaults, OFF bypass and terminal-flow cleanup are repaired. The iOS27 Vision adapter uses advertised CPU devices and passed the unchanged original repeated-inference smoke. The embedded standalone classifier UI/server still uses the unchanged vendor service and has separate runtime acceptance.
+- Remote runtime: v6 passed26 actual-network controls,12 process controls and11 HTTP controls. Earlier100-image actual-model workload and12 enabled-cache checks retain their v5 identities. Browser v6 has successful evidence for five distinct assets across runs; its initial SVG worker failure remains unexplained. Exact-input follow-ups passed.
+- Production: v6 activated through registered SentinelX service management at16:46:43UTC, PID1405719. All9 verified-HTTPS requests passed: both workers' allow/block misses and hits plus exact SVG. The existing2GiB/128-task limits and all7 profile/CA files are unchanged; peak cgroup memory was about893MiB, with no OOM/limit event. This is not physical iPad VPN acceptance.
+- Apple: full Pureline1.0(602), including PacketTunnel and both model resources, was signed, exported, verified, uploaded and processedVALID; internal stateREADY_FOR_BETA_TESTING. Source129Swift inputs and4dSYM UUIDs matched. Tester-group readback returnedHTTP403, so installation access is not claimed.
+- Model resources: all10 original numerical fixtures passed CPU_ONLY with original tolerances and semantics; the failingALL negative control is retained. Vendor and dependency pins are unchanged.
+- Integration owner alone accepts evidence, updates this board, publishes and reconciles Asana. DraftPR#3 remains a reviewable integration branch.
 
 ### Gates still requiring evidence
 
-Physical iPad access is absent; simulator and Mac tests do not close the historical iPad browsing, extension memory, VPN and cross-app gates. SentinelX service management still rejects pureline-poc because it is unregistered; preserve the prepared operator-reviewed rollout. Workflow-only commit 676d317039815f7b97131a35d96c3ab2c30701d7 is preserved separately but cannot be pushed through the existing OAuth grant without workflow scope. Modal billing/resource status was read, while saved usage/spend caps remain unverified. Development Heartbeat rejects Pureline as an unsupported project; report milestones in Asana without relabeling the run.
+Physical iPad access is absent; simulator and Mac tests do not close historical iPad browsing, extension memory, VPN, effective OFF, termination and cross-app gates. Workflow-only commit676d317039815f7b97131a35d96c3ab2c30701d7 is preserved separately; its publication requires OAuth workflow scope. This does not negate the completed authorized Scaleway archive/upload. Modal saved usage/spend caps remain unverified; the supported budget getter returned a permission denial for an unavailable workspace feature. No GPU deployment or T4 benchmark was started. Development Heartbeat has no registered Pureline project; milestones are recorded in Asana without relabeling the run.
 
-This is a lightweight working-memory document. Detailed execution state is in [Asana](https://app.asana.com/1/1219597879016953/project/1220424906877685/task/1220941302170999) and the reports in docs/validation.
+Detailed evidence is indexed in [the completion report](docs/validation/PURELINE_COMPLETION_2026-11-27.md), [the production rollout](docs/validation/PRODUCTION_ROLLOUT_2026-11-27.md) and [Asana](https://app.asana.com/1/1219597879016953/project/1220424906877685/task/1220941302170999).
 
 ## Discoveries
 
@@ -39,11 +41,12 @@ Implementation starts at b66864a8f022e913b9fb099b77b7e6f34676275c; the branch hi
 
 ## Remaining acceptance work
 
-- [ ] Production promotion: prepared configuration and rollback exist, but SentinelX service management returned service_not_allowed for pureline-poc. Enable the service capability through the operator; do not bypass policy with shell restarts.
+- [x] Production v6 promotion and same-process HTTPS/cache acceptance completed through registered service management; rollback remains available.
 - [ ] Existing physical iPad P0: successful handshake with Safari failing to load remains unresolved by this lab. Read-only Mac preflight found no physical device; do not close this gate on simulator evidence.
 - [ ] Physical iPhone/iPad: shared-keychain access, system VPN permission, actual Network Extension start/stop, direct UDP, sleep/wake, reconnect, DNS, and IPv6 coverage.
 - [ ] Measure third-party apps, certificate pinning, caches, animation/video, and representative group scenes separately from the portrait benchmark.
 - [ ] Keep the known archival-group false negative and three holdout false positives visible. Do not tune repeatedly on that holdout and continue calling it unseen.
-- [ ] Sign/export or distribute only through the existing authorized Apple workflow when that delivery is requested; current native build evidence alone is not a signed-device installation.
+- [x] Full602 signed archive, IPA validation, upload and Apple processing completed through the existing authorized Apple workflow.
+- [ ] Verify tester installation access and physical-device acceptance; uploaded/processed status alone does not establish either.
 
 No universal or perfect-filtering claim is supported by the current evidence.

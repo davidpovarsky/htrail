@@ -1,0 +1,96 @@
+{
+  "run_id": "chromium-v6-svg-input-identity-20261127",
+  "started_at": "2026-11-27T16:20:35.142Z",
+  "backend_revision": "a6bbb87f9ea665e51ae4f964c843483626195f76caaa57358a76d94b270e641d",
+  "route": "Chromium -> explicit CONNECT/HTTP -> wireguard-go netstack -> framed UDP/SSH carrier -> isolated Oracle WireGuard -> real candidate filter",
+  "selection": "public-wikisource.svg",
+  "scope": "One targeted rendered browser asset with diagnostic observation. Not a rerun of the other four cases or a physical iOS acceptance.",
+  "proxy": "http://127.0.0.1:18530",
+  "platform": "darwin",
+  "arch": "arm64",
+  "playwright": "1.65.1",
+  "trust": {
+    "ignoreHTTPSErrors": false,
+    "ca_spki_sha256_base64": "+WxkqBkmofeBCsyUjFYRhpUMdqyPeSnuzwtTA2fJRcY=",
+    "global_trust_changes": false
+  },
+  "readiness": {
+    "checked_at": "2026-11-27T16:20:34.586269+00:00",
+    "ready": {
+      "ready": true,
+      "pid": 1333134,
+      "worker_count": 2,
+      "header_capacity": 10,
+      "manifest_sha256": "a6bbb87f9ea665e51ae4f964c843483626195f76caaa57358a76d94b270e641d"
+    },
+    "attempts": [
+      {
+        "status": 200,
+        "ready": true
+      }
+    ]
+  },
+  "health_before": {
+    "bytes_down": 347921,
+    "bytes_up": 4875,
+    "connected": 10,
+    "errors": 0,
+    "requests": 10,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795796432",
+      "rx_bytes": "375303",
+      "tx_bytes": "28532"
+    }
+  },
+  "assets": [
+    {
+      "fixture": "public-wikisource.svg",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Wikisource-logo.svg",
+      "expected": "allow",
+      "expected_source_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95",
+      "passed": true,
+      "response": {
+        "status": 200,
+        "content_type": "image/svg+xml",
+        "content_encoding": "gzip",
+        "declared_content_length": "5662",
+        "action": "allow",
+        "reason": "policy",
+        "presentation": null,
+        "policy_exception": null,
+        "decoded_body_bytes": 16160,
+        "decoded_body_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95"
+      },
+      "dom": {
+        "complete": true,
+        "natural_width": 410,
+        "natural_height": 430,
+        "decode_resolved": true
+      },
+      "elapsed_ms": 1856
+    }
+  ],
+  "failures": [],
+  "passed": true,
+  "browser": "159.0.8154.6",
+  "screenshot": "gallery.png",
+  "health_after": {
+    "bytes_down": 358261,
+    "bytes_up": 7311,
+    "connected": 11,
+    "errors": 0,
+    "requests": 11,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795796432",
+      "rx_bytes": "386725",
+      "tx_bytes": "32452"
+    }
+  },
+  "finished_at": "2026-11-27T16:20:37.797Z",
+  "health_snapshots_valid": true,
+  "transport_verified": true
+}

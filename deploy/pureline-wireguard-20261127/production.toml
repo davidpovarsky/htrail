@@ -38,12 +38,12 @@ path = "/srv/pureline-poc/models/runtime-manifest-fully-official.json"
 [cache]
 enabled = true
 memory_entries = 256
-sqlite_path = "/srv/pureline-poc/cache/decisions-20261127-bounded-v5.sqlite3"
+sqlite_path = "/srv/pureline-poc/cache/20261127-wireguard-header-bounded-v6/decisions.sqlite3"
 ttl_seconds = 86400
 
 [diagnostics]
 enabled = true
-directory = "/srv/pureline-poc/diagnostics"
+directory = "/srv/pureline-poc/diagnostics/20261127-wireguard-header-bounded-v6"
 store_urls = false
 store_image_bytes = false
 store_crops = false

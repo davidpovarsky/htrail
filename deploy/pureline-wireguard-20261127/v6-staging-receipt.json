@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-27T15:45:38.002264+00:00",
+  "stage_only": true,
+  "release": "/srv/pureline-poc/releases/20261127-wireguard-header-bounded-v6",
+  "runtime_source_commit": "9142b08e8170d5c369c6427f78feee085966b4a5",
+  "manifest_file": "runtime-candidate-20261127-header-bounded-v6.json",
+  "manifest_sha256": "a6bbb87f9ea665e51ae4f964c843483626195f76caaa57358a76d94b270e641d",
+  "manifest_files_verified": 20,
+  "manifest_ancestry": [
+    "runtime-candidate-20261127-header-bounded-v6.json",
+    "runtime-candidate-20261127-bounded-v5.json",
+    "runtime-candidate-20261127-legacycc-6c7e4fc2.json",
+    "runtime-candidate-20261127-fc8c4247.json"
+  ],
+  "vendor_files_verified": 284,
+  "vendor_tree_sha256": "ce9897ee6a521476838d69cff59d784025315243cc517c2a8c338858c99b8f4c",
+  "release_files": 310,
+  "deployment_files": {
+    "production.toml": "8198c25521d3064a636215cf399a000dd4dd6030b91f463221d8ba609bc6d4eb",
+    "transport_diagnostics_v2.py": "a0ee233586eae1628631b28e771dcaa081e5fcef1cf975f795dc4ddc858a69ad"
+  },
+  "template_config_sha256": "78cc703d504bbfb8bce8fcdabbde729e47d88fda8739e1699bd53bd7af401191",
+  "only_configuration_values_changed": [
+    "cache.sqlite_path",
+    "diagnostics.directory"
+  ],
+  "cache_base_path": "/srv/pureline-poc/cache/20261127-wireguard-header-bounded-v6/decisions.sqlite3",
+  "worker_cache_paths": [
+    "/srv/pureline-poc/cache/20261127-wireguard-header-bounded-v6/decisions.worker-0.sqlite3",
+    "/srv/pureline-poc/cache/20261127-wireguard-header-bounded-v6/decisions.worker-1.sqlite3"
+  ],
+  "diagnostics_directory": "/srv/pureline-poc/diagnostics/20261127-wireguard-header-bounded-v6",
+  "private_mutable_directories": [
+    {
+      "path": "/srv/pureline-poc/cache/20261127-wireguard-header-bounded-v6",
+      "uid": 1002,
+      "mode": "0o700",
+      "empty": true
+    },
+    {
+      "path": "/srv/pureline-poc/diagnostics/20261127-wireguard-header-bounded-v6",
+      "uid": 1002,
+      "mode": "0o700",
+      "empty": true
+    }
+  ],
+  "required_environment": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PURELINE_TRANSPORT_DIAGNOSTICS_PATH": "/srv/pureline-poc/diagnostics/20261127-wireguard-header-bounded-v6/transport-path-diagnostics.json"
+  },
+  "root_owned_read_only": true,
+  "unprivileged_preflight": {
+    "source_preflight": true,
+    "config_readable": true,
+    "cache_directory_writable": true,
+    "diagnostics_directory_writable": true,
+    "uid": 1002
+  },
+  "models_warmed": false,
+  "service_changed": false,
+  "service_restarted": false,
+  "live_allowlist_changed": false
+}

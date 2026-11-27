@@ -1,0 +1,40 @@
+{
+  "observed_at": "2026-11-27T16:09:05.559754+00:00",
+  "old_pid": 1234933,
+  "before": {
+    "schema": 2,
+    "pid": 1234933,
+    "epoch_id": "1037e21d9c804928a2acf62209d42d7a",
+    "lifecycle": "running",
+    "started_utc": "2026-11-27T15:44:45.836428+00:00",
+    "updated_utc": "2026-11-27T15:49:35+00:00",
+    "counts": {
+      "dns_query": 1,
+      "dns_response": 1,
+      "http_request": 7,
+      "http_response:2xx": 7,
+      "tls_client_established": 1,
+      "tls_server_established": 1
+    },
+    "recent_error_categories": []
+  },
+  "after": {
+    "schema": 2,
+    "pid": 1234933,
+    "epoch_id": "1037e21d9c804928a2acf62209d42d7a",
+    "lifecycle": "stopped",
+    "started_utc": "2026-11-27T15:44:45.836428+00:00",
+    "updated_utc": "2026-11-27T16:09:05+00:00",
+    "counts": {
+      "dns_query": 1,
+      "dns_response": 1,
+      "http_request": 7,
+      "http_response:2xx": 7,
+      "tls_client_established": 1,
+      "tls_server_established": 1
+    },
+    "recent_error_categories": []
+  },
+  "termination": "SIGTERM graceful",
+  "production_or_old_lab_changed": false
+}

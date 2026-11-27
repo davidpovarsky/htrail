@@ -1,0 +1,6 @@
+{
+  "new_pid": 1405719,
+  "observed_utc": "2026-11-27T16:46:53.007956+00:00",
+  "restart_returncode": 0,
+  "method": "registered sentinel_restart pureline-poc"
+}

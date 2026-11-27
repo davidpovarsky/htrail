@@ -153,3 +153,9 @@ This choice is deliberate because the vendor iOS `NudityFilterPolicy.swift` is a
 ## 27 November validation boundary
 
 The focused socket and downstream runtime receipts are documented in the native validation report. Resource admission and bounded decoding are code-level safeguards; they do not establish the cause of a physical Network Extension termination, prove Jetsam recovery, or add an absolute Core ML inference deadline. Physical OFF/ON A/B, representative app browsing, reconnect and sustained device use remain separate gates.
+
+## iOS 27 Vision compute-device adaptation (2026-11-27)
+
+`PurelineHumanDetectionService` is a downstream ImageFilterCore source, explicitly included by `iosapp/project.yml`. On iOS 27 and later it selects an advertised CPU device for every supported Vision compute stage, requiring the main stage. If a required CPU device is unavailable the request throws and the configured safe failure policy applies. Older OS versions delegate to the unchanged vendor detector. Request revisions, detection mapping, face-crop expansion, model scores and thresholds are unchanged.
+
+The controlled diagnosis compared the bounded ImageIO image with the exact prior UIImage/Core Image rendering: both failed automatic Vision inference-context creation, while the same bounded input succeeded with the supported CPU device. The original repeated-inference smoke was preserved byte-for-byte and subsequently passed with both actual models. See `validation/NATIVE_PROXY_AND_IMAGE_FILTER_2026-11-27.md` for the failed controls, exact source hashes and accepted 27 distinct runtime cases. This simulator result does not establish physical Network Extension memory behavior or resolve an unobserved iPad Jetsam event.

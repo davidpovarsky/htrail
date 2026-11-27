@@ -1,0 +1,1 @@
+{"events": [{"stage": "worker-start"}, {"stage": "worker-ready"}, {"input_bytes": 16160, "input_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95", "stage": "svg-render-start"}, {"elapsed_ms": 704.58, "returncode": 0, "stage": "svg-render-finish"}], "pid": 1333158, "schema": 1}
