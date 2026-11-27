@@ -16,9 +16,16 @@ final class PurelineWireGuardUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
         let connect = app.buttons["pureline.wg.connect"]
+        // The same production components are exercised in the focused host
+        // and in the full app's actual Image Filter tab.
+        if !connect.waitForExistence(timeout: 3) {
+            let imageFilter = app.buttons["Image Filter"].firstMatch
+            XCTAssertTrue(imageFilter.waitForExistence(timeout: 20))
+            imageFilter.tap()
+        }
         XCTAssertTrue(connect.waitForExistence(timeout: 30))
         XCTAssertFalse(connect.isEnabled)
-        XCTAssertTrue(app.staticTexts["pureline.wg.status"].label.localizedCaseInsensitiveContains("simulator"))
+        XCTAssertTrue(app.staticTexts["pureline.wg.status"].label.contains("Physical device required for VPN"))
         screenshot("WireGuard-real-simulator-limitation")
         app.terminate()
     }
