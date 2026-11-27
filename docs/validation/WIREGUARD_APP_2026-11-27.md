@@ -34,9 +34,9 @@ The focused host compiles the production WireGuard UI, parser, keychain helper, 
 | Focused application, extension, and UI test build | Passed |
 | Final profile / state / counter unit tests | 13 passed, 0 failed |
 | Post-HTTP-fix UI suite | 3 passed, 0 failed; 151 seconds of test cases |
-| WebKit pages | allow, block, mixed, objects, groups, thumbnails |
-| WebKit decoded image instances | 51 / 51 across six pages, including actual scrolling |
-| Native URLSession client | 4 / 4 decoded, 0 failures |
+| Focused-host WebKit pages | allow, block, mixed, objects, groups, thumbnails |
+| Focused-host WebKit decoded image instances | 51 / 51 across six pages, including actual scrolling |
+| Focused-host native URLSession client | 4 / 4 decoded, 0 failures |
 | Full Remote device Release archive | Passed, with actual linked wgTurnOn / wgTurnOff / wgGetConfig / wgSetConfig |
 | Full Remote Simulator Debug build | Passed; installed and launched in the dedicated simulator |
 | Full Remote normal tab navigation | Passed: launch, Image Filter tab, real WireGuard screen, disabled simulator Connect |
@@ -57,6 +57,28 @@ Result bundles:
     UI-postfix-20261127.xcresult
 
 Fourteen original UI screenshot attachments were exported. Representative WebKit, native-client, and full-application screenshots were visually reviewed. Small JSON summaries and representative images are retained with this report; full logs and xcresult bundles remain on the Mac.
+
+## Final full-application acceptance run
+
+The final runner targeted the complete Pureline Remote application, with the native guard fixes and frozen server runtime. All **4 UI tests passed**, with zero failures or skips. The xcresult wall interval was 343.095 seconds; this run overlapped the independent Chromium page checks.
+
+| Full-app test | Observed result |
+|---|---|
+| Normal launch / Image Filter / true simulator status | Passed; Connect disabled, physical device required |
+| Six original WebKit galleries | 51/51 decoded; 274.324 seconds for the multi-page test |
+| Native URLSession images | 4/4 decoded, zero failures |
+| SVG and high-resolution WebKit galleries | 5/5 and 4/4 decoded |
+| Total final WebKit coverage | Eight pages, 60/60 decoded image instances, with real scrolling |
+
+The two format galleries also have WireGuard response/header/hash receipts and visual checks; the UI count alone is not used as a classification assertion. The coordinating assistant visually reviewed final full-app SVG, high-resolution and native-client captures. Eighteen original screenshot attachments were exported; representative files and their exact source/hash map are retained alongside this report.
+
+Final result bundle:
+
+    /Users/m1/caches/DerivedData/pureline-wireguard-20261127/evidence/FullApp-final-20261127.xcresult
+
+The final summary, command receipt and screenshot mapping are fullapp-final-summary.json, fullapp-final-receipt.json and fullapp-final-artifacts.json in this report's asset directory. Earlier focused runs remain historical evidence and are not counted as additional unique images.
+
+After completion, the full application was relaunched normally in the dedicated simulator. A read-only device preflight at 03:16:52 UTC returned 37 devices, all explicitly marked simulated, and no physical device. No unrelated device was modified.
 
 ## Network route and trust
 
@@ -83,7 +105,7 @@ The full Remote generator and build receipts are documented separately. It creat
 
 ## Remaining acceptance boundaries
 
-A physical iPhone or iPad is required to validate profile import into the shared keychain, system VPN permission, actual packet-tunnel start/stop, direct UDP, sleep/wake, reconnect, DNS and IPv6 behavior, and other installed applications. The existing iPad blocker remains open.
+A physical iPhone or iPad is required to validate profile import into the shared keychain, system VPN permission, actual packet-tunnel start/stop, direct UDP, sleep/wake, reconnect, DNS and IPv6 behavior, and other installed applications. The existing iPad blocker remains open. It records a physical iPad with a successful WireGuard handshake but Safari pages failing to load; this simulator/lab run does not establish that the reported physical failure is fixed. See [the existing P0 task](https://app.asana.com/1/1219597879016953/project/1220424906877685/task/1220768772450481).
 
 HTTPS inspection also depends on the device trusting the filtering CA. Certificate-pinned apps, cached content, video/animation policy, and unsupported formats cannot be inferred from a portrait benchmark or successful WebKit image delivery. The independent quality report provides the measured scope and failures; no universal 90% or perfect-filtering claim is made.
 
@@ -104,3 +126,16 @@ Focused host, actual WebKit rendering after the HTTP correction:
 Focused host, actual native URLSession rendering:
 
 ![Native image client](pureline-wireguard-20261127/native-images-postfix.png)
+
+
+Final full-app SVG page, including the inspected public globe and an embedded blocked image:
+
+![Full application SVG filtering](pureline-wireguard-20261127/fullapp-final-svg.png)
+
+Final full-app high-resolution page:
+
+![Full application high-resolution filtering](pureline-wireguard-20261127/fullapp-final-highres.png)
+
+Final full-app native URLSession client:
+
+![Full application native image client](pureline-wireguard-20261127/fullapp-final-native.png)

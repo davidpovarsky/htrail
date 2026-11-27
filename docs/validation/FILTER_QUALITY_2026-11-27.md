@@ -61,7 +61,7 @@ An additional 81 cases passed: eight calibration portraits transformed into 64-,
 
 These transforms are correlated observations derived from calibration material. They are not 81 additional independent holdout images, and no confidence interval is presented for them.
 
-A byte/decode audit covered 403 recorded outputs: the raw 82 calibration rows, the 240 holdout rows and the 81 supplemental cases. All 202 blocked outputs changed and decoded successfully; all 201 allowed outputs preserved their input bytes. The raw calibration rows include the later composition exclusions, which is why this audit denominator differs from the audited calibration count. This is a serialization audit, not an expanded accuracy benchmark.
+A byte/decode audit covered 403 recorded outputs: the raw 82 calibration rows, the 240 holdout rows and the 81 supplemental cases. All 202 pipeline replacements changed and decoded successfully; all 201 allow outcomes requested no replacement. The raw calibration rows include the later composition exclusions, which is why this audit denominator differs from the audited calibration count. This is a pipeline byte/decode audit, not serialization of 403 HTTP responses or an expanded accuracy benchmark. Actual HTTP representation preservation is covered separately by the nine-case serialization regression and browser receipts.
 
 See [supplemental receipt](../../tools/filter-quality/evidence/supplemental-calibration-v1/receipt.json) and the per-run checks in verification-report.json.
 
@@ -116,7 +116,11 @@ See [approved asset manifest](../../tools/filter-quality/approved-ui-rasters.jso
 
 The combined candidate was installed only into the isolated WireGuard laboratory, retaining its existing lab keys and CA. The 1536-pixel blocked JPEG was verified through actual WireGuard as a decodable strong-blur PNG. A live embedded-SVG request then exposed a worker-timeout discrepancy despite the direct worker/offline pass; the browser acceptance run was held while that runtime difference was investigated.
 
-The final live SVG and browser outcome is recorded in the browser report and final application test receipt. Do not treat offline SVG checks as proof that a particular deployed worker invocation succeeded.
+The same live embedded-SVG request subsequently passed in 1.88 seconds after shared disk pressure eased. A metadata-only probe confirmed the exact 5,601-byte pre-filter input matched the source fixture. No model, deadline or rendering bound was changed.
+
+The frozen runtime was then staged under /srv with all 13 pinned runtime files and 284 vendor files (24.8 MB) byte-verified. Final readiness verified the public globe's exact approved PNG, the embedded portrait's policy-blurred PNG, and the large blocked JPEG's strong-blur PNG through real WireGuard. The separately retained curated metadata check passed.
+
+The complete application then passed all four UI tests: eight WebKit pages with 60/60 decoded image instances and four native URLSession images with zero failures. Original timeout evidence is retained; a successful run does not guarantee immunity from later shared-host resource contention. Public-page exceptions and a bounded pending thumbnail observation are recorded in the browser report. Offline SVG checks alone are not used as proof of a live request.
 
 ## Performance and operational state
 

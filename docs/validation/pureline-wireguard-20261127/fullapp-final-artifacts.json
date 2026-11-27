@@ -1,0 +1,50 @@
+[
+  {
+    "file": "fullapp-final-summary.json",
+    "mac_source": "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/evidence/fullapp-final-summary.json",
+    "sha256": "0fd06cb0b106f24972199fa5ed8ac3a9514aa95f6359f19e80a24e3dd22e37b1",
+    "bytes": 1056
+  },
+  {
+    "file": "fullapp-final-receipt.json",
+    "mac_source": "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/evidence/fullapp-final-receipt.json",
+    "sha256": "6569b56465b324093d2fd74bed49e3f21205dd6c964d7caf07590dc4b341207c",
+    "bytes": 817
+  },
+  {
+    "file": "physical-device-preflight.json",
+    "mac_source": "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/evidence/physical-device-preflight.json",
+    "sha256": "5c785697b0bdf133c17b9199ae2e9e887e9891b3339ad30d1c717587b3c54645",
+    "bytes": 234
+  },
+  {
+    "file": "fullapp-final-wireguard.png",
+    "mac_source": "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/evidence/fullapp-final-attachments/37BB5235-0E27-4F9E-8479-EA3469C82327.png",
+    "sha256": "d502d380a7d4ccba329b30a8a6485b21d171ef10972d879f13045361be7ccafb",
+    "bytes": 307739
+  },
+  {
+    "file": "fullapp-final-svg.png",
+    "mac_source": "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/evidence/fullapp-final-attachments/2982CD88-E06A-445F-B51D-FEDCEB4B6229.png",
+    "sha256": "a9504539046709e24a49b6207d86405fbf660816fbb446bb3ae0557b5ee26c01",
+    "bytes": 710339
+  },
+  {
+    "file": "fullapp-final-highres.png",
+    "mac_source": "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/evidence/fullapp-final-attachments/4C3D6B4C-3E8D-482F-833B-F9224C02F49D.png",
+    "sha256": "34e08a8bd86db8e993ca3f1243adc132c2f4f275b4b968ad7e114302293928e7",
+    "bytes": 632659
+  },
+  {
+    "file": "fullapp-final-native.png",
+    "mac_source": "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/evidence/fullapp-final-attachments/4CAA4617-A27B-44B7-8901-C94D387C8A11.png",
+    "sha256": "ecc6cfed0e224901218303250801387347d428a3b5588347fe99f2a132750d6d",
+    "bytes": 438989
+  },
+  {
+    "file": "fullapp-final-attachments-manifest.json",
+    "mac_source": "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/evidence/fullapp-final-attachments/manifest.json",
+    "sha256": "a558ecbb5a62686a0a29365d7c574eb58283378a22cf04fc98a92b462a7105b0",
+    "bytes": 9266
+  }
+]
