@@ -1,0 +1,1 @@
+{"events": [{"stage": "worker-start"}, {"stage": "worker-ready"}, {"stage": "svg-render-start"}, {"elapsed_ms": 721.7, "returncode": 0, "stage": "svg-render-finish"}], "pid": 1301121, "schema": 1}

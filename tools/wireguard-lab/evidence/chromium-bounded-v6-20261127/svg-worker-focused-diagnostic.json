@@ -1,0 +1,40 @@
+{
+  "config_sha256": "43508db4cdfa94e9a32f16c5dc3dbce3d41f3fc9b6c2a295fe4fb87458c07505",
+  "content_hash": "75b2e0ce63caf7b597033cc9b6d44fb88abe85950e3df39eb55ca4c817f10ad1",
+  "decision": {
+    "action": "allow",
+    "evidenceIds": [],
+    "modelEvidenceComplete": true,
+    "reasons": [
+      "No configured blocking rule matched"
+    ]
+  },
+  "diagnostic_stages": [
+    {
+      "elapsed_ms": 751.03,
+      "exit": 0,
+      "output_bytes": 27891,
+      "output_sha256": "75b2e0ce63caf7b597033cc9b6d44fb88abe85950e3df39eb55ca4c817f10ad1",
+      "png": true,
+      "stage": "svg-renderer",
+      "stderr_type": null
+    }
+  ],
+  "error_type": null,
+  "fixture_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95",
+  "home": "/root",
+  "inspection_ms": 959.62,
+  "inspection_seconds": 18,
+  "manifest_sha256": "a6bbb87f9ea665e51ae4f964c843483626195f76caaa57358a76d94b270e641d",
+  "ok": true,
+  "ready": true,
+  "reaped": true,
+  "renderer_seconds": 5,
+  "replacement_bytes": 0,
+  "source_changes": false,
+  "startup_ms": 6301.18,
+  "uid": 1002,
+  "worker_exit": -9,
+  "worker_pid": 1272178,
+  "worker_slot": 97
+}

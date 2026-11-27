@@ -1,0 +1,147 @@
+{
+  "manifest_sha256": "592dd80686141d54da26dd84eb66d2e60a5dbadc3f3da75733283026a443182b",
+  "audit_sha256": "baba80f97104d7d2fe36185bb2529ce5bd0e2d78228c352c0c7aefd30e10f7f0",
+  "unique_originals": 325,
+  "composition_exclusions": 6,
+  "source_group_overlap_between_splits": 0,
+  "runs": {
+    "official-calibration-v2": {
+      "raw_result_rows": 82,
+      "audited_metrics": {
+        "n": 79,
+        "TP": 41,
+        "TN": 38,
+        "FP": 0,
+        "FN": 0,
+        "errors": 0,
+        "block_recall_pct": 100.0,
+        "allow_specificity_pct": 100.0,
+        "block_precision_pct": 100.0,
+        "accuracy_pct": 100.0,
+        "p50_ms": 1049.65,
+        "p95_ms": 1526.47,
+        "p99_ms": 2297.02,
+        "people_detected": 79,
+        "no_person_detection": 0,
+        "block_recall_wilson_95_pct": [
+          91.433,
+          100.0
+        ],
+        "allow_specificity_wilson_95_pct": [
+          90.819,
+          100.0
+        ]
+      },
+      "changed_decodable_replacements_verified": 42,
+      "allow_passthrough_verified": 40,
+      "result_sha256": "20cfa0459dc65241a440692f43a0d035af496dec378638775c78208e4deb7717",
+      "receipt_sha256": "874ae4530f58913ddd00cd2ca14fe75130e513bd55f17633f3e6b1e5414b3724",
+      "detector_sources": {
+        "yoloPersonDetector": 85
+      },
+      "mismatches": []
+    },
+    "official-holdout-frozen-v1": {
+      "raw_result_rows": 240,
+      "audited_metrics": {
+        "n": 240,
+        "TP": 121,
+        "TN": 115,
+        "FP": 3,
+        "FN": 1,
+        "errors": 0,
+        "block_recall_pct": 99.18,
+        "allow_specificity_pct": 97.458,
+        "block_precision_pct": 97.581,
+        "accuracy_pct": 98.333,
+        "p50_ms": 1268.91,
+        "p95_ms": 2210.69,
+        "p99_ms": 3945.9,
+        "people_detected": 240,
+        "no_person_detection": 0,
+        "block_recall_wilson_95_pct": [
+          95.503,
+          99.855
+        ],
+        "allow_specificity_wilson_95_pct": [
+          92.791,
+          99.132
+        ]
+      },
+      "changed_decodable_replacements_verified": 124,
+      "allow_passthrough_verified": 116,
+      "result_sha256": "b2fba60eed5e76f7d04f61872b93fa819199f636dafd6a0e67db33f3605c7369",
+      "receipt_sha256": "7f25b2be11b8c4d7abaa3bc0c19dc6ad1a87f4fc9e6a1eacb5eff30b84b29b0e",
+      "detector_sources": {
+        "yoloPersonDetector": 257
+      },
+      "mismatches": [
+        {
+          "id": "randomuser-men-68",
+          "expected": "allow",
+          "action": "blur",
+          "reasons": [
+            "person-2: uncertain=0.9725",
+            "person-4: uncertain=0.9624",
+            "person-5: uncertain=0.9260"
+          ]
+        },
+        {
+          "id": "wikipedia-63005541",
+          "expected": "block",
+          "action": "allow",
+          "reasons": [
+            "No configured blocking rule matched"
+          ]
+        },
+        {
+          "id": "wikipedia-14576147",
+          "expected": "allow",
+          "action": "blur",
+          "reasons": [
+            "MALE_GENITALIA_EXPOSED=0.4026 (threshold=0.3000)"
+          ]
+        },
+        {
+          "id": "wikipedia-6729501",
+          "expected": "allow",
+          "action": "blur",
+          "reasons": [
+            "person-2: uncertain=0.9253",
+            "MALE_GENITALIA_EXPOSED=0.3816 (threshold=0.3000)"
+          ]
+        }
+      ]
+    },
+    "supplemental-calibration-v1": {
+      "raw_result_rows": 81,
+      "audited_metrics": {
+        "n": 81,
+        "TP": 36,
+        "TN": 45,
+        "FP": 0,
+        "FN": 0,
+        "errors": 0,
+        "block_recall_pct": 100.0,
+        "allow_specificity_pct": 100.0,
+        "block_precision_pct": 100.0,
+        "accuracy_pct": 100.0,
+        "p50_ms": 1106.31,
+        "p95_ms": 1573.76,
+        "p99_ms": 1795.28,
+        "people_detected": 73,
+        "no_person_detection": 8,
+        "confidence_interval_omitted": "Correlated transforms of eight originals"
+      },
+      "changed_decodable_replacements_verified": 36,
+      "allow_passthrough_verified": 45,
+      "result_sha256": "f3ee75ed0d200e6fb3ebf40cb7dbcb3168f3896dcfc98d28df7333d42b34480c",
+      "receipt_sha256": "13158e6f78e372fec63f38f7b3f7773a4139b544aa1743f4f35c9fdbebcf8f46",
+      "detector_sources": {
+        "yoloPersonDetector": 72,
+        "faceFallback": 1
+      },
+      "mismatches": []
+    }
+  }
+}

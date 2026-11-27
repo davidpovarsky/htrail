@@ -42,3 +42,12 @@ Icon?
 .idea/
 *.swp
 *~
+
+# Pureline build-local models and test secrets
+.model-cache/
+*.xcresult
+.wireguard-lab/
+
+iosapp/PurelineWireGuardValidation.xcodeproj/
+
+iosapp/PurelineRemote.xcodeproj/

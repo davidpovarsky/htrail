@@ -1,0 +1,492 @@
+{
+  "purpose": "Real browser transport/rewrite checks, not independent quality sample",
+  "pages": {
+    "allow": [
+      {
+        "id": "randomuser-men-83",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/men/83.jpg",
+        "source_group": "randomuser-men-83"
+      },
+      {
+        "id": "randomuser-men-61",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/men/61.jpg",
+        "source_group": "randomuser-men-61"
+      },
+      {
+        "id": "randomuser-men-64",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/men/64.jpg",
+        "source_group": "randomuser-men-64"
+      },
+      {
+        "id": "randomuser-men-23",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/men/23.jpg",
+        "source_group": "randomuser-men-23"
+      },
+      {
+        "id": "randomuser-men-12",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/men/12.jpg",
+        "source_group": "randomuser-men-12"
+      },
+      {
+        "id": "randomuser-men-08",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/men/8.jpg",
+        "source_group": "randomuser-men-8"
+      },
+      {
+        "id": "wikipedia-31304878",
+        "expected": "allow",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Julius-adler-talmudist-rakov.jpg/500px-Julius-adler-talmudist-rakov.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Julius-adler-talmudist-rakov.jpg"
+      },
+      {
+        "id": "wikipedia-14749656",
+        "expected": "allow",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e6/TheRobAdams1.jpg/500px-TheRobAdams1.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "TheRobAdams1.jpg"
+      },
+      {
+        "id": "wikipedia-487964",
+        "expected": "allow",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Country_Music_Star_Trace_Adkins_at_the_USO_Gala_%28cropped%29.jpg/500px-Country_Music_Star_Trace_Adkins_at_the_USO_Gala_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Country_Music_Star_Trace_Adkins_at_the_USO_Gala_(cropped).jpg"
+      },
+      {
+        "id": "wikipedia-159599",
+        "expected": "allow",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Ben_Affleck_at_83rd_Venice_International_Film_Festival-1_%28cropped%29.jpg/500px-Ben_Affleck_at_83rd_Venice_International_Film_Festival-1_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Ben_Affleck_at_83rd_Venice_International_Film_Festival-1_(cropped).jpg"
+      }
+    ],
+    "block": [
+      {
+        "id": "randomuser-women-94",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/women/94.jpg",
+        "source_group": "randomuser-women-94"
+      },
+      {
+        "id": "randomuser-women-68",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/women/68.jpg",
+        "source_group": "randomuser-women-68"
+      },
+      {
+        "id": "randomuser-women-86",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/women/86.jpg",
+        "source_group": "randomuser-women-86"
+      },
+      {
+        "id": "randomuser-women-31",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/women/31.jpg",
+        "source_group": "randomuser-women-31"
+      },
+      {
+        "id": "randomuser-women-34",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/women/34.jpg",
+        "source_group": "randomuser-women-34"
+      },
+      {
+        "id": "randomuser-women-20",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/women/20.jpg",
+        "source_group": "randomuser-women-20"
+      },
+      {
+        "id": "wikipedia-923500",
+        "expected": "block",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/Acquanetta_Studio_Portrait_Photograph_1944_Universal_Pictures_Jungle_Woman_by_Ray_Jones.jpg/500px-Acquanetta_Studio_Portrait_Photograph_1944_Universal_Pictures_Jungle_Woman_by_Ray_Jones.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Acquanetta_Studio_Portrait_Photograph_1944_Universal_Pictures_Jungle_Woman_by_Ray_Jones.jpg"
+      },
+      {
+        "id": "wikipedia-16880471",
+        "expected": "block",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Mary_Ainslee_in_Mad_Youth_%281939%29.jpg/500px-Mary_Ainslee_in_Mad_Youth_%281939%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Mary_Ainslee_in_Mad_Youth_(1939).jpg"
+      },
+      {
+        "id": "wikipedia-9112294",
+        "expected": "block",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/Caroline_Aaron_Blue_Moon-44_%28cropped%29.jpg/500px-Caroline_Aaron_Blue_Moon-44_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Caroline_Aaron_Blue_Moon-44_(cropped).jpg"
+      },
+      {
+        "id": "wikipedia-63080419",
+        "expected": "block",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Betty_Alden_in_The_Nut_Farm.jpg/500px-Betty_Alden_in_The_Nut_Farm.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Betty_Alden_in_The_Nut_Farm.jpg"
+      }
+    ],
+    "mixed": [
+      {
+        "id": "randomuser-men-83",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/men/83.jpg",
+        "source_group": "randomuser-men-83"
+      },
+      {
+        "id": "randomuser-women-94",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/women/94.jpg",
+        "source_group": "randomuser-women-94"
+      },
+      {
+        "id": "randomuser-men-61",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/men/61.jpg",
+        "source_group": "randomuser-men-61"
+      },
+      {
+        "id": "randomuser-women-68",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/women/68.jpg",
+        "source_group": "randomuser-women-68"
+      },
+      {
+        "id": "randomuser-men-64",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/men/64.jpg",
+        "source_group": "randomuser-men-64"
+      },
+      {
+        "id": "randomuser-women-86",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/women/86.jpg",
+        "source_group": "randomuser-women-86"
+      },
+      {
+        "id": "randomuser-men-23",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/men/23.jpg",
+        "source_group": "randomuser-men-23"
+      },
+      {
+        "id": "randomuser-women-31",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/women/31.jpg",
+        "source_group": "randomuser-women-31"
+      },
+      {
+        "id": "randomuser-men-12",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/men/12.jpg",
+        "source_group": "randomuser-men-12"
+      },
+      {
+        "id": "randomuser-women-34",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/women/34.jpg",
+        "source_group": "randomuser-women-34"
+      }
+    ],
+    "mixed-2": [
+      {
+        "id": "randomuser-men-08",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/men/8.jpg",
+        "source_group": "randomuser-men-8"
+      },
+      {
+        "id": "randomuser-women-20",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/women/20.jpg",
+        "source_group": "randomuser-women-20"
+      },
+      {
+        "id": "wikipedia-31304878",
+        "expected": "allow",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Julius-adler-talmudist-rakov.jpg/500px-Julius-adler-talmudist-rakov.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Julius-adler-talmudist-rakov.jpg"
+      },
+      {
+        "id": "wikipedia-923500",
+        "expected": "block",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/Acquanetta_Studio_Portrait_Photograph_1944_Universal_Pictures_Jungle_Woman_by_Ray_Jones.jpg/500px-Acquanetta_Studio_Portrait_Photograph_1944_Universal_Pictures_Jungle_Woman_by_Ray_Jones.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Acquanetta_Studio_Portrait_Photograph_1944_Universal_Pictures_Jungle_Woman_by_Ray_Jones.jpg"
+      },
+      {
+        "id": "wikipedia-14749656",
+        "expected": "allow",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e6/TheRobAdams1.jpg/500px-TheRobAdams1.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "TheRobAdams1.jpg"
+      },
+      {
+        "id": "wikipedia-16880471",
+        "expected": "block",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Mary_Ainslee_in_Mad_Youth_%281939%29.jpg/500px-Mary_Ainslee_in_Mad_Youth_%281939%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Mary_Ainslee_in_Mad_Youth_(1939).jpg"
+      },
+      {
+        "id": "wikipedia-487964",
+        "expected": "allow",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Country_Music_Star_Trace_Adkins_at_the_USO_Gala_%28cropped%29.jpg/500px-Country_Music_Star_Trace_Adkins_at_the_USO_Gala_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Country_Music_Star_Trace_Adkins_at_the_USO_Gala_(cropped).jpg"
+      },
+      {
+        "id": "wikipedia-9112294",
+        "expected": "block",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/Caroline_Aaron_Blue_Moon-44_%28cropped%29.jpg/500px-Caroline_Aaron_Blue_Moon-44_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Caroline_Aaron_Blue_Moon-44_(cropped).jpg"
+      },
+      {
+        "id": "wikipedia-159599",
+        "expected": "allow",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Ben_Affleck_at_83rd_Venice_International_Film_Festival-1_%28cropped%29.jpg/500px-Ben_Affleck_at_83rd_Venice_International_Film_Festival-1_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Ben_Affleck_at_83rd_Venice_International_Film_Festival-1_(cropped).jpg"
+      },
+      {
+        "id": "wikipedia-63080419",
+        "expected": "block",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Betty_Alden_in_The_Nut_Farm.jpg/500px-Betty_Alden_in_The_Nut_Farm.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Betty_Alden_in_The_Nut_Farm.jpg"
+      }
+    ],
+    "objects": [
+      {
+        "id": "skimage-brick.png",
+        "expected": "allow",
+        "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/brick.png",
+        "source_group": "brick.png"
+      },
+      {
+        "id": "skimage-chelsea.png",
+        "expected": "allow",
+        "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/chelsea.png",
+        "source_group": "chelsea.png"
+      },
+      {
+        "id": "skimage-clock_motion.png",
+        "expected": "allow",
+        "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/clock_motion.png",
+        "source_group": "clock_motion.png"
+      },
+      {
+        "id": "skimage-coffee.png",
+        "expected": "allow",
+        "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/coffee.png",
+        "source_group": "coffee.png"
+      },
+      {
+        "id": "skimage-coins.png",
+        "expected": "allow",
+        "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/coins.png",
+        "source_group": "coins.png"
+      },
+      {
+        "id": "skimage-grass.png",
+        "expected": "allow",
+        "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/grass.png",
+        "source_group": "grass.png"
+      },
+      {
+        "id": "skimage-hubble_deep_field.jpg",
+        "expected": "allow",
+        "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/hubble_deep_field.jpg",
+        "source_group": "hubble_deep_field.jpg"
+      },
+      {
+        "id": "skimage-moon.png",
+        "expected": "allow",
+        "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/moon.png",
+        "source_group": "moon.png"
+      },
+      {
+        "id": "skimage-rocket.jpg",
+        "expected": "allow",
+        "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/rocket.jpg",
+        "source_group": "rocket.jpg"
+      }
+    ],
+    "groups": [
+      {
+        "id": "wikipedia-63005541",
+        "expected": "block",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Viola_Alberti_She_1911.jpg/500px-Viola_Alberti_She_1911.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Viola_Alberti_She_1911.jpg"
+      },
+      {
+        "id": "wikipedia-105969",
+        "expected": "allow",
+        "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Abbott_and_Costello_circa_1940s.JPG/500px-Abbott_and_Costello_circa_1940s.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "source_group": "Abbott_and_Costello_circa_1940s.JPG"
+      }
+    ],
+    "thumbnails": [
+      {
+        "id": "randomuser-women-77-published-med",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/med/women/77.jpg",
+        "source_group": "randomuser-women-77"
+      },
+      {
+        "id": "randomuser-women-77-published-thumb",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/thumb/women/77.jpg",
+        "source_group": "randomuser-women-77"
+      },
+      {
+        "id": "randomuser-women-02-published-med",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/med/women/2.jpg",
+        "source_group": "randomuser-women-2"
+      },
+      {
+        "id": "randomuser-women-02-published-thumb",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/thumb/women/2.jpg",
+        "source_group": "randomuser-women-2"
+      },
+      {
+        "id": "randomuser-women-48-published-med",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/med/women/48.jpg",
+        "source_group": "randomuser-women-48"
+      },
+      {
+        "id": "randomuser-women-48-published-thumb",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/thumb/women/48.jpg",
+        "source_group": "randomuser-women-48"
+      },
+      {
+        "id": "randomuser-women-26-published-med",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/med/women/26.jpg",
+        "source_group": "randomuser-women-26"
+      },
+      {
+        "id": "randomuser-women-26-published-thumb",
+        "expected": "block",
+        "source_url": "https://randomuser.me/api/portraits/thumb/women/26.jpg",
+        "source_group": "randomuser-women-26"
+      },
+      {
+        "id": "randomuser-men-54-published-med",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/med/men/54.jpg",
+        "source_group": "randomuser-men-54"
+      },
+      {
+        "id": "randomuser-men-54-published-thumb",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/thumb/men/54.jpg",
+        "source_group": "randomuser-men-54"
+      }
+    ],
+    "thumbnails-2": [
+      {
+        "id": "randomuser-men-31-published-med",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/med/men/31.jpg",
+        "source_group": "randomuser-men-31"
+      },
+      {
+        "id": "randomuser-men-31-published-thumb",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/thumb/men/31.jpg",
+        "source_group": "randomuser-men-31"
+      },
+      {
+        "id": "randomuser-men-44-published-med",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/med/men/44.jpg",
+        "source_group": "randomuser-men-44"
+      },
+      {
+        "id": "randomuser-men-44-published-thumb",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/thumb/men/44.jpg",
+        "source_group": "randomuser-men-44"
+      },
+      {
+        "id": "randomuser-men-28-published-med",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/med/men/28.jpg",
+        "source_group": "randomuser-men-28"
+      },
+      {
+        "id": "randomuser-men-28-published-thumb",
+        "expected": "allow",
+        "source_url": "https://randomuser.me/api/portraits/thumb/men/28.jpg",
+        "source_group": "randomuser-men-28"
+      }
+    ],
+    "svg": [
+      {
+        "id": "wikipedia-globe",
+        "expected": "allow",
+        "source_url": "https://en.wikipedia.org/static/images/icons/enwiki-25.svg",
+        "source_group": "wikipedia-globe",
+        "note": "Original public SVG logo"
+      },
+      {
+        "id": "wikipedia-wordmark",
+        "expected": "allow",
+        "source_url": "https://en.wikipedia.org/static/images/mobile/copyright/wikipedia-wordmark-en-25.svg",
+        "source_group": "wikipedia-wordmark",
+        "note": "Original public SVG logo"
+      },
+      {
+        "id": "wikipedia-tagline",
+        "expected": "allow",
+        "source_url": "https://en.wikipedia.org/static/images/mobile/copyright/wikipedia-tagline-en-25.svg",
+        "source_group": "wikipedia-tagline",
+        "note": "Original public SVG logo"
+      },
+      {
+        "id": "randomuser-women-77-embedded-svg",
+        "expected": "block",
+        "source_url": "http://192.0.2.1/pureline-lab-20261127/fixtures/randomuser-women-77.svg",
+        "source_group": "randomuser-women-77",
+        "note": "Controlled SVG with an embedded calibration image; still filtered on Oracle"
+      },
+      {
+        "id": "randomuser-men-54-embedded-svg",
+        "expected": "allow",
+        "source_url": "http://192.0.2.1/pureline-lab-20261127/fixtures/randomuser-men-54.svg",
+        "source_group": "randomuser-men-54",
+        "note": "Controlled SVG with an embedded calibration image; still filtered on Oracle"
+      }
+    ],
+    "highres": [
+      {
+        "id": "wikipedia-1111265-1024",
+        "expected": "block",
+        "source_url": "http://192.0.2.1/pureline-lab-20261127/fixtures/wikipedia-1111265-1024.jpg",
+        "source_group": "wikipedia-1111265",
+        "note": "1024/1536-pixel derivative for blur presentation; not an independent scene"
+      },
+      {
+        "id": "wikipedia-1111265-1536",
+        "expected": "block",
+        "source_url": "http://192.0.2.1/pureline-lab-20261127/fixtures/wikipedia-1111265-1536.jpg",
+        "source_group": "wikipedia-1111265",
+        "note": "1024/1536-pixel derivative for blur presentation; not an independent scene"
+      },
+      {
+        "id": "wikipedia-105969-1024",
+        "expected": "allow",
+        "source_url": "http://192.0.2.1/pureline-lab-20261127/fixtures/wikipedia-105969-1024.jpg",
+        "source_group": "wikipedia-105969",
+        "note": "1024/1536-pixel derivative for blur presentation; not an independent scene"
+      },
+      {
+        "id": "wikipedia-105969-1536",
+        "expected": "allow",
+        "source_url": "http://192.0.2.1/pureline-lab-20261127/fixtures/wikipedia-105969-1536.jpg",
+        "source_group": "wikipedia-105969",
+        "note": "1024/1536-pixel derivative for blur presentation; not an independent scene"
+      }
+    ]
+  },
+  "transport_note": "Only local HTML bypasses the proxy. All primary public HTTPS image sources must use the lab WireGuard proxy.",
+  "source_manifest": "experiments/pureline-quality-20261127/gallery/manifest.json"
+}

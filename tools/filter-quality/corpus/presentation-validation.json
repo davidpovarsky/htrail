@@ -1,0 +1,45 @@
+{
+  "derived_originals": 2,
+  "rows": [
+    {
+      "id": "wikipedia-1111265-1024",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/presentation/fixtures/wikipedia-1111265-1024.jpg",
+      "expected": "block",
+      "width": 843,
+      "height": 1024,
+      "original_id": "wikipedia-1111265",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Jean_Acker_1923.jpg/500px-Jean_Acker_1923.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+      "sha256": "6966a8377e2ab86b4b3f5b1d3007022010cb398a09605bdc6f5ed39334c5ff61"
+    },
+    {
+      "id": "wikipedia-1111265-1536",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/presentation/fixtures/wikipedia-1111265-1536.jpg",
+      "expected": "block",
+      "width": 1265,
+      "height": 1536,
+      "original_id": "wikipedia-1111265",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Jean_Acker_1923.jpg/500px-Jean_Acker_1923.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+      "sha256": "6dd02622b699326b37253010c55e43125b4f01e11c0c6555495c0c706b5e0a4c"
+    },
+    {
+      "id": "wikipedia-105969-1024",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/presentation/fixtures/wikipedia-105969-1024.jpg",
+      "expected": "allow",
+      "width": 828,
+      "height": 1024,
+      "original_id": "wikipedia-105969",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Abbott_and_Costello_circa_1940s.JPG/500px-Abbott_and_Costello_circa_1940s.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+      "sha256": "d7e131a9098e031242a73a99749368c32017aeee0820b702d37b05d8da821436"
+    },
+    {
+      "id": "wikipedia-105969-1536",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/presentation/fixtures/wikipedia-105969-1536.jpg",
+      "expected": "allow",
+      "width": 1243,
+      "height": 1536,
+      "original_id": "wikipedia-105969",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Abbott_and_Costello_circa_1940s.JPG/500px-Abbott_and_Costello_circa_1940s.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+      "sha256": "fc03288e8b32cb1abcce363487a3918b4274606e5907c9c3b8a87531532702c9"
+    }
+  ]
+}

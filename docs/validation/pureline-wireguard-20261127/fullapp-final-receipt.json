@@ -1,0 +1,21 @@
+{
+  "started_utc": "2026-11-27T03:07:17.290834+00:00",
+  "command": [
+    "/usr/bin/xcodebuild",
+    "test-without-building",
+    "-xctestrun",
+    "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Remote/Build/Products/PurelineRemoteWireGuardUI_iphonesimulator27.0-arm64.xctestrun",
+    "-destination",
+    "platform=iOS Simulator,id=6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+    "-parallel-testing-enabled",
+    "NO",
+    "-collect-test-diagnostics",
+    "never",
+    "-only-testing:PurelineRemoteWireGuardUITests",
+    "-resultBundlePath",
+    "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/evidence/FullApp-final-20261127.xcresult"
+  ],
+  "runner_sha256": "792cccf264c30c2584372f5fdea9e0c2536aad62c7af5e7958a422421494a921",
+  "finished_utc": "2026-11-27T03:13:04.944080+00:00",
+  "exit_code": 0
+}

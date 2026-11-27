@@ -1,0 +1,2376 @@
+{
+  "schema": "pureline-full-release-602-v1",
+  "generated_at": "2026-11-27T16:26:50.685569+00:00",
+  "outcome": "PASS_SIGNED_ARCHIVE_EXPORT_APPLE_VALIDATION_UPLOAD_AND_PROCESSING",
+  "scope": "Full app 1.0 build602 including Direct local filtering and Remote modes; App Store Connect/TestFlight processing.",
+  "source_commit": "d89d53106d5db87aaa4c9356c9114dbe76daa839",
+  "gitlinks": [
+    {
+      "path": "Vendor/AI-Image-Classifier",
+      "commit": "5291eedb9b46fa978e36ccec4f5504b017afe809"
+    },
+    {
+      "path": "Vendor/WireGuard",
+      "commit": "2fec12a6e1f6e3460b6ee483aa00ad29cddadab1"
+    }
+  ],
+  "apple_identity": {
+    "app": {
+      "id": "6809383144",
+      "name": "Pureline",
+      "bundleId": "com.davidpovarsky.pureline",
+      "sku": "httrail-ios-2026"
+    },
+    "build_id": "c99a9917-9a8b-4fad-9297-cb6a061b126a",
+    "build": {
+      "version": "602",
+      "processingState": "VALID",
+      "uploadedDate": "2026-11-27T08:18:21-08:00",
+      "expirationDate": "2027-02-25T08:18:21-08:00",
+      "minOsVersion": "26.5",
+      "usesNonExemptEncryption": false
+    },
+    "pre_release_version": {
+      "type": "preReleaseVersions",
+      "id": "d58e1109-c3d9-47f4-9ada-cc610dd11b55",
+      "attributes": {
+        "version": "1.0",
+        "platform": "IOS"
+      }
+    },
+    "beta_detail": {
+      "type": "buildBetaDetails",
+      "id": "c99a9917-9a8b-4fad-9297-cb6a061b126a",
+      "attributes": {
+        "autoNotifyEnabled": true,
+        "internalBuildState": "READY_FOR_BETA_TESTING",
+        "externalBuildState": "READY_FOR_BETA_SUBMISSION"
+      }
+    }
+  },
+  "ipa": {
+    "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/export/IPA/HTTrailiOS.ipa",
+    "bytes": 170165569,
+    "sha256": "c08dd6284f13270b5a786d1a01c56f2417cc59f30e0cfc917c42df3a817b9c48"
+  },
+  "archive": {
+    "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/Pureline-602-ssh-unlocked.xcarchive",
+    "sha256": "81cf66fb5bd4b0d5ea9032ffe4f61f009a7b7d45a6c9649b7d4badadb470b578",
+    "bytes": 318128578,
+    "files": 174
+  },
+  "accepted_automated_evidence": {
+    "core_distinct_cases": 29,
+    "runtime_distinct_cases": 27,
+    "runtime_reuse": "25 unchanged prior passing cases plus 2 final focused passing cases; the original failed smoke was rerun unchanged after the CPU request policy fix.",
+    "core_receipt": {
+      "path": "/Users/m1/builds/_preflight/pureline-native-validation-core-receipts-v2-20261127.json",
+      "sha256": "b9ef989671c587a1e46536f592a97b22b220146165bda0496c9d5515226f3e6b"
+    },
+    "runtime_receipt": {
+      "path": "/Users/m1/builds/_preflight/pureline-native-runtime-final-receipts-20261127.json",
+      "sha256": "dd2a77a4800beb7f78fd98e992ff5782016a645c69e2b0e27f4d0f9de12c2d72"
+    },
+    "model_qualification": {
+      "path": "/Users/m1/builds/_preflight/pureline-model-qualification-20261127/model-qualification-receipts.json",
+      "sha256": "4f9f2f899c62668c2013f04464abb5191f07c051f256cb85d57a49a10dcbb0ab"
+    }
+  },
+  "receipts": {
+    "toolchain": {
+      "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/toolchain.json",
+      "sha256": "f86da4f47ddca3623fecc1be432436a5a2eb494848d39f3d0413b2fa085b8812",
+      "data": {
+        "xcodegen": "Version: 2.48.0",
+        "swift": "Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)\nTarget: arm64-apple-macosx27.0.0",
+        "xcode": "Xcode 27.0\nBuild version 27A266a"
+      }
+    },
+    "beta_group_readback": {
+      "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/beta-associations-readback.json",
+      "sha256": "f985df67767e83b96c42462d22780cdb70126a7d1b3aa9c268e80e13ee75db89",
+      "data": {
+        "scope": "Optional read-only beta-group association readback",
+        "observed_at": "2026-11-27T16:26:48.131273+00:00",
+        "app_id": "6809383144",
+        "build_id": "c99a9917-9a8b-4fad-9297-cb6a061b126a",
+        "method": "GET",
+        "path": "/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/relationships/betaGroups",
+        "outcome": "ACCESS_DENIED",
+        "http_status": 403,
+        "reason": "Forbidden",
+        "request_count": 1,
+        "further_group_calls": 0,
+        "group_changes": false,
+        "interpretation": "Group association could not be read with the existing authorized API connection. Membership/distribution is unknown; no alternative route or write was attempted.",
+        "job_id": "job_de2e02b622bc"
+      }
+    },
+    "source_attestation": {
+      "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/source-attestation.json",
+      "sha256": "28391285d7adcf92669144b01457e34e9653a1abe4630d4f8f5242762197f49f",
+      "data": {
+        "source_commit": "d89d53106d5db87aaa4c9356c9114dbe76daa839",
+        "manifest_sha256": "c324bbcc03f505f307e2436b1e2308d7bb3a0cbd91258ff7f9c2468d40cbdfdd",
+        "time": "2026-11-27T15:56:19.774952+00:00",
+        "tracked_files_examined": 894,
+        "tracked_files_exactly_matched": 648,
+        "compiled_input_mismatches": [],
+        "untracked_source_code": [],
+        "documented_noncompiled_differences": [
+          {
+            "path": ".gitignore",
+            "reason": "hash",
+            "expected": "70e2971aa3ef2ced428816a3ca2b412b32f4f1e642af493132a88f8d9f10b986",
+            "actual": "b01d310ab455989a27e73590a0c899dfab342c60167bc36dd272bef2413b6cf8"
+          },
+          {
+            "path": "PROJECT_BOARD.md",
+            "reason": "hash",
+            "expected": "c7ecda557bd0c1957f7b7674369f2be4b775f6d97e52bb735bda5eaf6c6ebc1c",
+            "actual": "f9033d925786c49f4e0170a28b41cdcedf205090ce257628822c66f0cad1f311"
+          },
+          {
+            "path": "deploy/pureline-wireguard-20261127/90-verified-candidate.conf",
+            "reason": "missing",
+            "expected": "67ed1e9c6a02e17bb1e36896e5794d01c723c5f84b41338bc19594d492131ab3"
+          },
+          {
+            "path": "deploy/pureline-wireguard-20261127/check_transport_diagnostics.py",
+            "reason": "missing",
+            "expected": "c746ae9ce7452603671f343863fbb8ae90904ae2d5900b0c8531829824b7f2b5"
+          },
+          {
+            "path": "deploy/pureline-wireguard-20261127/production.toml",
+            "reason": "missing",
+            "expected": "78cc703d504bbfb8bce8fcdabbde729e47d88fda8739e1699bd53bd7af401191"
+          },
+          {
+            "path": "deploy/pureline-wireguard-20261127/service-management-preflight.json",
+            "reason": "missing",
+            "expected": "3f8b7f623ae6546a9eda45dba5368ab3a3e74e2135122260dffe0183b324ee5f"
+          },
+          {
+            "path": "deploy/pureline-wireguard-20261127/transport-epoch-regression.json",
+            "reason": "missing",
+            "expected": "6de7db10bbde03727e0220df1ae78c804783f4cab4c41577ee2c4165573dc919"
+          },
+          {
+            "path": "deploy/pureline-wireguard-20261127/transport_diagnostics_v2.py",
+            "reason": "missing",
+            "expected": "a0ee233586eae1628631b28e771dcaa081e5fcef1cf975f795dc4ddc858a69ad"
+          },
+          {
+            "path": "deploy/pureline-wireguard-20261127/v5-staging-receipt.json",
+            "reason": "missing",
+            "expected": "a9f6cc241db6a2cdeb9106fca75a619047f122dbdb97116f3cd6196f39e1c01b"
+          },
+          {
+            "path": "docs/PURELINE_DOWNSTREAM_INTEGRATION.md",
+            "reason": "hash",
+            "expected": "2fdf394762fa02eff4870fab26727da53d2c259aa4f3bce5c83811e354fdc0cc",
+            "actual": "4a3019c2ac7457149c08e9f4411554e52fbc3267189cc1e9b011a30c35c95627"
+          },
+          {
+            "path": "docs/validation/BROWSER_BOUNDED_V5_2026-11-27.md",
+            "reason": "missing",
+            "expected": "e9d59b44fb8e2084b7db11933829a42726b83248eb430d1aca5a5c80f86aef7d"
+          },
+          {
+            "path": "docs/validation/BROWSER_WIREGUARD_2026-11-27.md",
+            "reason": "missing",
+            "expected": "bb65f59cd13e3f68ca8753a41a6e2410b119a7ce98775183636be71b081caa67"
+          },
+          {
+            "path": "docs/validation/FILTER_QUALITY_2026-11-27.md",
+            "reason": "missing",
+            "expected": "05be6f8e57f579cd099486b753d7f2e96694cee88c54172efe9da08ea400d790"
+          },
+          {
+            "path": "docs/validation/HTTP_INPUT_BOUNDS_2026-11-27.md",
+            "reason": "missing",
+            "expected": "f2f0af2fca8af8c34b1b3965d723d368f61e5ec89cbfb67513d1cb0a365fc072"
+          },
+          {
+            "path": "docs/validation/NATIVE_PROXY_AND_IMAGE_FILTER_2026-11-27.md",
+            "reason": "missing",
+            "expected": "f17ab4aae4dae8619f29e59474e56ab56cf89b7e9103348ffd2a37d1f9a78798"
+          },
+          {
+            "path": "docs/validation/PRODUCTION_ROLLOUT_2026-11-27.md",
+            "reason": "missing",
+            "expected": "6de95e7e70644812b32ffd01e9315dd4d078383d2cdd24d5369a9b2a21cac60c"
+          },
+          {
+            "path": "docs/validation/REMOTE_IOS_BUILD_2026-11-27.json",
+            "reason": "missing",
+            "expected": "dfe9db61ac7e6ce8ad2c64cdeeb12e242c135808ffb30b00400c853c480b47d8"
+          },
+          {
+            "path": "docs/validation/REMOTE_IOS_BUILD_2026-11-27.md",
+            "reason": "missing",
+            "expected": "fc1f9c6353150616405d8ef08cd43a849dd306f033fa996c39a76aedcc913d05"
+          },
+          {
+            "path": "docs/validation/RUNTIME_BOUNDS_2026-11-27.md",
+            "reason": "missing",
+            "expected": "b1571a82eaa29077fd6bdb2ce5db829f282485472f7e1e1523dd35f4c37a3780"
+          },
+          {
+            "path": "docs/validation/WIREGUARD_APP_2026-11-27.md",
+            "reason": "missing",
+            "expected": "c8921aed4c8cccfab3cf5383facbb338f91b99cce7e5f9c307852ec783888b35"
+          },
+          {
+            "path": "docs/validation/native-completion-20261127/VisionComputeDeviceSDK27.txt",
+            "reason": "missing",
+            "expected": "3def3cd15c2dfa3fd223eee02463bdcd42d0497058bc31d7690139ebd2d2c85e"
+          },
+          {
+            "path": "docs/validation/native-completion-20261127/core-receipts.json",
+            "reason": "missing",
+            "expected": "b9ef989671c587a1e46536f592a97b22b220146165bda0496c9d5515226f3e6b"
+          },
+          {
+            "path": "docs/validation/native-completion-20261127/frozen-source-manifest.json",
+            "reason": "missing",
+            "expected": "ad3727754b87cb674f292889989e699aeb68527ae1a28e39ea50d658ce834ce6"
+          },
+          {
+            "path": "docs/validation/native-completion-20261127/runtime-final-receipts.json",
+            "reason": "missing",
+            "expected": "dd2a77a4800beb7f78fd98e992ff5782016a645c69e2b0e27f4d0f9de12c2d72"
+          },
+          {
+            "path": "docs/validation/native-completion-20261127/runtime-interim-receipts.json",
+            "reason": "missing",
+            "expected": "2c466c5053f829609ad1127f365786c3181909a47439bcb2487aee63e4fe5047"
+          },
+          {
+            "path": "docs/validation/native-completion-20261127/vision-input-diagnostic-receipts.json",
+            "reason": "missing",
+            "expected": "ce959e02a233614e1fa03641f48f9b5b165df21c38e41971c63a93859ec79b01"
+          },
+          {
+            "path": "docs/validation/native-completion-20261127/vision-input-diagnostic-report.md",
+            "reason": "missing",
+            "expected": "6bc73f2b1bf5e2683e0cbf1b5311b6f3ac6daa1557b3942b980f142691e4a026"
+          },
+          {
+            "path": "docs/validation/pureline-model-qualification-20261127/model-qualification-receipts.json",
+            "reason": "missing",
+            "expected": "4f9f2f899c62668c2013f04464abb5191f07c051f256cb85d57a49a10dcbb0ab"
+          },
+          {
+            "path": "docs/validation/pureline-model-qualification-20261127/model-qualification-report.md",
+            "reason": "missing",
+            "expected": "17ef363af627e8f940a109d7500df7847532b492ae39f1954b14517c78054218"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/full-app-wireguard-screen.png",
+            "reason": "missing",
+            "expected": "7c7afac5d0da9907d99ef3e24409eb12110f7c5d04448901a89303b30469f6fb"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/fullapp-final-artifacts.json",
+            "reason": "missing",
+            "expected": "e35f355c99d4e90d01382a2a6f87f05fe2bf9099c06e1c407a6d00e5e426a03a"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/fullapp-final-attachments-manifest.json",
+            "reason": "missing",
+            "expected": "a558ecbb5a62686a0a29365d7c574eb58283378a22cf04fc98a92b462a7105b0"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/fullapp-final-highres.png",
+            "reason": "missing",
+            "expected": "34e08a8bd86db8e993ca3f1243adc132c2f4f275b4b968ad7e114302293928e7"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/fullapp-final-native.png",
+            "reason": "missing",
+            "expected": "ecc6cfed0e224901218303250801387347d428a3b5588347fe99f2a132750d6d"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/fullapp-final-receipt.json",
+            "reason": "missing",
+            "expected": "6569b56465b324093d2fd74bed49e3f21205dd6c964d7caf07590dc4b341207c"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/fullapp-final-summary.json",
+            "reason": "missing",
+            "expected": "0fd06cb0b106f24972199fa5ed8ac3a9514aa95f6359f19e80a24e3dd22e37b1"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/fullapp-final-svg.png",
+            "reason": "missing",
+            "expected": "a9504539046709e24a49b6207d86405fbf660816fbb446bb3ae0557b5ee26c01"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/fullapp-final-wireguard.png",
+            "reason": "missing",
+            "expected": "d502d380a7d4ccba329b30a8a6485b21d171ef10972d879f13045361be7ccafb"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/fullapp-navigation-summary.json",
+            "reason": "missing",
+            "expected": "222046a3eea1334a32dacc84defd1ef6af17a2c7f7677ea92b0bc1044715aa87"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/native-images-postfix.png",
+            "reason": "missing",
+            "expected": "2bd005e4c2d1a9cba3a83004d360504320a10bd6dc24c19e8fda0fefdfb175e2"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/physical-device-preflight.json",
+            "reason": "missing",
+            "expected": "5c785697b0bdf133c17b9199ae2e9e887e9891b3339ad30d1c717587b3c54645"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/ui-postfix-summary.json",
+            "reason": "missing",
+            "expected": "42b5e9a1269cfc9383f3cbd48e3f0f4e65945ff4886272098420fd4bbe355d5d"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/unit-built-summary.json",
+            "reason": "missing",
+            "expected": "c3a9f49251ffac3eb6237588d11536d7d5818aff8dafc1c710f17d319701ff0a"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/unit-guards-summary.json",
+            "reason": "missing",
+            "expected": "fd843e1a972501a154391549e6de8dc96aa6a28728e13bc506675c94a523d131"
+          },
+          {
+            "path": "docs/validation/pureline-wireguard-20261127/webkit-mixed-postfix.png",
+            "reason": "missing",
+            "expected": "8bab0ef3157c6931c993275cbfe2b4d054d5d532bb10449b2d26abcbfea4bb1d"
+          },
+          {
+            "path": "iosapp/Info.plist",
+            "reason": "hash",
+            "expected": "4d65222c03df4c5e7dc1cde7bfd8eafdc6614b64397b73675844289e9a7d48b0",
+            "actual": "31e2118654ab133127e79d4bd21e9e35d0e542ca67485e3ee70879627257ac5a"
+          },
+          {
+            "path": "iosapp/project.wireguard-validation.yml",
+            "reason": "hash",
+            "expected": "0f9f2d63086a59565977fdd3a633e529d498ab527770d217f84fecdf0ec6f15d",
+            "actual": "9af30ae8edd3d2747e19adf72e1e4db350bba8dc4985adec4b4be64fb57c8cd1"
+          },
+          {
+            "path": "tools/filter-quality/.gitignore",
+            "reason": "missing",
+            "expected": "d285447db6da2a0b9dd0fd923c80a60b8326081fe8dfa9e2dfee025fbbe46d8a"
+          },
+          {
+            "path": "tools/filter-quality/README.md",
+            "reason": "missing",
+            "expected": "3dfdc27d4b82da875caa7cd1e95bdc5f169b047f306aa271ecd072bfd30f2ad0"
+          },
+          {
+            "path": "tools/filter-quality/approved-ui-rasters.json",
+            "reason": "missing",
+            "expected": "ade4980fb508c632fff654f81fe2f5a7c10c34d35ceb70ab5d022d04730c2cff"
+          },
+          {
+            "path": "tools/filter-quality/candidate-freeze.json",
+            "reason": "missing",
+            "expected": "d3aed12fd92d2e07a83f68169aef1aa239041ee3ded04bc336a29be109f7c413"
+          },
+          {
+            "path": "tools/filter-quality/candidate.toml",
+            "reason": "missing",
+            "expected": "b53f002e883414ccba6011e07bde9297481f75538c85c5cefab0c6a16c4ad617"
+          },
+          {
+            "path": "tools/filter-quality/check_animated_images.py",
+            "reason": "missing",
+            "expected": "6bbb980550f1be313a7b43ca97e984393c555c2dc6ef43b12fa2832b1076d091"
+          },
+          {
+            "path": "tools/filter-quality/check_evidence.py",
+            "reason": "missing",
+            "expected": "a68f0133e6c6cca457942055401c7e065a8fac3cc7559cb59fe85c28f88f9ad3"
+          },
+          {
+            "path": "tools/filter-quality/check_http_network_bounds.py",
+            "reason": "missing",
+            "expected": "fa3a157425a035dd1d0994ee42ee6dc81fdc6c10286582e30e02af46d8c9644e"
+          },
+          {
+            "path": "tools/filter-quality/check_http_serialization.py",
+            "reason": "missing",
+            "expected": "becbdfbceb033aa4d7e65cd6756312d872cd0af8eae54dcd82379e91bf531420"
+          },
+          {
+            "path": "tools/filter-quality/check_packaged_runtime.py",
+            "reason": "missing",
+            "expected": "23e94b4a36b001e78cc36e8b197711aa392400a75504ce950df3e5b45e10d7aa"
+          },
+          {
+            "path": "tools/filter-quality/check_process_bounds.py",
+            "reason": "missing",
+            "expected": "d5715089b03d41d612755987bd6477af72ef6d5f3e2ca272efc1146bb920dba5"
+          },
+          {
+            "path": "tools/filter-quality/check_runtime_cache.py",
+            "reason": "missing",
+            "expected": "d18813e32b867a16ce83fd7d30aed316265719d7f843faf4baaf9daed99f54f9"
+          },
+          {
+            "path": "tools/filter-quality/check_runtime_http.py",
+            "reason": "missing",
+            "expected": "b56a55e4777762537274023b2f0c45f5fe0e9a1b116f6f949573077fcd70cde5"
+          },
+          {
+            "path": "tools/filter-quality/check_runtime_real_models.py",
+            "reason": "missing",
+            "expected": "40a0048248f4fa6f9c5e98225d3477b2ae5e08b82ea64f16db7829d78e94663c"
+          },
+          {
+            "path": "tools/filter-quality/check_svg_legacy_metadata.py",
+            "reason": "missing",
+            "expected": "f574f4c178d204c031a2c362993adff807fe23ec174147aadc86046b6ca88432"
+          },
+          {
+            "path": "tools/filter-quality/check_svg_presentation.py",
+            "reason": "missing",
+            "expected": "4a3c0d77a9817ee7cb57ceb9cc80e9029f45826e2254b3f0e0973fefe8847ff7"
+          },
+          {
+            "path": "tools/filter-quality/composition-audit.json",
+            "reason": "missing",
+            "expected": "baba80f97104d7d2fe36185bb2529ce5bd0e2d78228c352c0c7aefd30e10f7f0"
+          },
+          {
+            "path": "tools/filter-quality/corpus/animation-validation.json",
+            "reason": "missing",
+            "expected": "386b6d5e13d5bfdd834a4457007b6f37eaf1622f4c4c16b3634b8733ea04acbd"
+          },
+          {
+            "path": "tools/filter-quality/corpus/main.json",
+            "reason": "missing",
+            "expected": "592dd80686141d54da26dd84eb66d2e60a5dbadc3f3da75733283026a443182b"
+          },
+          {
+            "path": "tools/filter-quality/corpus/presentation-validation.json",
+            "reason": "missing",
+            "expected": "35bc64896f940a2490cac3008f006d29eb78065d2a1faa9bbd0c0755936ebde6"
+          },
+          {
+            "path": "tools/filter-quality/corpus/supplemental.json",
+            "reason": "missing",
+            "expected": "4a76b48a28406eadf3050b148489e66f0e1056a582777cc3a38fd9038e1befb3"
+          },
+          {
+            "path": "tools/filter-quality/corpus/svg-legacy-metadata.json",
+            "reason": "missing",
+            "expected": "eb9f0cead41292ff1e8bf955715a0340b38930df11ba5dfcbb3bf1d7a2bc83d8"
+          },
+          {
+            "path": "tools/filter-quality/corpus/svg-validation.json",
+            "reason": "missing",
+            "expected": "dab7b0a6fb2d95579a475190b0bde2cebd5ff2d9f93d1d1efb603a17d76321a0"
+          },
+          {
+            "path": "tools/filter-quality/downstream/animation_pipeline.py",
+            "reason": "missing",
+            "expected": "13eb1d0fb5cfc478c6701c4abfeb1454228e87609c5832e794d722a61e317866"
+          },
+          {
+            "path": "tools/filter-quality/downstream/face_fallback.py",
+            "reason": "missing",
+            "expected": "291365c7e1745ac1cecfcf9bd8a2a74955ca9d3bc3ecb93ed4318dd8a11b1399"
+          },
+          {
+            "path": "tools/filter-quality/downstream/http-serialization.patch",
+            "reason": "missing",
+            "expected": "eff77223048b1c90236ee51ba70c6869bf84c8427407eb18561499f6503c4fc4"
+          },
+          {
+            "path": "tools/filter-quality/downstream/http_body_bounds.py",
+            "reason": "missing",
+            "expected": "021cf12d42a46d3ebfacfe77f320317ba44c8d141cfeb9def88b14e8e51bdf86"
+          },
+          {
+            "path": "tools/filter-quality/downstream/http_input.py",
+            "reason": "missing",
+            "expected": "089f3f7f86fbca039f4d01bfc277382f9b02887d4ebe30f5277be7249e99cde4"
+          },
+          {
+            "path": "tools/filter-quality/downstream/pipeline_worker.py",
+            "reason": "missing",
+            "expected": "393f5c98fbef9f0f9cb9b7ea15de7060c0dbb693ac7568fb71bc5ccc06b50b5c"
+          },
+          {
+            "path": "tools/filter-quality/downstream/process_pool.py",
+            "reason": "missing",
+            "expected": "adda3f8212d45962a0e3ab504651b1c3dcde1e22bc80b8d8436991bdad63c952"
+          },
+          {
+            "path": "tools/filter-quality/downstream/pureline_addon_candidate.py",
+            "reason": "missing",
+            "expected": "84c258349b8808c4340f29a899c4f1807411426405d3607d94b56d988628dd23"
+          },
+          {
+            "path": "tools/filter-quality/downstream/pureline_addon_v2.py",
+            "reason": "missing",
+            "expected": "ffcf4f64a7c1501b9cb30411c3125e885ded367f24a7ef83748cd87f87291aec"
+          },
+          {
+            "path": "tools/filter-quality/downstream/pureline_http_addon.py",
+            "reason": "missing",
+            "expected": "358be1d5af3ab2561d01f2e4af25b17ecfef4e46d0709140061698842d10dead"
+          },
+          {
+            "path": "tools/filter-quality/downstream/runtime_factory.py",
+            "reason": "missing",
+            "expected": "0d80bf3fb391ba408a7f9c67fe1ef43158e87f190501e4752a6342feecf29e56"
+          },
+          {
+            "path": "tools/filter-quality/downstream/strong_blur.py",
+            "reason": "missing",
+            "expected": "51a34aec315cc3035dcc7d00312d229e5ea02725f43e8eb921b098eef94ccf42"
+          },
+          {
+            "path": "tools/filter-quality/downstream/svg_pipeline.py",
+            "reason": "missing",
+            "expected": "fc8c4247e44e0468331d21a6cdba9ff90b7e013e3081353bbf59f9037eda8f97"
+          },
+          {
+            "path": "tools/filter-quality/downstream/svg_worker.py",
+            "reason": "missing",
+            "expected": "6c7e4fc2c6ff1d109710f090b3e4eccf4b622566ed928c20019a00b41603b393"
+          },
+          {
+            "path": "tools/filter-quality/downstream/worker_protocol.py",
+            "reason": "missing",
+            "expected": "ad5665429f3dd69586e8595603d67738078dec1116653a0b48ccb213741a8ecb"
+          },
+          {
+            "path": "tools/filter-quality/evidence/animated-format-regression.json",
+            "reason": "missing",
+            "expected": "d62feecc5558c7eaaa037a48c31e45d87296c18b851b501dfc76e14d603074be"
+          },
+          {
+            "path": "tools/filter-quality/evidence/http-network-bounds.json",
+            "reason": "missing",
+            "expected": "7f3391c229419ee08da6e95e59fd0d04c9a83f9dff68914f4eada9745bfd52db"
+          },
+          {
+            "path": "tools/filter-quality/evidence/http-serialization-regression.json",
+            "reason": "missing",
+            "expected": "ecab5ca0e32dd713b8c4d9c3f28f44fe1f38cfd5bc43816af505ce01690a54ae"
+          },
+          {
+            "path": "tools/filter-quality/evidence/official-calibration-v2/receipt.json",
+            "reason": "missing",
+            "expected": "874ae4530f58913ddd00cd2ca14fe75130e513bd55f17633f3e6b1e5414b3724"
+          },
+          {
+            "path": "tools/filter-quality/evidence/official-calibration-v2/results.jsonl",
+            "reason": "missing",
+            "expected": "20cfa0459dc65241a440692f43a0d035af496dec378638775c78208e4deb7717"
+          },
+          {
+            "path": "tools/filter-quality/evidence/official-calibration-v2/summary.json",
+            "reason": "missing",
+            "expected": "47079b32afbb81cd925eb021749c5fcaa8985ed6c40e6a8b5ebd1f9fad3be9a9"
+          },
+          {
+            "path": "tools/filter-quality/evidence/official-holdout-frozen-v1/receipt.json",
+            "reason": "missing",
+            "expected": "7f25b2be11b8c4d7abaa3bc0c19dc6ad1a87f4fc9e6a1eacb5eff30b84b29b0e"
+          },
+          {
+            "path": "tools/filter-quality/evidence/official-holdout-frozen-v1/results.jsonl",
+            "reason": "missing",
+            "expected": "b2fba60eed5e76f7d04f61872b93fa819199f636dafd6a0e67db33f3605c7369"
+          },
+          {
+            "path": "tools/filter-quality/evidence/official-holdout-frozen-v1/summary.json",
+            "reason": "missing",
+            "expected": "73d946fc0b652c8ac43bb45b795d26fa5ab192cfdcfca0b4b650449e43c393c9"
+          },
+          {
+            "path": "tools/filter-quality/evidence/packaging-check.json",
+            "reason": "missing",
+            "expected": "d884d2a35692dfeaace7e4e0e1f11fc2bae539208d11026f70d08ba56fa59f5d"
+          },
+          {
+            "path": "tools/filter-quality/evidence/process-bounds-regression.json",
+            "reason": "missing",
+            "expected": "29233d39b8bc94aca7a86374815c946573d029ee39a7e5ed2a3171879190b115"
+          },
+          {
+            "path": "tools/filter-quality/evidence/process-bounds-v6-regression.json",
+            "reason": "missing",
+            "expected": "adbd5d0cccb5863fbae30d5ee6e59aa0e3e8fc19fb72f28a94fbd9d14c82a14b"
+          },
+          {
+            "path": "tools/filter-quality/evidence/real-animation-workers1.json",
+            "reason": "missing",
+            "expected": "3c49c65d8cdb396e08452827e99ae612a3ea9b3d2826f49fde72526a5f4321cb"
+          },
+          {
+            "path": "tools/filter-quality/evidence/real-animation-workers2-final.json",
+            "reason": "missing",
+            "expected": "7318a775bffe15fe1c585007444ad3c4bbb45e0806b51f3ae31e57a4806e928f"
+          },
+          {
+            "path": "tools/filter-quality/evidence/real-load-workers2-100.json",
+            "reason": "missing",
+            "expected": "d3f6ab8ca36f04ea90b9454940993de9ec9f9e82a4e2ad7757ea4a7b573b39f8"
+          },
+          {
+            "path": "tools/filter-quality/evidence/real-static-png-final.json",
+            "reason": "missing",
+            "expected": "a6f48a6669b6afa7569b56dcb7ad20d9ab5ef787e83fcf4151eb3323dae71f1d"
+          },
+          {
+            "path": "tools/filter-quality/evidence/runtime-cache-enabled.json",
+            "reason": "missing",
+            "expected": "d79e6c404332792578dbeb9acf8d2ac6b8a56b97fab2ccff2a0dd734b87dc064"
+          },
+          {
+            "path": "tools/filter-quality/evidence/runtime-http-bounds-regression.json",
+            "reason": "missing",
+            "expected": "64fa4a3ff2b356281894eb0c4ead5636c7a4726dae64d96ba433b88ceb309ac4"
+          },
+          {
+            "path": "tools/filter-quality/evidence/runtime-http-bounds-v6-regression.json",
+            "reason": "missing",
+            "expected": "4588e57b6adb507d6ebea69145d7a8ff14f1158e21a77d3aef843bd72e84aa38"
+          },
+          {
+            "path": "tools/filter-quality/evidence/supplemental-calibration-v1/receipt.json",
+            "reason": "missing",
+            "expected": "13158e6f78e372fec63f38f7b3f7773a4139b544aa1743f4f35c9fdbebcf8f46"
+          },
+          {
+            "path": "tools/filter-quality/evidence/supplemental-calibration-v1/results.jsonl",
+            "reason": "missing",
+            "expected": "f3ee75ed0d200e6fb3ebf40cb7dbcb3168f3896dcfc98d28df7333d42b34480c"
+          },
+          {
+            "path": "tools/filter-quality/evidence/supplemental-calibration-v1/summary.json",
+            "reason": "missing",
+            "expected": "3cbe689b55033728c55ae1730b53cd38c6a7c2015b29233afc9de3bcdb224c1c"
+          },
+          {
+            "path": "tools/filter-quality/evidence/svg-curated-metadata-coherence.json",
+            "reason": "missing",
+            "expected": "ba314e1b612c47fc3907419ca3d43d39f891b1dca8273876bba7229fb4a46c2a"
+          },
+          {
+            "path": "tools/filter-quality/evidence/svg-dependencies.json",
+            "reason": "missing",
+            "expected": "bbe9bae0bcad1d52f33a5d7d3f5e42b7bd68022f0ebe10e9799fa1c9017b7221"
+          },
+          {
+            "path": "tools/filter-quality/evidence/svg-legacy-metadata-validation.json",
+            "reason": "missing",
+            "expected": "f778a716fbaf081f2d62b41a01ef514138f4759d63791115b37a3c4d1ab0e977"
+          },
+          {
+            "path": "tools/filter-quality/evidence/svg-normalization-before-ui-exception.json",
+            "reason": "missing",
+            "expected": "3e2f7ead63b538c6be926217824d80e1c8af362af1618931b5cc81d0b2bfc0ee"
+          },
+          {
+            "path": "tools/filter-quality/evidence/svg-normalization-validation.json",
+            "reason": "missing",
+            "expected": "6e02bda5b55dee0c70d315de04d9830ca64b1b8f5f4051f7e214733d52695963"
+          },
+          {
+            "path": "tools/filter-quality/evidence/svg-presentation-validation.json",
+            "reason": "missing",
+            "expected": "dad6884bf377b005326e4bde5a576d4a0ee56f4f2444cfed8396d00167185b08"
+          },
+          {
+            "path": "tools/filter-quality/evidence/svg-seven-case-final-before-metadata.json",
+            "reason": "missing",
+            "expected": "6e02bda5b55dee0c70d315de04d9830ca64b1b8f5f4051f7e214733d52695963"
+          },
+          {
+            "path": "tools/filter-quality/evidence/svg-source-urls.json",
+            "reason": "missing",
+            "expected": "3f022832c2c68425cbe0f76c322400e6bc5cf85ec816cbfad473a7b7bacbb9a2"
+          },
+          {
+            "path": "tools/filter-quality/evidence/verification-report.json",
+            "reason": "missing",
+            "expected": "43228a45d6c8f9b0ca4c3f2b0da35c80642adba47cd88969501a0f7856c72190"
+          },
+          {
+            "path": "tools/filter-quality/evidence/wikipedia-globe-inspected.png",
+            "reason": "missing",
+            "expected": "bb0e4b77e584215801290c003052a2aa2b0a760adcba1894a2fcddcbad9a8153"
+          },
+          {
+            "path": "tools/filter-quality/evidence/wikisource-svg-compatibility-boundary.json",
+            "reason": "missing",
+            "expected": "e8cc333908b12159cd04d084921c86125b9b7cf627d5df6dc1aefe38e8cb519b"
+          },
+          {
+            "path": "tools/filter-quality/install_svg_dependencies.py",
+            "reason": "missing",
+            "expected": "04be80eed54b46c29d0234467e5b92a1ff08f40422be629f608de187e8f66352"
+          },
+          {
+            "path": "tools/filter-quality/make_audit_sheets.py",
+            "reason": "missing",
+            "expected": "3c9f52c98b90fc3e48f23a9e5d3db3f517e675ccfb651c435436310e13671454"
+          },
+          {
+            "path": "tools/filter-quality/make_gallery.py",
+            "reason": "missing",
+            "expected": "229396c6fbc98da1090960e5c47a7d7c6ef2b79c732889ff90bd6044a5959fdb"
+          },
+          {
+            "path": "tools/filter-quality/prepare_corpus.py",
+            "reason": "missing",
+            "expected": "b940210493ffa1d5dcd39d59b5512f55e2da8d35a9d219cf084ace14da18aec9"
+          },
+          {
+            "path": "tools/filter-quality/prepare_supplemental.py",
+            "reason": "missing",
+            "expected": "e38077ef39ef643f2006ff60c90a75abcc8f1b2d204031b655bab317766fb499"
+          },
+          {
+            "path": "tools/filter-quality/prepare_svg_validation.py",
+            "reason": "missing",
+            "expected": "b461550dfba20144fcb557fa01903c66e22e9f3de8759a715c78bad6b4966f44"
+          },
+          {
+            "path": "tools/filter-quality/requirements-svg.lock",
+            "reason": "missing",
+            "expected": "929c0511abb64b41765ba78a46ddabc2d89b362e5df18e5c2bdd3aaf6036cf03"
+          },
+          {
+            "path": "tools/filter-quality/restore_corpus.py",
+            "reason": "missing",
+            "expected": "d49a4228553f9078a38933543c77b337514f6be44bb471b08a70dc06e47c6c99"
+          },
+          {
+            "path": "tools/filter-quality/run_quality.py",
+            "reason": "missing",
+            "expected": "0c2932bf76ac679012c9eb325f37e5cd315d1ec0b1c0b232c0a98d5bcd650bd9"
+          },
+          {
+            "path": "tools/filter-quality/runtime-candidate-20261127-bounded-v5.json",
+            "reason": "missing",
+            "expected": "e9b4424cce6a376c9ac2620cf5b5ad0ac0680264e5653042dc29eb812b13711b"
+          },
+          {
+            "path": "tools/filter-quality/runtime-candidate-20261127-fc8c4247.json",
+            "reason": "missing",
+            "expected": "4a6868b7afa5d575ca62f62288022ebb5cec3aaac2463aec29f9e52aba04c970"
+          },
+          {
+            "path": "tools/filter-quality/runtime-candidate-20261127-header-bounded-v6.json",
+            "reason": "missing",
+            "expected": "a6bbb87f9ea665e51ae4f964c843483626195f76caaa57358a76d94b270e641d"
+          },
+          {
+            "path": "tools/filter-quality/runtime-candidate-20261127-legacycc-6c7e4fc2.json",
+            "reason": "missing",
+            "expected": "74fd5f729dbacd846e827506d6230daebfe32a3e45b36fa759e989b5c4ea4704"
+          },
+          {
+            "path": "tools/filter-quality/runtime-contract.json",
+            "reason": "missing",
+            "expected": "78d496d76a65a2a4c582e9fa0bf61b500e37da413bbb6e1fcdc3d8ad15fb041a"
+          },
+          {
+            "path": "tools/filter-quality/runtime_contract.py",
+            "reason": "missing",
+            "expected": "11d20dfda902910d0db24ae35b2e08a0b483919259d6c622b908779054498a2e"
+          },
+          {
+            "path": "tools/filter-quality/tests/boundary_addon.py",
+            "reason": "missing",
+            "expected": "d20edf72bd0009763cf3e7ea625824fdf874ae34a7689aaa021a53dbfdf47552"
+          },
+          {
+            "path": "tools/filter-quality/tests/fake_pipeline_worker.py",
+            "reason": "missing",
+            "expected": "11a1c17010e4f9935b7335124f71c602a767de704398264ffc48669ad654e919"
+          },
+          {
+            "path": "tools/filter-quality/verification-report.json",
+            "reason": "missing",
+            "expected": "43228a45d6c8f9b0ca4c3f2b0da35c80642adba47cd88969501a0f7856c72190"
+          },
+          {
+            "path": "tools/filter-quality/verify_results.py",
+            "reason": "missing",
+            "expected": "8a0f15de838304fbf11d0fec0f8375d57ca5edcd8b063263e960f3dc5c6730be"
+          },
+          {
+            "path": "tools/wireguard-lab/.gitignore",
+            "reason": "missing",
+            "expected": "7c2e856906ec0172c71ebd4a966edf629239ea8b7284eca981558de0f17aba6f"
+          },
+          {
+            "path": "tools/wireguard-lab/README.md",
+            "reason": "missing",
+            "expected": "5725c1dd46bc683bb8a16d4cedfae4d26bc2529cd93a2c4d37b3ab6d72a3c62d"
+          },
+          {
+            "path": "tools/wireguard-lab/browser/package-lock.json",
+            "reason": "missing",
+            "expected": "9054c4638f19912dd37a6a346962ff881eb9cc7821e2c7f051915b8e3a9ceb51"
+          },
+          {
+            "path": "tools/wireguard-lab/browser/package.json",
+            "reason": "missing",
+            "expected": "6ac7f8c8ec996515a60b7d4201f640291fc2c38c25e75802d5e3fbbc796cc5c4"
+          },
+          {
+            "path": "tools/wireguard-lab/browser_bounded_v5_validation.cjs",
+            "reason": "missing",
+            "expected": "6ae666fd498f0c66e4338de8c9ee417749bcdbb36c3c27432d7878c000ff07c8"
+          },
+          {
+            "path": "tools/wireguard-lab/browser_discover_svg.cjs",
+            "reason": "missing",
+            "expected": "5edd8b7f55a70631a877bce1b7b27bb697137cb8492298614477c28f1c832b3a"
+          },
+          {
+            "path": "tools/wireguard-lab/browser_trust_probe.cjs",
+            "reason": "missing",
+            "expected": "689576a37586b8bedb9f03411e93f8819b336b2d7ddd24d835f9960946e9514c"
+          },
+          {
+            "path": "tools/wireguard-lab/browser_validation.cjs",
+            "reason": "missing",
+            "expected": "f9a7b3ed1abef1c61990dbe39b474c85974f745535912a6ed48119cfce98a25b"
+          },
+          {
+            "path": "tools/wireguard-lab/browser_wikisource_validation.cjs",
+            "reason": "missing",
+            "expected": "ea6c43ced2f0b9cf8d773be3bba290de1b6addf35d38532d15b372bfa914dcac"
+          },
+          {
+            "path": "tools/wireguard-lab/datagram_relay.py",
+            "reason": "missing",
+            "expected": "9bbc0a22e33e0dafa6b48f1c02e2f25819d11f724d5ba73a1ea73ad04c8e03ab"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/browser-trust-negative-control.json",
+            "reason": "missing",
+            "expected": "7d32cde6dbee3ab36e4023956db26ce13f087f55ec586a6570ee350ec3f21ccf"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/build-receipt.json",
+            "reason": "missing",
+            "expected": "d9f015c8fd0734ceb42acb884d921df351af0017b69f43fe79b40db25271d669"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/candidate-runtime-receipt.json",
+            "reason": "missing",
+            "expected": "c78a5a1a0b98d8ee63aa9f2e0dd4302f705241e80a64013df59749bb69d5cf1b"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-bounded-v5-20261127/cleanup-mac.json",
+            "reason": "missing",
+            "expected": "60d04f6b8343e8be52829d54dab90b9180b81b2b479f1802de2d3f416c1ae4a0"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-bounded-v5-20261127/cleanup-oracle.json",
+            "reason": "missing",
+            "expected": "9798dc784afff298371b58895346aae897a405284f29435a631ce4901c741cfb"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-bounded-v5-20261127/fixtures-public.json",
+            "reason": "missing",
+            "expected": "88938e319da3242d739ad12a6ed9c010d208b2c0f3a3701be00bb121a5db3a2f"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-bounded-v5-20261127/gallery.png",
+            "reason": "missing",
+            "expected": "f9f48448f6200804b28b430aaeea1a90ad17615c471e7b089c7c844ae898c855"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-bounded-v5-20261127/late-blocked-frame.gif-frame-0.png",
+            "reason": "missing",
+            "expected": "0bf32cef739d3182d215ff24b688aed1ccfcf7f6b1296c50bcd581b40d2f3444"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-bounded-v5-20261127/late-blocked-frame.gif-frame-1.png",
+            "reason": "missing",
+            "expected": "0bf32cef739d3182d215ff24b688aed1ccfcf7f6b1296c50bcd581b40d2f3444"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-bounded-v5-20261127/late-blocked-frame.gif-frame-2.png",
+            "reason": "missing",
+            "expected": "0bf32cef739d3182d215ff24b688aed1ccfcf7f6b1296c50bcd581b40d2f3444"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-bounded-v5-20261127/pangea.gif-frame-0.png",
+            "reason": "missing",
+            "expected": "16d5f6d722f88604d5e179e65a04a798c6ba4caf0f65fb5e77160b08e14d63d7"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-bounded-v5-20261127/pangea.gif-frame-1.png",
+            "reason": "missing",
+            "expected": "e1805e10dc701e498fdb87ceb178e2502d1323996968efc1c913e5542b8b3421"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-bounded-v5-20261127/pangea.gif-frame-2.png",
+            "reason": "missing",
+            "expected": "fd88163cf00a751086a428f213cec36692cb573cb2e2c8712b6c29c65cce364c"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-bounded-v5-20261127/stage-receipt.json",
+            "reason": "missing",
+            "expected": "1da7c113b7134a4ad193a26b1bab4be825806d54f727feeb00aee338fd1b4004"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-bounded-v5-20261127/summary.json",
+            "reason": "missing",
+            "expected": "aa29d44ad7e75644f084f912cda0c3badf617f4e96493e4013769c1059286a5c"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-frozen-v3/highres.json",
+            "reason": "missing",
+            "expected": "acede5048d0eda0fdcff08144f2fdf7e9883bb50db61869732b49356b8801d03"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-frozen-v3/highres.png",
+            "reason": "missing",
+            "expected": "eec8feda4c44e4d1db1a10f4b4a00c277f8c5d082c7bfdf45b8b4b37b657ce63"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-frozen-v3/summary.json",
+            "reason": "missing",
+            "expected": "83f30eaad5f3ad0c32240c7aade11d6911d7b1a2f08b40671a1d30dbeb34ec53"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-frozen-v3/svg.json",
+            "reason": "missing",
+            "expected": "3654863d97268435736851db124a7ed152f81d0e4acf42df16d2459646d09398"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-frozen-v3/svg.png",
+            "reason": "missing",
+            "expected": "27b5b9893ea559c5f5a94b15df84b2cc165d6dfcac51b611d13291259f0af2db"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-frozen-v3/wikipedia-einstein-scrolled.png",
+            "reason": "missing",
+            "expected": "04f278a0f97c6e067ae8bbf2376d4b86678876fdc5def5a1f23da4c02cb264e7"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-frozen-v3/wikipedia-einstein.json",
+            "reason": "missing",
+            "expected": "fbe5d32b07c0a53ccd441ff318561ab8d670edede83be47d7a336525a96f51d9"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-frozen-v3/wikipedia-einstein.png",
+            "reason": "missing",
+            "expected": "64f82e38717d422913eb01e5dd60678aa3b913ab2c0cb5ff794c6805ec747fd2"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-frozen-v3/wikipedia-meir-scrolled.png",
+            "reason": "missing",
+            "expected": "af50f35246df24d4c929aa1bf202d4eb4b86f8863e355ea99f3296c9e9504455"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-frozen-v3/wikipedia-meir.json",
+            "reason": "missing",
+            "expected": "7b1e567fdbb4d03c5ced4bd472a5f1ec79e975d0882f7fcc2474c4deb367e6ed"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-frozen-v3/wikipedia-meir.png",
+            "reason": "missing",
+            "expected": "1007f5ad8850dae5f6f6eeda23c00eacf7373f86b01aee24ffda2276b07d9007"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-frozen-v3/wikipedia-nature-scrolled.png",
+            "reason": "missing",
+            "expected": "a9588b8060ff627d501310ac3c4c8194ab38b05e3106d20fdf7b1fa5a420c7c1"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-frozen-v3/wikipedia-nature.json",
+            "reason": "missing",
+            "expected": "c6157be6075e801d445844ca944793a9864a3b3f07c8d9608f8bad689b05f589"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-frozen-v3/wikipedia-nature.png",
+            "reason": "missing",
+            "expected": "3f1154381ad56beaa868ef3e4a3cb7175f074b608a86090e6fac73724f144ad5"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-http-rewrite-fixed-v2/block.json",
+            "reason": "missing",
+            "expected": "8d89ccaf89bd858ae8d51d0bdccdfbd9241d5fb00b6be0a2ae1f263e75c3e4b9"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-http-rewrite-fixed-v2/block.png",
+            "reason": "missing",
+            "expected": "4c7c96c019f8a82d2c980d8a31ab3fa0bffd591691e072fa26bb9fecd9954e42"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-http-rewrite-fixed-v2/summary.json",
+            "reason": "missing",
+            "expected": "b8dbcfc7d1504eb95ff48e5eed541967e41f86dbe0d79aa0827f4d1a33dd1099"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-http-rewrite-fixed-v2/thumbnails.json",
+            "reason": "missing",
+            "expected": "49921d17a184734fcc61a5be6ce8361fd38cb185a3bb187186a34d7939022571"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-http-rewrite-fixed-v2/thumbnails.png",
+            "reason": "missing",
+            "expected": "70e53c78e5dc60a82b4ffad2c3aa30fedd7b2b506da44ab94ee6d98fc6d5904d"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/allow.json",
+            "reason": "missing",
+            "expected": "ffbc976897c21d29377f10d83e8cacbc337a846b1d40ac336dc3097ef1885ee7"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/allow.png",
+            "reason": "missing",
+            "expected": "08486b59f6d0650997ea471a97927db724b37e46118b33a5a65a07cb7f07c4b4"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/block.json",
+            "reason": "missing",
+            "expected": "3366c4ce613266db5562975b223534137e4ff455266d5a4f9918e3b7f3f246ec"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/block.png",
+            "reason": "missing",
+            "expected": "4aa8dd702e18f84c7cda27cc1f0aaceaf6868a8c4d533518b7294dcb713b19ee"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/groups.json",
+            "reason": "missing",
+            "expected": "c4550e0c9b19dc90610d5aa611d5b7769603633b18b21b9bade371e101314074"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/groups.png",
+            "reason": "missing",
+            "expected": "81b5d380665b0418746f3b5e1d4e2bbca95caef8d444a31708cc824fdc7733f8"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/mixed-2.json",
+            "reason": "missing",
+            "expected": "7dbd1b0a19a344327a2bbf83d871fdc3a9e7d7174330164ad5422aee636010cc"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/mixed-2.png",
+            "reason": "missing",
+            "expected": "3ff8cf8a793916134b77633b41d21fb8cc2702b9fe760dcaedcdf65f0c01bedc"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/mixed.json",
+            "reason": "missing",
+            "expected": "c6a0fecc03b28bfbac873dd22681031c2c1b71a9920778523ed5bc5dedbf00dd"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/mixed.png",
+            "reason": "missing",
+            "expected": "24e577c0085e6a804124ec559a66566b3c03fe5ac9fcb6506afab15695418335"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/objects.json",
+            "reason": "missing",
+            "expected": "e18223592e55bd2635a40964d0f9982383e92394fc27066482143df6eb63e577"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/objects.png",
+            "reason": "missing",
+            "expected": "516a83f1e0c723dd8540dc111095de5927c675e3c3968c3d9320629876701141"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/summary.json",
+            "reason": "missing",
+            "expected": "5da299126de6bf2a59887ce69c80b8ac5afcf670f63b905ccae0877a53469a59"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/thumbnails-2.json",
+            "reason": "missing",
+            "expected": "d0b98fe5e63f7451ca027d8f1617077a2601711a6298b42e7cad06a75daa96fa"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/thumbnails-2.png",
+            "reason": "missing",
+            "expected": "304afcb3c83a835d0deb02688d37f81c172674ed2e223cd2f1a70123a3a72314"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/thumbnails.json",
+            "reason": "missing",
+            "expected": "5cab2c704ca470366f00286aee443f39e96f8202d7f0792a8ffead7d6b8ecebd"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/thumbnails.png",
+            "reason": "missing",
+            "expected": "9dc01becb42a1e90215cc80bb6f1fa1f330b28b7398612e6b6e3e9514eda3e6f"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/wikipedia-einstein.json",
+            "reason": "missing",
+            "expected": "93b947ce98a358e3ee1892c2dff3d9b2fc00d89d2bf1ea7ba293127a236879e9"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/wikipedia-einstein.png",
+            "reason": "missing",
+            "expected": "f873f9ac76dc70ecaccb996d0670323884c83bcaeeb5555029b784b68f59752b"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/wikipedia-meir.json",
+            "reason": "missing",
+            "expected": "7b7aabad2b485151e67e82945b2c3bb284532c56c68d87bbab954b52f5ef6ce8"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/wikipedia-meir.png",
+            "reason": "missing",
+            "expected": "c122c6fba05932899a48458b15d4f525c75e240e799af277d5f279fa5931eec2"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/wikipedia-nature.json",
+            "reason": "missing",
+            "expected": "4790a9c665185a610270b7ec8f9b2285311d97fe81308fdc8dd8fad0b82d9eb6"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-rendered-v1/wikipedia-nature.png",
+            "reason": "missing",
+            "expected": "74c35c3c572bcaf64ab138308a1675a9644fe922a4a3e148e00cdc9c6bfebbfe"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-wikisource-v4/summary.json",
+            "reason": "missing",
+            "expected": "73e36cc14714d4e177cb1fcb75b7a00823ccbfea797f80ad3222b85f6e81f13e"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/chromium-wikisource-v4/wikisource.png",
+            "reason": "missing",
+            "expected": "b32131be9ef56046c5fc699c24b317ee2557a526319b45b4944ac1275e280a17"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/combined-final-regression-run.json",
+            "reason": "missing",
+            "expected": "2d21d5b7d4edd5ce59c81635125f7c1c5ba2ff946dc8429faff0b604dbac777b"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/combined-v3-runtime-receipt.json",
+            "reason": "missing",
+            "expected": "2a8e1551519f969f87cc16bfc622af4d91c8e0de0e2ff83575e4d8344b32d4d6"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/fixture-input-probe.json",
+            "reason": "missing",
+            "expected": "b733ad176eab65d99b03b3e272134d259c5ee3c011253e259f745f023a15098a"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/fixture-origin-manifest.json",
+            "reason": "missing",
+            "expected": "e9c2a6081cbb5c9b2f1b0ff47ea07c8bfc12669e7eee09d2f9353bd6511088fa"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/frozen-client-restart.json",
+            "reason": "missing",
+            "expected": "089d229eec48eef0a173c15212164315ef5a0c7bde8444cb83078cc1ed2bda24"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/frozen-runtime-cutover.json",
+            "reason": "missing",
+            "expected": "23d40be2da1131926a8c0e677099198da9f8d8b9f5e30a69b5a4ab401f4b2a6d"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/frozen-v3-readiness-health.json",
+            "reason": "missing",
+            "expected": "cc39bb2108261420dce242537a3e07e6a63a2d8f2f6f6bc07be81da66ba1eb19"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/frozen-v3-readiness.json",
+            "reason": "missing",
+            "expected": "1fb3721b9a314a0da0cb8a6d96924bed53df83e01e3544433882a1f4c1bac23f"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/frozen-v4-client-restart.json",
+            "reason": "missing",
+            "expected": "2416dc61c04ff318a49b02aef7aa0e97ba2c3a2e8d2893c439575d2d2aa8c0ca"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/frozen-v4-runtime-cutover.json",
+            "reason": "missing",
+            "expected": "be3c6de39f242645fde8d86283015728a419996794e900697ea436cbb603c320"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/http-rewrite-fix-receipt.json",
+            "reason": "missing",
+            "expected": "7e9011bd64aceb4540d012e47fc02602f8f4d0c168ac7abf63d64d3aef44249d"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/http-rewrite-wire-proof.json",
+            "reason": "missing",
+            "expected": "e8701a5770b077b22a7a807936630b6bceb879c54d5aea778478846eb002110f"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/image-transport-baseline.json",
+            "reason": "missing",
+            "expected": "1c7d5ec9395bd605ceab8108a8776490518fa7a513cf640fab90e913a43ecbf0"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/image-transport-candidate.json",
+            "reason": "missing",
+            "expected": "6c732887e3674d7c681b29c126347a6b05e5bf4313cb398b49554e472af00bb3"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/io-pressure-initial-readiness.json",
+            "reason": "missing",
+            "expected": "11c34616253940bde91029ea642c6b888bd054e5ba2497d18ea76eab3c54f420"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/nature-svg-urls.json",
+            "reason": "missing",
+            "expected": "3f022832c2c68425cbe0f76c322400e6bc5cf85ec816cbfad473a7b7bacbb9a2"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/pending-thumbnail-direct-probe.json",
+            "reason": "missing",
+            "expected": "6bad29784f59288433ad36e66a3b75e9a58faf6defb2c5f546a689ab1e609624"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/pending-thumbnail-wg-probe.json",
+            "reason": "missing",
+            "expected": "bdca20499b826e71227191484001d1e59ae442fff8c872bebd235efb007f2392"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/public-svg-error-probe.json",
+            "reason": "missing",
+            "expected": "2ef67ff2c073a9af9267432e1fd8ffff00cee20bd9f217f0c2fc463f2a84fd81"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/runtime-staging-receipt.json",
+            "reason": "missing",
+            "expected": "857eaaa85daa3369f2578dd7176c6ee4f50ae1983fedd45bfc0797b1489b54d7"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/runtime-staging-v4-receipt.json",
+            "reason": "missing",
+            "expected": "6309889609c2f358cfe0b0e120b0a0d3108eb21c82896b06b1f7b5137b9e1821"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/svg-worker-io-observation.json",
+            "reason": "missing",
+            "expected": "71bb6b797aff32fe684337dc4c948eb03a2c53efb7afe3cb6557627c55b68e04"
+          },
+          {
+            "path": "tools/wireguard-lab/evidence/transport-smoke.json",
+            "reason": "missing",
+            "expected": "108b43e227270f8a79d0799da8ba7094a081374bd9c3bf3bafbe6ac7df13e1b3"
+          },
+          {
+            "path": "tools/wireguard-lab/fixture_origin.py",
+            "reason": "missing",
+            "expected": "1884d48cb0820d5dd29f89fa5806b64677cd13cc2e2e10db00b3c358af819a51"
+          },
+          {
+            "path": "tools/wireguard-lab/gallery/allow.html",
+            "reason": "missing",
+            "expected": "48b19b1bace8147c7514096afd21c98ca657c2c01c14864b01414f2cef8e30fc"
+          },
+          {
+            "path": "tools/wireguard-lab/gallery/block.html",
+            "reason": "missing",
+            "expected": "0647aba725a17557330861e49525105c1614dd5099a15b7320b4693f7f14050c"
+          },
+          {
+            "path": "tools/wireguard-lab/gallery/groups.html",
+            "reason": "missing",
+            "expected": "cf03cd79c4594877e4807e41b4aee6cc001258e36257f696d8538659616b03b2"
+          },
+          {
+            "path": "tools/wireguard-lab/gallery/highres.html",
+            "reason": "missing",
+            "expected": "ee2d87dcaa20d067c9b82f7c4fbdb22215f7fe2d7dba483298e0c78554351620"
+          },
+          {
+            "path": "tools/wireguard-lab/gallery/index.html",
+            "reason": "missing",
+            "expected": "049e90b926f09d2f7eab7f1d7988674c73c894ff684a7dd4a5df7c0c84d10a43"
+          },
+          {
+            "path": "tools/wireguard-lab/gallery/manifest.json",
+            "reason": "missing",
+            "expected": "174db73bfe28af91cf1853a01e98553943916c27faadfbacf0e084a2a919a594"
+          },
+          {
+            "path": "tools/wireguard-lab/gallery/mixed-2.html",
+            "reason": "missing",
+            "expected": "ba47699fc5a1d2e907f8aa359b0cbec8aad302fd1c7ad2535f5ddcae765f92c8"
+          },
+          {
+            "path": "tools/wireguard-lab/gallery/mixed.html",
+            "reason": "missing",
+            "expected": "404616bf00c6e466e1fd390aec25243593edd6292422d250129889c5e9e95ee9"
+          },
+          {
+            "path": "tools/wireguard-lab/gallery/objects.html",
+            "reason": "missing",
+            "expected": "3526e90fa3efc31d37dc22a12882353398daa2d50b4ec16e0358abe769f064b5"
+          },
+          {
+            "path": "tools/wireguard-lab/gallery/svg.html",
+            "reason": "missing",
+            "expected": "0cb605634d2047b4c099618a1a50b6830c4b309539af382ba5a39e2efaabb892"
+          },
+          {
+            "path": "tools/wireguard-lab/gallery/thumbnails-2.html",
+            "reason": "missing",
+            "expected": "67dfd4a330f9ddc8d04cdcdc808d2339c2d0be3d409f60b231ac5641ce84922c"
+          },
+          {
+            "path": "tools/wireguard-lab/gallery/thumbnails.html",
+            "reason": "missing",
+            "expected": "c53cd5a50b6a990725d9d77a3d5a830ee7944722ae4adb7fd88b70b0993f4a89"
+          },
+          {
+            "path": "tools/wireguard-lab/go.mod",
+            "reason": "missing",
+            "expected": "81724c3451ca79d290850b155e4c3bf60e1fff0c836009bc35f194f64bdc8cd7"
+          },
+          {
+            "path": "tools/wireguard-lab/go.sum",
+            "reason": "missing",
+            "expected": "328d3e164fd9e57ea74aa31ebe319c0017f4ecadba8e0915c86a272072aa73fe"
+          },
+          {
+            "path": "tools/wireguard-lab/main.go",
+            "reason": "missing",
+            "expected": "9bdcdcffc5cc49570791d7e73f10da328ebf732456c1e95135236b19c0f7f025"
+          },
+          {
+            "path": "tools/wireguard-lab/pureline_http_addon.py",
+            "reason": "missing",
+            "expected": "0a359e1a28e26e1ca30e9f63d07c00ae60f8212509a70f76e7fb76821068a55e"
+          }
+        ],
+        "gitlinks": [
+          {
+            "path": "Vendor/AI-Image-Classifier",
+            "commit": "5291eedb9b46fa978e36ccec4f5504b017afe809"
+          },
+          {
+            "path": "Vendor/WireGuard",
+            "commit": "2fec12a6e1f6e3460b6ee483aa00ad29cddadab1"
+          }
+        ],
+        "generated_input_attestation": {
+          "iosapp/project.yml": "7d6494f41636e9f3b2c31dd64962616c6a9df611c644e367d4f6a8d85d36d8dd",
+          "generated_project_sha256": "149437a29549d203047ad697773e1fe56905d5ba26544f133c4c9d4cbc3ede35",
+          "info_plist_sha256": "31e2118654ab133127e79d4bd21e9e35d0e542ca67485e3ee70879627257ac5a",
+          "info_all_explicit_frozen_spec_properties_match": true,
+          "info_defaults": {
+            "CFBundleDevelopmentRegion": "$(DEVELOPMENT_LANGUAGE)",
+            "CFBundleExecutable": "$(EXECUTABLE_NAME)",
+            "CFBundleIdentifier": "$(PRODUCT_BUNDLE_IDENTIFIER)",
+            "CFBundleInfoDictionaryVersion": "6.0",
+            "CFBundleName": "$(PRODUCT_NAME)",
+            "CFBundlePackageType": "APPL"
+          },
+          "unused_validation_spec": "iosapp/project.wireguard-validation.yml is not loaded by the full HTTrailiOS scheme generated from project.yml",
+          "resolved_lock_sha256": "68b3c03c349dd9c6c35ddd307fe1e673b52dec5c777c7fb40397006624df4039"
+        },
+        "package_checkouts": [
+          {
+            "identity": "flyingfox",
+            "revision": "d06fd45653bcab9803af31d66440f552c9dd9c93",
+            "dirty": false,
+            "version": "0.27.0"
+          },
+          {
+            "identity": "swift-asn1",
+            "revision": "a9a5efd40eaf558a2bcd48d64b1d1646be686008",
+            "dirty": false,
+            "version": "1.7.1"
+          },
+          {
+            "identity": "swift-atomics",
+            "revision": "b601256eab081c0f92f059e12818ac1d4f178ff7",
+            "dirty": false,
+            "version": "1.3.0"
+          },
+          {
+            "identity": "swift-certificates",
+            "revision": "bde8ca32a096825dfce37467137c903418c1893d",
+            "dirty": false,
+            "version": "1.19.1"
+          },
+          {
+            "identity": "swift-collections",
+            "revision": "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
+            "dirty": false,
+            "version": "1.6.0"
+          },
+          {
+            "identity": "swift-crypto",
+            "revision": "95ba0316a9b733e92bb6b071255ff46263bbe7dc",
+            "dirty": false,
+            "version": "3.15.1"
+          },
+          {
+            "identity": "swift-nio",
+            "revision": "77b84ac2cd2ac9e4ac67d19f045fd5b434f56967",
+            "dirty": false,
+            "version": "2.101.0"
+          },
+          {
+            "identity": "swift-nio-ssl",
+            "revision": "407d82d5b6cc00e1c3fb83a81b1539b70c788c5e",
+            "dirty": false,
+            "version": "2.37.1"
+          },
+          {
+            "identity": "swift-system",
+            "revision": "7502b711c92a17741fa625d722b0ccbd595d8ed1",
+            "dirty": false,
+            "version": "1.7.2"
+          }
+        ],
+        "qualified_assets": [
+          {
+            "path": "Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ImageEncoder.mlpackage",
+            "sha256": "d051afb7eeb6619fb1f510cd7bccf34e812f7e4f3d430c1e86d48591448bf78f",
+            "bytes": 71735075
+          },
+          {
+            "path": "Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2PromptEmbeddings.json",
+            "sha256": "8f411353a134d8c32fd9d6e309bc228481fce5b8dd46e867a864c0f4d139aedf",
+            "bytes": 59054
+          },
+          {
+            "path": "Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ModelManifest.json",
+            "sha256": "ccdfeb440160c94a7c9e694011f1e4b3a4dd6d42f7141a1cb6b4ad6359c2a8ac",
+            "bytes": 943
+          },
+          {
+            "path": "Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ConversionReport.json",
+            "sha256": "38db92db33e34a50b688e5b41369baf12e18e11ee9ab2f2edbae3ce55a0f90ce",
+            "bytes": 277
+          },
+          {
+            "path": "Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2-MODEL-LICENSE.md",
+            "sha256": "b939e6c51a3e6c4fd7ceb2d74e8a6e7dc4cb0a9cd995c08493031251914b0bef",
+            "bytes": 6141
+          },
+          {
+            "path": "Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/NudeNet320n.mlpackage",
+            "sha256": "573ea21255941b761dda7d0c61d213a46c7712027724d6dffb37d7cedca37292"
+          }
+        ],
+        "model_qualification_receipt_sha256": "6be592e735fecefb8eb31cc121e84c314573cdd2e083efd0d612dc4638be6864",
+        "tree_hash_algorithm": "SHA256 of sorted relative file paths (UTF-8) followed by their bytes, without separators."
+      }
+    },
+    "post_archive_attestation": {
+      "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/post-archive-attestation.json",
+      "sha256": "06930c849d4a13ec9462eebc314375e181cc9672f895962ab6eb6a7f0a759fe3",
+      "data": {
+        "scope": "Post-archive exact source and symbols attestation",
+        "source_commit": "d89d53106d5db87aaa4c9356c9114dbe76daa839",
+        "time": "2026-11-27T16:12:22.668646+00:00",
+        "outcome": "PASS",
+        "tracked_source_state_unchanged_since_preflight": true,
+        "compiled_repository_swift_files": [
+          "Sources/HTTrailCore/APIClient/BodyEncoding.swift",
+          "Sources/HTTrailCore/APIClient/CodeGenerator.swift",
+          "Sources/HTTrailCore/APIClient/CurlConverter.swift",
+          "Sources/HTTrailCore/APIClient/Importers.swift",
+          "Sources/HTTrailCore/APIClient/RequestRunner.swift",
+          "Sources/HTTrailCore/APIClient/ScriptRunner.swift",
+          "Sources/HTTrailCore/AppGroup.swift",
+          "Sources/HTTrailCore/AppPaths.swift",
+          "Sources/HTTrailCore/CATrustProbe.swift",
+          "Sources/HTTrailCore/CertificateAuthority.swift",
+          "Sources/HTTrailCore/Discovery/BonjourService.swift",
+          "Sources/HTTrailCore/Discovery/CaptureHealthCheck.swift",
+          "Sources/HTTrailCore/Discovery/CaptureStartReadiness.swift",
+          "Sources/HTTrailCore/Discovery/CaptureTarget.swift",
+          "Sources/HTTrailCore/Discovery/PairingServer.swift",
+          "Sources/HTTrailCore/Downstream/DirectImageFilterSettings.swift",
+          "Sources/HTTrailCore/Export/HARExporter.swift",
+          "Sources/HTTrailCore/LocalNetwork.swift",
+          "Sources/HTTrailCore/Model/CaptureSession.swift",
+          "Sources/HTTrailCore/Model/Flow.swift",
+          "Sources/HTTrailCore/Model/ImageSniffer.swift",
+          "Sources/HTTrailCore/Model/ResourceType.swift",
+          "Sources/HTTrailCore/Model/Workspace.swift",
+          "Sources/HTTrailCore/Persistence/CaptureSessionStore.swift",
+          "Sources/HTTrailCore/Persistence/JSONStore.swift",
+          "Sources/HTTrailCore/ProfileGenerator.swift",
+          "Sources/HTTrailCore/ProfileHTTPServer.swift",
+          "Sources/HTTrailCore/Proxy/DecryptedProxyHandler.swift",
+          "Sources/HTTrailCore/Proxy/GlueHandler.swift",
+          "Sources/HTTrailCore/Proxy/InterceptEngine.swift",
+          "Sources/HTTrailCore/Proxy/ProxyHandlers.swift",
+          "Sources/HTTrailCore/Proxy/ProxyRuntimeEvents.swift",
+          "Sources/HTTrailCore/Proxy/ProxyServer.swift",
+          "Sources/HTTrailCore/Proxy/StreamingProxyHandler.swift",
+          "Sources/HTTrailCore/Proxy/UpstreamConnectionPool.swift",
+          "Sources/HTTrailCore/Proxy/WebSocketProxy.swift",
+          "Sources/HTTrailCore/Realtime/MQTTClient.swift",
+          "Sources/HTTrailCore/Realtime/RealtimeTestServer.swift",
+          "Sources/HTTrailCore/Realtime/RealtimeURLSession.swift",
+          "Sources/HTTrailCore/Realtime/SSEClient.swift",
+          "Sources/HTTrailCore/Realtime/SocketIOClient.swift",
+          "Sources/HTTrailCore/Realtime/WebSocketClient.swift",
+          "Sources/HTTrailCore/SharedConfigStore.swift",
+          "Sources/HTTrailCore/SharedFlowStore.swift",
+          "Sources/HTTrailCore/SystemProxyController.swift",
+          "Sources/HTTrailCore/UI/AppModel.swift",
+          "Sources/HTTrailCore/UI/ExportSupport.swift",
+          "Sources/HTTrailCore/UI/HexViewer.swift",
+          "Sources/HTTrailCore/UI/SessionComponents.swift",
+          "Sources/HTTrailCore/UI/SharedComponents.swift",
+          "Sources/HTTrailCore/UI/Theme.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Configuration/MobileCLIPPromptConfiguration.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Configuration/PersonClassifierConfiguration.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/LocalServer/APIModels.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/LocalServer/HTTPResponse+JSON.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/LocalServer/LocalInferenceServer.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/LocalServer/LocalServerView.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/LocalServer/ServerConfiguration.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/ImageSafetyModels.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/NudeDetection.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/PersonClassification.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/PredictionResult.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/CameraService.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/CoreMLService.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/DetectionMappingService.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/DetectionMergeService.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/DiagnosticLogService.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/HumanDetectionService.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/ImageSafetyPipelineService.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/MobileCLIPService.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/NudityFilterPolicy.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/PersonClassificationService.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/PersonCropService.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Services/SpeechService.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/ViewModels/CameraViewModel.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/ViewModels/ImageRecognitionViewModel.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/ViewModels/VoiceViewModel.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Views/CameraView.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Views/ContentView.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Views/DiagnosticsView.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Views/Helpers/Utilities/ImagePicker.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Views/ImageRecognitionView.swift",
+          "Vendor/AI-Image-Classifier/AI-Image-Classifier/Views/VoiceView.swift",
+          "Vendor/WireGuard/Sources/WireGuardKit/Array+ConcurrentMap.swift",
+          "Vendor/WireGuard/Sources/WireGuardKit/DNSResolver.swift",
+          "Vendor/WireGuard/Sources/WireGuardKit/DNSServer.swift",
+          "Vendor/WireGuard/Sources/WireGuardKit/Endpoint.swift",
+          "Vendor/WireGuard/Sources/WireGuardKit/IPAddress+AddrInfo.swift",
+          "Vendor/WireGuard/Sources/WireGuardKit/IPAddressRange.swift",
+          "Vendor/WireGuard/Sources/WireGuardKit/InterfaceConfiguration.swift",
+          "Vendor/WireGuard/Sources/WireGuardKit/PacketTunnelSettingsGenerator.swift",
+          "Vendor/WireGuard/Sources/WireGuardKit/PeerConfiguration.swift",
+          "Vendor/WireGuard/Sources/WireGuardKit/PrivateKey.swift",
+          "Vendor/WireGuard/Sources/WireGuardKit/TunnelConfiguration.swift",
+          "Vendor/WireGuard/Sources/WireGuardKit/WireGuardAdapter.swift",
+          "iosapp/ImageFilterIntegration/Core/DirectImageSafetyAnalyzer.swift",
+          "iosapp/ImageFilterIntegration/Core/ExtensionSafeDiagnosticLogService.swift",
+          "iosapp/ImageFilterIntegration/Core/PurelineFilterConfiguration.swift",
+          "iosapp/ImageFilterIntegration/Core/PurelineHumanDetectionService.swift",
+          "iosapp/ImageFilterIntegration/EmbeddedImageFilterRootView.swift",
+          "iosapp/PacketTunnel/ImageFilterProxyBridge.swift",
+          "iosapp/PacketTunnel/PacketTunnelProvider.swift",
+          "iosapp/PurelineIntegration/Capture/PurelineBoundedFlowSink.swift",
+          "iosapp/PurelineIntegration/Compatibility/PurelineAntiBotCompatibilityStore.swift",
+          "iosapp/PurelineIntegration/Configuration/PurelineConfigurationDocument.swift",
+          "iosapp/PurelineIntegration/Configuration/PurelineFilterConfigurationStore.swift",
+          "iosapp/PurelineIntegration/Configuration/PurelineFilterConfigurationViewModel.swift",
+          "iosapp/PurelineIntegration/Diagnostics/PurelineDiagnosticArchive.swift",
+          "iosapp/PurelineIntegration/Diagnostics/PurelinePacketTunnelDiagnostics.swift",
+          "iosapp/PurelineIntegration/FailOpen/PurelineRuntimePolicy.swift",
+          "iosapp/PurelineIntegration/ImageFiltering/PurelineImageResponsePolicy.swift",
+          "iosapp/PurelineIntegration/ImageFiltering/PurelineInspectionAdmissionController.swift",
+          "iosapp/PurelineIntegration/TLS/PurelineCompatibilityBypassStore.swift",
+          "iosapp/Sources/App.swift",
+          "iosapp/Sources/CaptureSetupGateView.swift",
+          "iosapp/Sources/CaptureView.swift",
+          "iosapp/Sources/ComposeView.swift",
+          "iosapp/Sources/ImageFilterTabHostView.swift",
+          "iosapp/Sources/RealtimeView.swift",
+          "iosapp/Sources/RulesView.swift",
+          "iosapp/Sources/SetupView.swift",
+          "iosapp/Sources/VPNController.swift",
+          "iosapp/Sources/WebPreview.swift",
+          "iosapp/WireGuardIntegration/App/PurelineFilteringLabView.swift",
+          "iosapp/WireGuardIntegration/App/PurelineWGController.swift",
+          "iosapp/WireGuardIntegration/App/PurelineWireGuardView.swift",
+          "iosapp/WireGuardIntegration/Extension/PurelineWireGuardTunnel.swift",
+          "iosapp/WireGuardIntegration/Shared/PurelineWGKeychain.swift",
+          "iosapp/WireGuardIntegration/Shared/PurelineWGProfile.swift"
+        ],
+        "compiled_repository_swift_count": 129,
+        "compiled_external_swift_count": 682,
+        "generated_swift_inputs": {
+          "Build/Intermediates.noindex/ArchiveIntermediates/HTTrailiOS/IntermediateBuildFilesPath/swift-nio-ssl.build/Release-iphoneos/NIOSSL-t.build/DerivedSources/resource_bundle_accessor.swift": "416ef0cf3bbcadf5ecf69f6d77d3ae274b87f863965b0fc1e1716623c7795497",
+          "Build/Intermediates.noindex/ArchiveIntermediates/HTTrailiOS/IntermediateBuildFilesPath/HTTrailiOS.build/Release-iphoneos/HTTrailiOS.build/DerivedSources/GeneratedAssetSymbols.swift": "c3d8b6adb619f947dec2de308862af23882af003a02f6802c0a210c159f2ad7b",
+          "Build/Intermediates.noindex/ArchiveIntermediates/HTTrailiOS/IntermediateBuildFilesPath/swift-nio.build/Release-iphoneos/NIOPosix-t.build/DerivedSources/resource_bundle_accessor.swift": "8443b03f690372e402c6f51a6b455a875b960e4ba4eac1de8d71b3f025083bf7",
+          "Build/Intermediates.noindex/ArchiveIntermediates/HTTrailiOS/IntermediateBuildFilesPath/swift-crypto.build/Release-iphoneos/Crypto-t.build/DerivedSources/resource_bundle_accessor.swift": "fdc5ff900c15428bc3a659798329142a4b62c26e074e4513578f2ea5b3d9281c",
+          "Build/Intermediates.noindex/ArchiveIntermediates/HTTrailiOS/IntermediateBuildFilesPath/swift-crypto.build/Release-iphoneos/_CryptoExtras-t.build/DerivedSources/resource_bundle_accessor.swift": "3d5480fade650618294aa5886ce70587be3fdbd88f4b7d3d81b6de7a9760320b",
+          "Build/Intermediates.noindex/ArchiveIntermediates/HTTrailiOS/IntermediateBuildFilesPath/swift-crypto.build/Release-iphoneos/CryptoBoringWrapper-t.build/DerivedSources/resource_bundle_accessor.swift": "efc8116b1f442f0df937147a78c642179b05d409afe086a9f2a497a90b56e905"
+        },
+        "documented_noncompiled_differences_unchanged": 246,
+        "archive_tree": {
+          "sha256": "81cf66fb5bd4b0d5ea9032ffe4f61f009a7b7d45a6c9649b7d4badadb470b578",
+          "bytes": 318128578,
+          "files": 174
+        },
+        "dsym_binary_uuid_matches": [
+          {
+            "path": "dSYMs/EmbeddedImageFilter.framework.dSYM",
+            "binary": "Products/Applications/HTTrailiOS.app/Frameworks/EmbeddedImageFilter.framework/EmbeddedImageFilter",
+            "uuids": [
+              [
+                "981E6E21-C7ED-3627-8271-4D4073A15715",
+                "arm64"
+              ]
+            ],
+            "dwarf_sha256": "d5545f86ae41fd22d6a9352c45a277cc361cbb308fee2e40fb49e5b354444196"
+          },
+          {
+            "path": "dSYMs/HTTrailiOS.app.dSYM",
+            "binary": "Products/Applications/HTTrailiOS.app/HTTrailiOS",
+            "uuids": [
+              [
+                "E0CA60C3-C080-38D3-85E8-4F8815438D5E",
+                "arm64"
+              ]
+            ],
+            "dwarf_sha256": "3a49fdf7c93ab9917c194223e0b3b4abd618f6263b03376d0bfd29e17e534949"
+          },
+          {
+            "path": "dSYMs/ImageFilterCore.framework.dSYM",
+            "binary": "Products/Applications/HTTrailiOS.app/Frameworks/ImageFilterCore.framework/ImageFilterCore",
+            "uuids": [
+              [
+                "600CD213-EC1D-3950-B985-3163491BB20E",
+                "arm64"
+              ]
+            ],
+            "dwarf_sha256": "869ecec08803fd63a933d5227bdd0a94538f5d127da1da7cf5443d027f606bf4"
+          },
+          {
+            "path": "dSYMs/PacketTunnel.appex.dSYM",
+            "binary": "Products/Applications/HTTrailiOS.app/PlugIns/PacketTunnel.appex/PacketTunnel",
+            "uuids": [
+              [
+                "A4EBD268-6A87-3CEF-8EB7-6CF8A92F9FA1",
+                "arm64"
+              ]
+            ],
+            "dwarf_sha256": "cd3b3337c717807b82ab2ecd0d5664dbabf609c0199d28a7eba487acbd2e5c22"
+          }
+        ]
+      }
+    },
+    "signing_preflight": {
+      "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/signing-preflight.json",
+      "sha256": "01d543150e78ff1836d717891a2f1da917cb08e6c63018a3451ec5b1f82d37c5",
+      "data": {
+        "time": "2026-11-27T15:54:18.924277+00:00",
+        "decode_method": "OpenSSL CMS signature verification and extraction without certificate-chain evaluation; no Keychain mutation. Xcode signing/archive validation remains the certificate/provisioning gate.",
+        "profiles": [
+          {
+            "name": "Pureline App Store",
+            "uuid": "66173d4f-fc97-4ec5-b818-64cacdcf237f",
+            "team": [
+              "NA6HPWARQ2"
+            ],
+            "expiration": "2027-09-07T07:25:00",
+            "app_identifier": "NA6HPWARQ2.com.davidpovarsky.pureline",
+            "app_groups": [
+              "group.com.davidpovarsky.pureline"
+            ],
+            "network_extension": [
+              "app-proxy-provider",
+              "content-filter-provider",
+              "packet-tunnel-provider",
+              "dns-proxy",
+              "dns-settings",
+              "relay",
+              "url-filter-provider",
+              "hotspot-provider"
+            ],
+            "get_task_allow": false,
+            "cms_signature_verification_exit": 0,
+            "sha256": "640345652fb8986665a525cc038d872e815d0f79081a4d0221bb2ca67a8dbd24"
+          },
+          {
+            "name": "Pureline PacketTunnel App Store",
+            "uuid": "178b87b6-ffd4-44af-87b9-9827606caa9a",
+            "team": [
+              "NA6HPWARQ2"
+            ],
+            "expiration": "2027-09-07T07:25:00",
+            "app_identifier": "NA6HPWARQ2.com.davidpovarsky.pureline.PacketTunnel",
+            "app_groups": [
+              "group.com.davidpovarsky.pureline"
+            ],
+            "network_extension": [
+              "app-proxy-provider",
+              "content-filter-provider",
+              "packet-tunnel-provider",
+              "dns-proxy",
+              "dns-settings",
+              "relay",
+              "url-filter-provider",
+              "hotspot-provider"
+            ],
+            "get_task_allow": false,
+            "cms_signature_verification_exit": 0,
+            "sha256": "05e185fb1a39c4a7e36a9bedab7d6c9346481bd82ef98917924b0a5b86265207"
+          }
+        ],
+        "identity_command": [
+          "security",
+          "find-identity",
+          "-v",
+          "-p",
+          "codesigning",
+          "/Users/m1/Library/Keychains/apple-signing.keychain-db"
+        ],
+        "identity": "1) 644940FCF25D1730DBD1BF7596AEBA7229E2B8FD \"Apple Distribution: David Povarsky (NA6HPWARQ2)\"\n     1 valid identities found",
+        "prior_read_only_tool_errors": {
+          "unscoped_identity": "0 valid identities; explicit existing signing keychain returns expected valid identity",
+          "security_cms": "cert import failed: Write permissions error; OpenSSL used to read signed metadata without importing certificates"
+        },
+        "disk": "Filesystem   1024-blocks      Used Available Capacity iused     ifree %iused  Mounted on\n/dev/disk3s5   482797652 422857976  12907856    98% 6576858 129078560    5%   /System/Volumes/Data",
+        "memory": "System-wide memory free percentage: 58%",
+        "swap": "vm.swapusage: total = 4096.00M  used = 3112.50M  free = 983.50M  (encrypted)"
+      }
+    },
+    "signed_archive": {
+      "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/archive-ssh-unlocked/receipt.json",
+      "sha256": "1442026cae781cfc2d6e687fa7714b63b64bea8a3c8698e486ab55157548289d",
+      "data": {
+        "scope": "Pureline full signed archive 602 after established helper in SSH session",
+        "source_commit": "d89d53106d5db87aaa4c9356c9114dbe76daa839",
+        "source_attestation_sha256": "28391285d7adcf92669144b01457e34e9653a1abe4630d4f8f5242762197f49f",
+        "prior_attempt_receipt_sha256": "1740b3cc9848c4414a5ece93fa8d1dc3825eca10b5fe80c353ebdffa172886dc",
+        "started_at": "2026-11-27T16:05:44.961650+00:00",
+        "command": [
+          "xcodebuild",
+          "-project",
+          "/Users/m1/builds/pureline-wireguard-app-20261127/iosapp/HTTrailiOS.xcodeproj",
+          "-scheme",
+          "HTTrailiOS",
+          "-configuration",
+          "Release",
+          "-destination",
+          "generic/platform=iOS",
+          "-sdk",
+          "iphoneos",
+          "-derivedDataPath",
+          "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Full",
+          "-clonedSourcePackagesDirPath",
+          "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Full/SourcePackages",
+          "-onlyUsePackageVersionsFromResolvedFile",
+          "-disableAutomaticPackageResolution",
+          "-skipPackageUpdates",
+          "-archivePath",
+          "/Users/m1/builds/_artifacts/pureline-full-602-20261127/Pureline-602-ssh-unlocked.xcarchive",
+          "-resultBundlePath",
+          "/Users/m1/builds/_artifacts/pureline-full-602-20261127/archive-ssh-unlocked/Archive.xcresult",
+          "-jobs",
+          "2",
+          "CURRENT_PROJECT_VERSION=602",
+          "MARKETING_VERSION=1.0",
+          "CODE_SIGN_STYLE=Manual",
+          "DEVELOPMENT_TEAM=NA6HPWARQ2",
+          "CODE_SIGN_IDENTITY=644940FCF25D1730DBD1BF7596AEBA7229E2B8FD",
+          "HTTRAIL_APP_PROFILE_SPECIFIER=66173d4f-fc97-4ec5-b818-64cacdcf237f",
+          "HTTRAIL_PACKET_TUNNEL_PROFILE_SPECIFIER=178b87b6-ffd4-44af-87b9-9827606caa9a",
+          "OTHER_CODE_SIGN_FLAGS=--keychain /Users/m1/Library/Keychains/apple-signing.keychain-db",
+          "COMPILER_INDEX_STORE_ENABLE=NO",
+          "CODE_SIGN_KEYCHAIN=/Users/m1/Library/Keychains/apple-signing.keychain-db",
+          "archive"
+        ],
+        "disk_before": {
+          "raw": "Filesystem   1024-blocks      Used Available Capacity iused    ifree %iused  Mounted on\n/dev/disk3s5   482797652 426006512   9759320    98% 6584231 97593200    6%   /System/Volumes/Data",
+          "available_bytes": 9993543680
+        },
+        "archive_path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/Pureline-602-ssh-unlocked.xcarchive",
+        "result_bundle": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/archive-ssh-unlocked/Archive.xcresult",
+        "change_from_prior": "Invoke approved unlock helper inside the same pinned SSH security session before codesign; verify a tiny owned bundle copy before archive. No credential or shared signing configuration mutation.",
+        "host": "109bcd84-6a7a-475f-9c53-0cf427912d04",
+        "uid": 501,
+        "established_helper_exit": 0,
+        "identity_preflight": "1) 644940FCF25D1730DBD1BF7596AEBA7229E2B8FD \"Apple Distribution: David Povarsky (NA6HPWARQ2)\"\n     1 valid identities found",
+        "signing_probe": {
+          "command": [
+            "codesign",
+            "--force",
+            "--sign",
+            "644940FCF25D1730DBD1BF7596AEBA7229E2B8FD",
+            "--keychain",
+            "/Users/m1/Library/Keychains/apple-signing.keychain-db",
+            "--generate-entitlement-der",
+            "/Users/m1/builds/_artifacts/pureline-full-602-20261127/archive-ssh-unlocked/SigningProbe.bundle"
+          ],
+          "exit": 0,
+          "stderr": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/archive-ssh-unlocked/SigningProbe.bundle: replacing existing signature",
+          "stdout": "",
+          "verify_exit": 0,
+          "verify_stderr": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/archive-ssh-unlocked/SigningProbe.bundle: valid on disk\n/Users/m1/builds/_artifacts/pureline-full-602-20261127/archive-ssh-unlocked/SigningProbe.bundle: satisfies its Designated Requirement"
+        },
+        "exit_code": 0,
+        "elapsed_seconds": 180.505,
+        "finished_at": "2026-11-27T16:08:45.631670+00:00",
+        "disk_after": {
+          "raw": "Filesystem   1024-blocks      Used Available Capacity iused    ifree %iused  Mounted on\n/dev/disk3s5   482797652 427032372   8733460    98% 6590377 87334600    7%   /System/Volumes/Data",
+          "available_bytes": 8943063040
+        },
+        "log_sha256": "b993fe0081887ffae83d8a22e23e5edfcf87cbb8385516269aa297950a96c4b8"
+      }
+    },
+    "archive_bundle_verification": {
+      "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/archive-bundle-verification.json",
+      "sha256": "ba7b653730e2704d58e842fed8ae7902feae12dce02fcb9c0312c89e8b95a7ca",
+      "data": {
+        "time": "2026-11-27T16:09:42.297997+00:00",
+        "app_path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/Pureline-602-ssh-unlocked.xcarchive/Products/Applications/HTTrailiOS.app",
+        "outcome": "PASS",
+        "bundles": [
+          {
+            "bundle_id": "com.davidpovarsky.pureline",
+            "version": "1.0",
+            "build": "602",
+            "executable_sha256": "89f9d7c41c2a206c0d3c0c6d5287859608c6e85d43af7b7db4674117b6e95766",
+            "architecture": "arm64",
+            "platform": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/Pureline-602-ssh-unlocked.xcarchive/Products/Applications/HTTrailiOS.app/HTTrailiOS:\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform IOS\n    minos 26.5\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n",
+            "codesign_verify_exit": 0,
+            "signing_metadata": [
+              "Identifier=com.davidpovarsky.pureline",
+              "Format=app bundle with Mach-O thin (arm64)",
+              "CDHash=daccb42816134d27258dc87f0073cc3de712bde6",
+              "Signature size=4786",
+              "Authority=Apple Distribution: David Povarsky (NA6HPWARQ2)",
+              "Authority=Apple Worldwide Developer Relations Certification Authority",
+              "Authority=Apple Root CA",
+              "TeamIdentifier=NA6HPWARQ2"
+            ],
+            "entitlements": {
+              "application-identifier": "NA6HPWARQ2.com.davidpovarsky.pureline",
+              "beta-reports-active": true,
+              "com.apple.developer.networking.networkextension": [
+                "packet-tunnel-provider"
+              ],
+              "com.apple.developer.team-identifier": "NA6HPWARQ2",
+              "com.apple.security.application-groups": [
+                "group.com.davidpovarsky.pureline"
+              ],
+              "get-task-allow": false
+            },
+            "profile_metadata": {
+              "uuid": "66173d4f-fc97-4ec5-b818-64cacdcf237f",
+              "name": "Pureline App Store",
+              "team": [
+                "NA6HPWARQ2"
+              ],
+              "expiration": "2027-09-07T07:25:00",
+              "sha256": "640345652fb8986665a525cc038d872e815d0f79081a4d0221bb2ca67a8dbd24",
+              "cms_signature_exit": 0
+            },
+            "compiled_models": {
+              "NudeNet320n.mlmodelc": {
+                "sha256": "4a5b600a2c44e44ac2b5d45dc13ffafa2515d7e4c0ebc78efe775f959c3cfb43",
+                "bytes": 6188016,
+                "files": 8
+              },
+              "MobileCLIP2S2ImageEncoder.mlmodelc": {
+                "sha256": "9675364a5960bc68fd3181a21df48c6ffce11a128443bdd729dd6ca00795c220",
+                "bytes": 71802139,
+                "files": 5
+              }
+            },
+            "qualified_json_resources": {
+              "NudeNet320n.labels.json": "8e9e4fc4e701901f3ba1e5a7275699eca68e87dc1d63b0f85732fe983bddf888",
+              "MobileCLIP2S2PromptEmbeddings.json": "8f411353a134d8c32fd9d6e309bc228481fce5b8dd46e867a864c0f4d139aedf",
+              "MobileCLIP2S2ModelManifest.json": "ccdfeb440160c94a7c9e694011f1e4b3a4dd6d42f7141a1cb6b4ad6359c2a8ac"
+            }
+          },
+          {
+            "bundle_id": "com.davidpovarsky.pureline.PacketTunnel",
+            "version": "1.0",
+            "build": "602",
+            "executable_sha256": "3dc9a148cb6ab4060d45346c297870f8b3acade3f500db18a1bf33bc5594fa34",
+            "architecture": "arm64",
+            "platform": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/Pureline-602-ssh-unlocked.xcarchive/Products/Applications/HTTrailiOS.app/PlugIns/PacketTunnel.appex/PacketTunnel:\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform IOS\n    minos 26.5\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n",
+            "codesign_verify_exit": 0,
+            "signing_metadata": [
+              "Identifier=com.davidpovarsky.pureline.PacketTunnel",
+              "Format=bundle with Mach-O thin (arm64)",
+              "CDHash=3ef4cf25b8a91003ea3680315cf54671cd6c92f2",
+              "Signature size=4786",
+              "Authority=Apple Distribution: David Povarsky (NA6HPWARQ2)",
+              "Authority=Apple Worldwide Developer Relations Certification Authority",
+              "Authority=Apple Root CA",
+              "TeamIdentifier=NA6HPWARQ2"
+            ],
+            "entitlements": {
+              "application-identifier": "NA6HPWARQ2.com.davidpovarsky.pureline.PacketTunnel",
+              "beta-reports-active": true,
+              "com.apple.developer.networking.networkextension": [
+                "packet-tunnel-provider"
+              ],
+              "com.apple.developer.team-identifier": "NA6HPWARQ2",
+              "com.apple.security.application-groups": [
+                "group.com.davidpovarsky.pureline"
+              ],
+              "get-task-allow": false
+            },
+            "profile_metadata": {
+              "uuid": "178b87b6-ffd4-44af-87b9-9827606caa9a",
+              "name": "Pureline PacketTunnel App Store",
+              "team": [
+                "NA6HPWARQ2"
+              ],
+              "expiration": "2027-09-07T07:25:00",
+              "sha256": "05e185fb1a39c4a7e36a9bedab7d6c9346481bd82ef98917924b0a5b86265207",
+              "cms_signature_exit": 0
+            },
+            "compiled_models": {
+              "NudeNet320n.mlmodelc": {
+                "sha256": "94776056d9939d41098009c2a0ca755cc9d321a63dd25cfd09e3f8556647a652",
+                "bytes": 6188016,
+                "files": 8
+              },
+              "MobileCLIP2S2ImageEncoder.mlmodelc": {
+                "sha256": "210f2984ca8af5a3225155b83d2e9e179c641e49051db0dda0cbbd16ec115343",
+                "bytes": 71802139,
+                "files": 5
+              }
+            },
+            "qualified_json_resources": {
+              "NudeNet320n.labels.json": "8e9e4fc4e701901f3ba1e5a7275699eca68e87dc1d63b0f85732fe983bddf888",
+              "MobileCLIP2S2PromptEmbeddings.json": "8f411353a134d8c32fd9d6e309bc228481fce5b8dd46e867a864c0f4d139aedf",
+              "MobileCLIP2S2ModelManifest.json": "ccdfeb440160c94a7c9e694011f1e4b3a4dd6d42f7141a1cb6b4ad6359c2a8ac"
+            },
+            "wireguard_exported_symbols": [
+              "wgSetLogger",
+              "wgTurnOn",
+              "wgTurnOff",
+              "wgSetConfig",
+              "wgGetConfig",
+              "wgBumpSockets",
+              "wgDisableSomeRoamingForBrokenMobileSemantics"
+            ]
+          }
+        ],
+        "frameworks": [
+          "EmbeddedImageFilter.framework",
+          "ImageFilterCore.framework"
+        ]
+      }
+    },
+    "ipa_export": {
+      "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/export/receipt.json",
+      "sha256": "fcc3f594c2f6bcd61e67d848735b8a2bf9fc9798869361372076a4cb14bef6b9",
+      "data": {
+        "scope": "Pureline App Store IPA export 602",
+        "source_commit": "d89d53106d5db87aaa4c9356c9114dbe76daa839",
+        "archive_receipt_sha256": "1442026cae781cfc2d6e687fa7714b63b64bea8a3c8698e486ab55157548289d",
+        "archive_path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/Pureline-602-ssh-unlocked.xcarchive",
+        "started_at": "2026-11-27T16:09:42.228553+00:00",
+        "disk_before": {
+          "raw": "Filesystem   1024-blocks      Used Available Capacity iused    ifree %iused  Mounted on\n/dev/disk3s5   482797652 427025044   8740788    98% 6590413 87407880    7%   /System/Volumes/Data",
+          "available_bytes": 8950566912
+        },
+        "archive_app_bytes": 187178081,
+        "export_options_sha256": "9ad2e5a35c1c802bf863a6741412fe47a42ccb0c7db1ed4d5dc1d2712fc12761",
+        "established_helper_exit": 0,
+        "archive_verification_exit": 0,
+        "command": [
+          "xcodebuild",
+          "-exportArchive",
+          "-archivePath",
+          "/Users/m1/builds/_artifacts/pureline-full-602-20261127/Pureline-602-ssh-unlocked.xcarchive",
+          "-exportPath",
+          "/Users/m1/builds/_artifacts/pureline-full-602-20261127/export/IPA",
+          "-exportOptionsPlist",
+          "/Users/m1/builds/_artifacts/pureline-full-602-20261127/ExportOptions.plist"
+        ],
+        "export_exit": 0,
+        "export_elapsed_seconds": 9.55,
+        "export_log_sha256": "291555af2f15f009338f9bff10391fb0534c55ed3d29dec5bbc47f045a01109e",
+        "ipa": {
+          "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/export/IPA/HTTrailiOS.ipa",
+          "bytes": 170165569,
+          "sha256": "c08dd6284f13270b5a786d1a01c56f2417cc59f30e0cfc917c42df3a817b9c48"
+        },
+        "ipa_verification_exit": 0,
+        "temporary_extraction_removed": true,
+        "disk_after": {
+          "raw": "Filesystem   1024-blocks      Used Available Capacity iused    ifree %iused  Mounted on\n/dev/disk3s5   482797652 426520580   9245252    98% 6590522 92452520    7%   /System/Volumes/Data",
+          "available_bytes": 9467138048
+        },
+        "finished_at": "2026-11-27T16:09:57.938005+00:00",
+        "outcome": "PASS"
+      }
+    },
+    "ipa_bundle_verification": {
+      "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/ipa-bundle-verification.json",
+      "sha256": "3ee524ecfa4c989e6fb166621a9cbec233260538814085c406238f919b365859",
+      "data": {
+        "time": "2026-11-27T16:09:55.599950+00:00",
+        "app_path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/export/ipa-verification-x069g0gq/Payload/HTTrailiOS.app",
+        "outcome": "PASS",
+        "bundles": [
+          {
+            "bundle_id": "com.davidpovarsky.pureline",
+            "version": "1.0",
+            "build": "602",
+            "executable_sha256": "216fd37e74fb6f920d816ed1aa0f77c743aab93b4c0f7506774eb600c6bfc58c",
+            "architecture": "arm64",
+            "platform": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/export/ipa-verification-x069g0gq/Payload/HTTrailiOS.app/HTTrailiOS:\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform IOS\n    minos 26.5\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n",
+            "codesign_verify_exit": 0,
+            "signing_metadata": [
+              "Identifier=com.davidpovarsky.pureline",
+              "Format=app bundle with Mach-O thin (arm64)",
+              "CDHash=b39dd0a94b496c03ce4f5d22dc5b44d675e1a583",
+              "Signature size=4786",
+              "Authority=Apple Distribution: David Povarsky (NA6HPWARQ2)",
+              "Authority=Apple Worldwide Developer Relations Certification Authority",
+              "Authority=Apple Root CA",
+              "TeamIdentifier=NA6HPWARQ2"
+            ],
+            "entitlements": {
+              "application-identifier": "NA6HPWARQ2.com.davidpovarsky.pureline",
+              "beta-reports-active": true,
+              "com.apple.developer.networking.networkextension": [
+                "packet-tunnel-provider"
+              ],
+              "com.apple.developer.team-identifier": "NA6HPWARQ2",
+              "com.apple.security.application-groups": [
+                "group.com.davidpovarsky.pureline"
+              ],
+              "get-task-allow": false
+            },
+            "profile_metadata": {
+              "uuid": "66173d4f-fc97-4ec5-b818-64cacdcf237f",
+              "name": "Pureline App Store",
+              "team": [
+                "NA6HPWARQ2"
+              ],
+              "expiration": "2027-09-07T07:25:00",
+              "sha256": "640345652fb8986665a525cc038d872e815d0f79081a4d0221bb2ca67a8dbd24",
+              "cms_signature_exit": 0
+            },
+            "compiled_models": {
+              "NudeNet320n.mlmodelc": {
+                "sha256": "4a5b600a2c44e44ac2b5d45dc13ffafa2515d7e4c0ebc78efe775f959c3cfb43",
+                "bytes": 6188016,
+                "files": 8
+              },
+              "MobileCLIP2S2ImageEncoder.mlmodelc": {
+                "sha256": "9675364a5960bc68fd3181a21df48c6ffce11a128443bdd729dd6ca00795c220",
+                "bytes": 71802139,
+                "files": 5
+              }
+            },
+            "qualified_json_resources": {
+              "NudeNet320n.labels.json": "8e9e4fc4e701901f3ba1e5a7275699eca68e87dc1d63b0f85732fe983bddf888",
+              "MobileCLIP2S2PromptEmbeddings.json": "8f411353a134d8c32fd9d6e309bc228481fce5b8dd46e867a864c0f4d139aedf",
+              "MobileCLIP2S2ModelManifest.json": "ccdfeb440160c94a7c9e694011f1e4b3a4dd6d42f7141a1cb6b4ad6359c2a8ac"
+            }
+          },
+          {
+            "bundle_id": "com.davidpovarsky.pureline.PacketTunnel",
+            "version": "1.0",
+            "build": "602",
+            "executable_sha256": "c81267155c5490c7dfbe932aa5d23d8325c82992f15ba1a025d598c9ae0dff0b",
+            "architecture": "arm64",
+            "platform": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/export/ipa-verification-x069g0gq/Payload/HTTrailiOS.app/PlugIns/PacketTunnel.appex/PacketTunnel:\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform IOS\n    minos 26.5\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n",
+            "codesign_verify_exit": 0,
+            "signing_metadata": [
+              "Identifier=com.davidpovarsky.pureline.PacketTunnel",
+              "Format=bundle with Mach-O thin (arm64)",
+              "CDHash=1a02fbe465650f88e573840113c3d156dd0078eb",
+              "Signature size=4786",
+              "Authority=Apple Distribution: David Povarsky (NA6HPWARQ2)",
+              "Authority=Apple Worldwide Developer Relations Certification Authority",
+              "Authority=Apple Root CA",
+              "TeamIdentifier=NA6HPWARQ2"
+            ],
+            "entitlements": {
+              "application-identifier": "NA6HPWARQ2.com.davidpovarsky.pureline.PacketTunnel",
+              "beta-reports-active": true,
+              "com.apple.developer.networking.networkextension": [
+                "packet-tunnel-provider"
+              ],
+              "com.apple.developer.team-identifier": "NA6HPWARQ2",
+              "com.apple.security.application-groups": [
+                "group.com.davidpovarsky.pureline"
+              ],
+              "get-task-allow": false
+            },
+            "profile_metadata": {
+              "uuid": "178b87b6-ffd4-44af-87b9-9827606caa9a",
+              "name": "Pureline PacketTunnel App Store",
+              "team": [
+                "NA6HPWARQ2"
+              ],
+              "expiration": "2027-09-07T07:25:00",
+              "sha256": "05e185fb1a39c4a7e36a9bedab7d6c9346481bd82ef98917924b0a5b86265207",
+              "cms_signature_exit": 0
+            },
+            "compiled_models": {
+              "NudeNet320n.mlmodelc": {
+                "sha256": "94776056d9939d41098009c2a0ca755cc9d321a63dd25cfd09e3f8556647a652",
+                "bytes": 6188016,
+                "files": 8
+              },
+              "MobileCLIP2S2ImageEncoder.mlmodelc": {
+                "sha256": "210f2984ca8af5a3225155b83d2e9e179c641e49051db0dda0cbbd16ec115343",
+                "bytes": 71802139,
+                "files": 5
+              }
+            },
+            "qualified_json_resources": {
+              "NudeNet320n.labels.json": "8e9e4fc4e701901f3ba1e5a7275699eca68e87dc1d63b0f85732fe983bddf888",
+              "MobileCLIP2S2PromptEmbeddings.json": "8f411353a134d8c32fd9d6e309bc228481fce5b8dd46e867a864c0f4d139aedf",
+              "MobileCLIP2S2ModelManifest.json": "ccdfeb440160c94a7c9e694011f1e4b3a4dd6d42f7141a1cb6b4ad6359c2a8ac"
+            },
+            "wireguard_exported_symbols": [
+              "wgSetLogger",
+              "wgTurnOn",
+              "wgTurnOff",
+              "wgSetConfig",
+              "wgGetConfig",
+              "wgBumpSockets",
+              "wgDisableSomeRoamingForBrokenMobileSemantics"
+            ]
+          }
+        ],
+        "frameworks": [
+          "EmbeddedImageFilter.framework",
+          "ImageFilterCore.framework"
+        ]
+      }
+    },
+    "apple_validation": {
+      "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/validation/receipt.json",
+      "sha256": "61ede1b81598fed50e80d20d8e6a07f453b8884a46bf85251e5120d31f7d5c1f",
+      "data": {
+        "scope": "App Store validation of full Pureline 1.0 build 602",
+        "source_commit": "d89d53106d5db87aaa4c9356c9114dbe76daa839",
+        "ipa": {
+          "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/export/IPA/HTTrailiOS.ipa",
+          "bytes": 170165569,
+          "sha256": "c08dd6284f13270b5a786d1a01c56f2417cc59f30e0cfc917c42df3a817b9c48"
+        },
+        "started_at": "2026-11-27T16:11:01.216537+00:00",
+        "command": "xcrun altool --validate-app /Users/m1/builds/_artifacts/pureline-full-602-20261127/export/IPA/HTTrailiOS.ipa --api-key [REDACTED] --api-issuer [REDACTED] --p8-file-path /Users/m1/.appstoreconnect/private_keys/AuthKey_[REDACTED].p8 --output-format json",
+        "disk_before": "Filesystem   1024-blocks      Used Available Capacity iused    ifree %iused  Mounted on\n/dev/disk3s5   482797652 426535820   9230012    98% 6590813 92300120    7%   /System/Volumes/Data",
+        "exit_code": 0,
+        "elapsed_seconds": 142.931,
+        "log_sha256": "b51b78292c63821eaede53dfd472b44de3a4fce8eb86a09180dc1af23d518942",
+        "finished_at": "2026-11-27T16:13:24.158595+00:00",
+        "disk_after": "Filesystem   1024-blocks      Used Available Capacity iused    ifree %iused  Mounted on\n/dev/disk3s5   482797652 427853616   7912216    99% 6596867 79122160    8%   /System/Volumes/Data",
+        "outcome": "PASS"
+      }
+    },
+    "apple_upload_and_processing": {
+      "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/upload/receipt.json",
+      "sha256": "a439864f1d2fc0b79a9b34b23fd06a13fb00e101d209842d1ff098144e6d9603",
+      "data": {
+        "scope": "Authorized TestFlight upload and Apple processing for full Pureline 1.0 build 602",
+        "source_commit": "d89d53106d5db87aaa4c9356c9114dbe76daa839",
+        "ipa": {
+          "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/export/IPA/HTTrailiOS.ipa",
+          "bytes": 170165569,
+          "sha256": "c08dd6284f13270b5a786d1a01c56f2417cc59f30e0cfc917c42df3a817b9c48"
+        },
+        "validation_receipt_sha256": "61ede1b81598fed50e80d20d8e6a07f453b8884a46bf85251e5120d31f7d5c1f",
+        "asc_before_upload": {
+          "time": "2026-11-27T16:15:58.598295+00:00",
+          "app": {
+            "id": "6809383144",
+            "name": "Pureline",
+            "bundleId": "com.davidpovarsky.pureline",
+            "sku": "httrail-ios-2026"
+          },
+          "builds": [],
+          "included": []
+        },
+        "started_at": "2026-11-27T16:15:58.599355+00:00",
+        "command": "xcrun altool --upload-package /Users/m1/builds/_artifacts/pureline-full-602-20261127/export/IPA/HTTrailiOS.ipa --wait --api-key [REDACTED] --api-issuer [REDACTED] --p8-file-path [REDACTED] --output-format json",
+        "disk_before": "Filesystem   1024-blocks      Used Available Capacity iused    ifree %iused  Mounted on\n/dev/disk3s5   482797652 428823472   6942360    99% 6597152 69423600    9%   /System/Volumes/Data",
+        "outcome": "PASS",
+        "upload_exit_code": 0,
+        "upload_elapsed_seconds": 266.724,
+        "upload_log_sha256": "50850b3aa635d2795ecc64c401f6ff03768749e9e98a4a65150ede76492ecb34",
+        "asc_after_upload": {
+          "time": "2026-11-27T16:20:29.219742+00:00",
+          "app": {
+            "id": "6809383144",
+            "name": "Pureline",
+            "bundleId": "com.davidpovarsky.pureline",
+            "sku": "httrail-ios-2026"
+          },
+          "builds": [
+            {
+              "id": "c99a9917-9a8b-4fad-9297-cb6a061b126a",
+              "attributes": {
+                "version": "602",
+                "processingState": "VALID",
+                "uploadedDate": "2026-11-27T08:18:21-08:00",
+                "expirationDate": "2027-02-25T08:18:21-08:00",
+                "minOsVersion": "26.5",
+                "usesNonExemptEncryption": false
+              },
+              "relationships": {
+                "preReleaseVersion": {
+                  "data": {
+                    "type": "preReleaseVersions",
+                    "id": "d58e1109-c3d9-47f4-9ada-cc610dd11b55"
+                  },
+                  "links": {
+                    "self": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/relationships/preReleaseVersion",
+                    "related": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/preReleaseVersion"
+                  }
+                },
+                "individualTesters": {
+                  "links": {
+                    "self": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/relationships/individualTesters",
+                    "related": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/individualTesters"
+                  }
+                },
+                "betaGroups": {
+                  "links": {
+                    "self": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/relationships/betaGroups"
+                  }
+                },
+                "betaBuildLocalizations": {
+                  "links": {
+                    "self": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/relationships/betaBuildLocalizations",
+                    "related": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/betaBuildLocalizations"
+                  }
+                },
+                "appEncryptionDeclaration": {
+                  "links": {
+                    "self": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/relationships/appEncryptionDeclaration",
+                    "related": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/appEncryptionDeclaration"
+                  }
+                },
+                "betaAppReviewSubmission": {
+                  "links": {
+                    "self": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/relationships/betaAppReviewSubmission",
+                    "related": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/betaAppReviewSubmission"
+                  }
+                },
+                "app": {
+                  "links": {
+                    "self": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/relationships/app",
+                    "related": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/app"
+                  }
+                },
+                "buildBetaDetail": {
+                  "data": {
+                    "type": "buildBetaDetails",
+                    "id": "c99a9917-9a8b-4fad-9297-cb6a061b126a"
+                  },
+                  "links": {
+                    "self": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/relationships/buildBetaDetail",
+                    "related": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/buildBetaDetail"
+                  }
+                },
+                "appStoreVersion": {
+                  "links": {
+                    "self": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/relationships/appStoreVersion",
+                    "related": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/appStoreVersion"
+                  }
+                },
+                "icons": {
+                  "links": {
+                    "self": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/relationships/icons",
+                    "related": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/icons"
+                  }
+                },
+                "perfPowerMetrics": {
+                  "links": {
+                    "related": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/perfPowerMetrics"
+                  }
+                },
+                "diagnosticSignatures": {
+                  "links": {
+                    "self": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/relationships/diagnosticSignatures",
+                    "related": "https://api.appstoreconnect.apple.com/v1/builds/c99a9917-9a8b-4fad-9297-cb6a061b126a/diagnosticSignatures"
+                  }
+                }
+              }
+            }
+          ],
+          "included": [
+            {
+              "type": "preReleaseVersions",
+              "id": "d58e1109-c3d9-47f4-9ada-cc610dd11b55",
+              "attributes": {
+                "version": "1.0",
+                "platform": "IOS"
+              }
+            },
+            {
+              "type": "buildBetaDetails",
+              "id": "c99a9917-9a8b-4fad-9297-cb6a061b126a",
+              "attributes": {
+                "autoNotifyEnabled": true,
+                "internalBuildState": "READY_FOR_BETA_TESTING",
+                "externalBuildState": "READY_FOR_BETA_SUBMISSION"
+              }
+            }
+          ]
+        },
+        "finished_at": "2026-11-27T16:20:29.222343+00:00",
+        "disk_after": "Filesystem   1024-blocks      Used Available Capacity iused    ifree %iused  Mounted on\n/dev/disk3s5   482797652 428899684   6866148    99% 6601905 68661480    9%   /System/Volumes/Data"
+      }
+    }
+  },
+  "apple_validation_output": "{\n  \"details\" : {\n\n  },\n  \"os-version\" : \"Version 27.0 (Build 26A428)\",\n  \"success-message\" : \"No errors validating archive at '/Users/m1/builds/_artifacts/pureline-full-602-20261127/export/IPA/HTTrailiOS.ipa'.\",\n  \"tool-path\" : \"/Applications/Xcode.app/Contents/SharedFrameworks/ContentDelivery.framework/Resources\",\n  \"tool-version\" : \"27.0.5 (2.1)\"\n}\n\nRunning altool at path '/Applications/Xcode.app/Contents/SharedFrameworks/ContentDelivery.framework/Resources/altool'...\n\n2026-11-27 17:13:24.150  INFO: [ContentDelivery.Uploader.7AF8801780] \n==========================================\nVERIFY SUCCEEDED with no errors\n==========================================\n",
+  "apple_upload_output": "{\n  \"app-store-attributes\" : {\n    \"buildAudienceType\" : \"APP_STORE_ELIGIBLE\",\n    \"computedMinMacOsVersion\" : \"26.5\",\n    \"computedMinVisionOsVersion\" : \"26.5\",\n    \"expirationDate\" : \"expirationDate\",\n    \"expired\" : false,\n    \"iconAssetToken\" : {\n      \"height\" : 152,\n      \"templateUrl\" : \"https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/e0/e4/61/e0e461df-84ec-fb8c-057b-5c4c5a556a74/AppIcon76x76@2x_U007eipad.png/{w}x{h}bb.{f}\",\n      \"width\" : 152\n    },\n    \"minOsVersion\" : \"26.5\",\n    \"processingState\" : \"VALID\",\n    \"uploadedDate\" : \"uploadedDate\",\n    \"usesNonExemptEncryption\" : false,\n    \"version\" : \"602\"\n  },\n  \"apple-id\" : \"6809383144\",\n  \"build-audience-type\" : \"APP_STORE_ELIGIBLE\",\n  \"build-status\" : \"VALID\",\n  \"bundle-short-version-string\" : \"1.0\",\n  \"bundle-version\" : \"602\",\n  \"delivery-uuid\" : \"c99a9917-9a8b-4fad-9297-cb6a061b126a\",\n  \"expiration-date\" : \"25/02/2027, 17:18:21\",\n  \"import-status\" : \"VALID\",\n  \"is-on-app-store-connect\" : true,\n  \"uploaded-date\" : \"27/11/2026, 17:18:21\",\n  \"uses-non-exempt-encryption\" : false\n}\n{\n  \"details\" : {\n    \"delivery-uuid\" : \"c99a9917-9a8b-4fad-9297-cb6a061b126a\",\n    \"transferred\" : \"170165569 bytes in 6.909 seconds (24.6MB/s, 197.027Mbps)\"\n  },\n  \"os-version\" : \"Version 27.0 (Build 26A428)\",\n  \"success-message\" : \"No errors uploading archive at '/Users/m1/builds/_artifacts/pureline-full-602-20261127/export/IPA/HTTrailiOS.ipa'.\",\n  \"tool-path\" : \"/Applications/Xcode.app/Contents/SharedFrameworks/ContentDelivery.framework/Resources\",\n  \"tool-version\" : \"27.0.5 (2.1)\"\n}\n\nRunning altool at path '/Applications/Xcode.app/Contents/SharedFrameworks/ContentDelivery.framework/Resources/altool'...\n\n2026-11-27 17:17:15.518  INFO: [ContentDelivery.Uploader.7986801780] \n==========================================\nUPLOAD SUCCEEDED with no errors\nDelivery UUID: c99a9917-9a8b-4fad-9297-cb6a061b126a\nTransferred 170165569 bytes in 6.909 seconds (24.6MB/s, 197.027Mbps)\n==========================================\n",
+  "preserved_signing_negative_attempts": [
+    {
+      "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/archive-receipt.json",
+      "sha256": "5d414c8a1cc4dca17c857afe826be20e757fd7d1378f87876b3342c93cd9df41",
+      "exit": 65,
+      "reason": "Environment/security-session signing preflight; retained independently from successful signed archive."
+    },
+    {
+      "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/archive-explicit-keychain/receipt.json",
+      "sha256": "dc1e6c89763f5dcfe1b8bdb2cadd72f8462a82f214975005052b197e4b0a10fc",
+      "exit": 65,
+      "reason": "Environment/security-session signing preflight; retained independently from successful signed archive."
+    },
+    {
+      "path": "/Users/m1/builds/_artifacts/pureline-full-602-20261127/archive-ssh/receipt.json",
+      "sha256": "1740b3cc9848c4414a5ece93fa8d1dc3825eca10b5fe80c353ebdffa172886dc",
+      "exit": 65,
+      "reason": "Environment/security-session signing preflight; retained independently from successful signed archive."
+    }
+  ],
+  "storage": {
+    "existing_files_or_caches_deleted_by_this_lane": [],
+    "temporary_ipa_verification_copy_removed": true,
+    "final_disk": "Filesystem   1024-blocks      Used Available Capacity iused    ifree %iused  Mounted on\n/dev/disk3s5   482797652 429181356   6584476    99% 6603969 65844760    9%   /System/Volumes/Data",
+    "retention": "Keep original archive, IPA, dSYMs, xcresults, source/model caches and receipts. No cleanup was required to admit the measured release phases."
+  },
+  "limitations": [
+    "The optional GET of beta-group relationships returned HTTP403 Forbidden. Group membership/distribution was not established through this API key; no further group calls or changes were made.",
+    "No physical iPad was connected. Simulator app-host measurements do not establish PacketTunnel physical memory, jetsam, battery, network-switch or device acceptance.",
+    "The verified iOS27 Vision CPU repair is on PacketTunnelProvider \u2192 ImageFilterProxyBridge \u2192 ImageFilterCore.DirectImageSafetyAnalyzer \u2192 PurelineHumanDetectionService.",
+    "The separate EmbeddedImageFilter app-tab and LocalInferenceServer retain the unchanged vendor HumanDetectionService pipeline. Their standalone iOS27 inference is not certified by this Direct VPN runtime acceptance.",
+    "TestFlight processing does not itself prove physical-device acceptance. No new tester invitations or public App Store submission were performed."
+  ]
+}

@@ -15,6 +15,7 @@ private let tunnelLog = Logger(subsystem: "com.davidpovarsky.pureline.PacketTunn
 /// minted here chain to the exact root the user trusted on the device.
 final class PacketTunnelProvider: NEPacketTunnelProvider {
 
+    private var remoteWireGuard: PurelineWireGuardTunnel?
     private var proxy: ProxyServer?
     private let engine = InterceptEngine()
     private let configStore = SharedConfigStore()
@@ -25,6 +26,12 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     override func startTunnel(options: [String: NSObject]?,
                              completionHandler: @escaping (Error?) -> Void) {
+        if PurelineWireGuardTunnel.isSelected(protocolConfiguration) {
+            let remote = PurelineWireGuardTunnel(provider: self)
+            remoteWireGuard = remote
+            remote.start(completion: completionHandler)
+            return
+        }
         let startCount = diagnostics.beginRun()
         // The app and this extension are separate processes; the app writes the
         // rules / SSL allowlist / port / pinning into the shared config, which we
@@ -72,7 +79,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 "truncatedResponses": String(snapshot.truncatedResponseCount)
             ])
         }
-        let sink: FlowSink = boundedSink ?? NullFlowSink()
+        let sink = PurelineCompletionFlowSink(downstream: boundedSink ?? NullFlowSink()) {
+            ImageFilterProxyBridge.responseCompleted($0)
+        }
         let server = ProxyServer(port: port, certificateAuthority: ca, sink: sink, engine: engine)
         server.bindHost = "127.0.0.1"
         server.verifyUpstreamCertificates = true
@@ -85,7 +94,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         )
         ImageFilterProxyBridge.configure(server: server, diagnostics: diagnostics)
         server.streamingResponseObserver = { [weak self, diagnostics] request, response in
-            ImageFilterProxyBridge.responseCompleted(request)
             guard PurelineAntiBotChallengeDetector.isStrongChallenge(response) else { return }
             guard let self else { return }
             let info = self.antiBotStore.add(host: request.host)
@@ -253,8 +261,18 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
+    override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)?) {
+        guard let remote = remoteWireGuard else { completionHandler?(nil); return }
+        remote.message(messageData, completion: completionHandler)
+    }
+
     override func stopTunnel(with reason: NEProviderStopReason,
                             completionHandler: @escaping () -> Void) {
+        if let remote = remoteWireGuard {
+            remoteWireGuard = nil
+            remote.stop(completion: completionHandler)
+            return
+        }
         diagnostics.endRun(stopReason: reason.rawValue)
         configSyncTask?.cancel()
         configSyncTask = nil

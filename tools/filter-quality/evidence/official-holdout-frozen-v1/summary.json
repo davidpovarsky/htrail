@@ -1,0 +1,55 @@
+{
+  "overall": {
+    "n": 240,
+    "TP": 121,
+    "TN": 115,
+    "FP": 3,
+    "FN": 1,
+    "errors": 0,
+    "block_recall_pct": 99.18,
+    "allow_specificity_pct": 97.458,
+    "block_precision_pct": 97.581,
+    "accuracy_pct": 98.333,
+    "p50_ms": 1268.91,
+    "p95_ms": 2210.69,
+    "p99_ms": 3945.9,
+    "people_detected": 240,
+    "no_person_detection": 0
+  },
+  "by_source": {
+    "randomuser": {
+      "n": 137,
+      "TP": 69,
+      "TN": 67,
+      "FP": 1,
+      "FN": 0,
+      "errors": 0,
+      "block_recall_pct": 100.0,
+      "allow_specificity_pct": 98.529,
+      "block_precision_pct": 98.571,
+      "accuracy_pct": 99.27,
+      "p50_ms": 1277.71,
+      "p95_ms": 2189.2,
+      "p99_ms": 3945.9,
+      "people_detected": 137,
+      "no_person_detection": 0
+    },
+    "wikipedia": {
+      "n": 103,
+      "TP": 52,
+      "TN": 48,
+      "FP": 2,
+      "FN": 1,
+      "errors": 0,
+      "block_recall_pct": 98.113,
+      "allow_specificity_pct": 96.0,
+      "block_precision_pct": 96.296,
+      "accuracy_pct": 97.087,
+      "p50_ms": 1222.13,
+      "p95_ms": 2230.31,
+      "p99_ms": 2874.04,
+      "people_detected": 103,
+      "no_person_detection": 0
+    }
+  }
+}

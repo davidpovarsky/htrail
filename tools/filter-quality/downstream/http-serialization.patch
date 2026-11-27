@@ -1,0 +1,50 @@
+--- upstream/CrossPlatformImageFilter/src/local_image_filter/proxy/addon.py
++++ downstream/pureline_http_addon.py
+@@ -31,6 +31,10 @@
+     cache: str = "miss",
+ ) -> None:
+     response.status_code = 200
++    # Clear origin representation headers BEFORE the content setter; mitmproxy
++    # otherwise re-encodes replacement bytes using the obsolete Content-Encoding.
++    for header in INVALIDATED_HEADERS:
++        response.headers.pop(header, None)
+     response.content = body
+     response.headers["content-type"] = mime_type
+     response.headers["content-length"] = str(len(body))
+@@ -38,8 +42,6 @@
+     response.headers["x-local-image-filter"] = "replace"
+     response.headers["x-local-image-filter-cache"] = cache
+     response.headers["x-local-image-filter-reason"] = reason
+-    for header in INVALIDATED_HEADERS:
+-        response.headers.pop(header, None)
+ 
+ 
+ class LocalImageFilterAddon:
+@@ -126,12 +128,27 @@
+                 body, mime_type = create_failure_placeholder(content, text="Image unavailable")
+                 apply_replacement(response, body, mime_type, reason="missing-rewrite")
+                 return
++            # Invalidate the original encoding before assigning decoded pixels.
++            for header in INVALIDATED_HEADERS:
++                response.headers.pop(header, None)
+             response.content = outcome.replacement_bytes
+             response.headers["content-type"] = outcome.replacement_mime_type or "image/png"
+             response.headers["content-length"] = str(len(outcome.replacement_bytes))
+             response.headers["cache-control"] = "no-store"
++        elif (outcome.decision.action == FilterAction.ALLOW
++              and outcome.replacement_bytes is not None
++              and outcome.response.get("pipeline", {}).get("svgPresentation") == "rasterized_allow"):
+             for header in INVALIDATED_HEADERS:
+                 response.headers.pop(header, None)
++            response.content = outcome.replacement_bytes
++            response.headers["content-type"] = "image/png"
++            response.headers["content-length"] = str(len(outcome.replacement_bytes))
++            response.headers["cache-control"] = "no-store"
++            response.headers["x-local-image-filter-presentation"] = "rasterized_allow"
++            curated = outcome.response.get("pipeline", {}).get("curatedUIAsset")
++            if curated:
++                response.headers["x-local-image-filter-policy-exception"] = curated["id"]
++                response.headers["x-local-image-filter-reason"] = "curated-public-ui-asset"
+         elif outcome.decision.action == FilterAction.ERROR:
+             body, mime_type = create_failure_placeholder(content, text="Image analysis failed")
+             apply_replacement(response, body, mime_type, reason="policy-error")

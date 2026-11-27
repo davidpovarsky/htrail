@@ -1,0 +1,10 @@
+{
+  "at_utc": "2026-11-27T16:34:46.515085+00:00",
+  "operations_backup_directory": "/var/backups/pureline-completion-20261127",
+  "policy_sha256_before": "0e2831107af6d6de70202bb57e861c8557a4a3f4f4a7c3216a74c4d54b387bf9",
+  "unit_preview_verified": true,
+  "preview_dropin_sha256": "e1c7bd5689ae152c7d05882cad31a43be97a53e4b20c27e1a331b997efc3c389",
+  "wireguard_profile_files_recorded_privately": 7,
+  "loopback_port18530_available": true,
+  "mode_parse": "[\"ProxyMode.parse('wireguard@51820')\", \"ProxyMode.parse('regular@127.0.0.1:18530')\"]"
+}

@@ -1,0 +1,55 @@
+{
+  "overall": {
+    "n": 82,
+    "TP": 41,
+    "TN": 40,
+    "FP": 1,
+    "FN": 0,
+    "errors": 0,
+    "block_recall_pct": 100.0,
+    "allow_specificity_pct": 97.561,
+    "block_precision_pct": 97.619,
+    "accuracy_pct": 98.78,
+    "p50_ms": 1032.92,
+    "p95_ms": 1526.47,
+    "p99_ms": 2297.02,
+    "people_detected": 82,
+    "no_person_detection": 0
+  },
+  "by_source": {
+    "randomuser": {
+      "n": 46,
+      "TP": 23,
+      "TN": 23,
+      "FP": 0,
+      "FN": 0,
+      "errors": 0,
+      "block_recall_pct": 100.0,
+      "allow_specificity_pct": 100.0,
+      "block_precision_pct": 100.0,
+      "accuracy_pct": 100.0,
+      "p50_ms": 1164.5,
+      "p95_ms": 1526.47,
+      "p99_ms": 2297.02,
+      "people_detected": 46,
+      "no_person_detection": 0
+    },
+    "wikipedia": {
+      "n": 36,
+      "TP": 18,
+      "TN": 17,
+      "FP": 1,
+      "FN": 0,
+      "errors": 0,
+      "block_recall_pct": 100.0,
+      "allow_specificity_pct": 94.444,
+      "block_precision_pct": 94.737,
+      "accuracy_pct": 97.222,
+      "p50_ms": 928.25,
+      "p95_ms": 1640.02,
+      "p99_ms": 1853.66,
+      "people_detected": 36,
+      "no_person_detection": 0
+    }
+  }
+}

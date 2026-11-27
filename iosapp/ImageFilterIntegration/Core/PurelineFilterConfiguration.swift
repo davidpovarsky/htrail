@@ -38,7 +38,7 @@ public nonisolated struct PurelineFilterConfiguration: Codable, Equatable, Senda
         public var maximumTotalPixels: Int
     }
 
-    public enum OverflowAction: String, Codable, Sendable { case failOpen }
+    public enum OverflowAction: String, Codable, Sendable { case failOpen, block }
     public struct Runtime: Codable, Equatable, Sendable {
         public var maxConcurrentInference: Int
         public var maxConcurrentImageInspections: Int
@@ -98,13 +98,13 @@ public nonisolated struct PurelineFilterConfiguration: Codable, Equatable, Senda
         ),
         runtime: Runtime(
             maxConcurrentInference: 1, maxConcurrentImageInspections: 1,
-            maxQueuedImageInspections: 2, inspectionQueueOverflowAction: .failOpen,
+            maxQueuedImageInspections: 2, inspectionQueueOverflowAction: .block,
             minimumAvailableMemoryBytes: 32 * 1_024 * 1_024
         ),
         failurePolicy: FailurePolicy(
-            classifierError: .failOpen, modelUnavailable: .failOpen,
-            imageTooLarge: .failOpen, memoryPressure: .failOpen,
-            unsupportedEncoding: .failOpen
+            classifierError: .block, modelUnavailable: .block,
+            imageTooLarge: .block, memoryPressure: .block,
+            unsupportedEncoding: .block
         )
     )
 

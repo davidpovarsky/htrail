@@ -18,7 +18,7 @@ resource limits, and image-filter choices remain in `iosapp/PurelineIntegration`
 ## `Sources/HTTrailCore/Proxy/ProxyServer.swift`
 
 - Exact reason: a constrained Network Extension needs opt-in request streaming, bounded response inspection, and runtime observability.
-- Generic hook/change: opt-in request caps/streaming, response inspection/observation closures, runtime event callback, and an optional bounded upstream HTTP/1.1 pool configuration.
+- Generic hook/change: opt-in request caps/streaming, response inspection/observation closures, optional streamingResponseDispositionPolicy, runtime event callback, and an optional bounded upstream HTTP/1.1 pool configuration.
 - Original/default behavior: request streaming remains off, inspectors/callback remain nil, capture cap remains 10 MiB, and upstream verification remains false unless a caller opts in.
 - Pureline caller: `PacketTunnelProvider` and `ImageFilterProxyBridge`.
 - Likely merge conflict risk: medium; additive configuration at the main proxy construction seam.
@@ -26,7 +26,7 @@ resource limits, and image-filter choices remain in `iosapp/PurelineIntegration`
 ## `Sources/HTTrailCore/Proxy/ProxyHandlers.swift`
 
 - Exact reason: carry the generic server options into plain HTTP, MITM, and blind-tunnel paths.
-- Generic hook/change: constructor plumbing plus a blind-tunnel failure event.
+- Generic hook/change: constructor plumbing, the optional response disposition policy, and a blind-tunnel failure event.
 - Original/default behavior: all new arguments default to the prior behavior.
 - Pureline caller: options installed by `PacketTunnelProvider`.
 - Likely merge conflict risk: medium; CONNECT pipeline construction is an upstream hotspot, but behavior changes only when hooks are installed.
@@ -35,15 +35,15 @@ resource limits, and image-filter choices remain in `iosapp/PurelineIntegration`
 
 - Exact reason: avoid retaining complete ordinary uploads and enforce a bounded body-inspection fallback.
 - Generic hook/change: opt-in chunked request forwarding with backpressure, bounded preview capture, bounded body-rule inspection, failure/timing events, and pooled-channel checkout for eligible ordinary responses.
-- Original/default behavior: the existing buffered request path is used when `streamRequestBodies == false`.
+- Original/default behavior: the existing buffered request path is used when `streamRequestBodies == false`. When streaming is enabled, only requests with a real body enter the upload path; GET/HEAD, empty POST, and WebSocket upgrades retain their appropriate paths. Completion restores reads before the next keep-alive request.
 - Pureline caller: `PacketTunnelProvider` enables the option with Pureline limits.
 - Likely merge conflict risk: medium-high; this is the only substantial upstream seam because request streaming must live in the NIO data path. It is feature-gated and leaves the original path intact.
 
 ## `Sources/HTTrailCore/Proxy/StreamingProxyHandler.swift`
 
-- Exact reason: inspect candidate images without unbounded response buffering while retaining transparent fallback.
-- Generic hook/change: optional bounded streaming-response inspector/observer, complete-response framing checks, benign TLS-peer-close classification, and safe return of reusable HTTP/1.1 channels. Unknown-length bodies that cross the cap flush held bytes and continue streaming unchanged.
-- Original/default behavior: nil inspector preserves the original immediate streaming path.
+- Exact reason: inspect candidate images with bounded response storage and caller-selected failure behavior.
+- Generic hook/change: optional bounded streaming-response inspector/observer, complete-response framing checks, benign TLS-peer-close classification, and safe return of reusable HTTP/1.1 channels. The additive StreamingResponseDisposition API chooses stream, inspect(maximumBytes:failureResponse:), or respond. When the caller supplies a failure response, cap overflow, incomplete framing, configured upstream idle failure, or inspector failure returns it before original held bytes are exposed. Immediate replacement discards the unread origin connection. Without the hook/failure response, legacy bounded inspection still falls back to original streaming.
+- Original/default behavior: nil policy/inspector preserves the original immediate streaming path; no Pureline decision or placeholder is built into HTTrail.
 - Pureline caller: `ImageFilterProxyBridge.configure(server:diagnostics:)`.
 - Likely merge conflict risk: medium-high; response streaming is an upstream hotspot, though the new branch is opt-in.
 
@@ -73,7 +73,7 @@ resource limits, and image-filter choices remain in `iosapp/PurelineIntegration`
 
 ## Upstream tests
 
-- `Tests/HTTrailCoreTests/StreamingProxyTests.swift`: verifies full-byte large upload/download forwarding, bounded capture, oversized inspection bypass, and inspector fail-open.
+- `Tests/HTTrailCoreTests/StreamingProxyTests.swift`: verifies full-byte large upload/download forwarding, bounded capture, legacy oversized/failure passthrough, bodyless request pooling, upload-to-next-request progress, and explicit strict fallback for overflow, incomplete origin data, idle failure and inspector errors. Close-delimited EOF framing has a separate focused raw-socket regression.
 - `Tests/HTTrailCoreTests/RulesAndConvertersTests.swift`: verifies restored bypass, expiry, force-decrypt, and unchanged HTTrail defaults.
 - Merge conflict risk: low; focused additive tests.
 
@@ -91,17 +91,20 @@ NudeNet pipeline, diagnostics, and tests remain intact.
 - `iosapp/PurelineIntegration/Diagnostics/PurelineDiagnosticArchive.swift`: creates an exportable ZIP containing sanitized PacketTunnel events and summary without adding a dynamic framework.
 - `iosapp/PurelineIntegration/Capture/PurelineBoundedFlowSink.swift`: 200-flow, 8-MiB aggregate body budget with 256-KiB request and 512-KiB response previews. Depends on HTTrail `FlowSink`, `Flow`, and `SharedFlowStore`.
 - `iosapp/PurelineIntegration/TLS/PurelineCompatibilityBypassStore.swift`: persists host plus expiry in the App Group and prunes expired entries. Depends on generic HTTrail `PinnedHostInfo`.
-- `iosapp/PurelineIntegration/FailOpen/PurelineRuntimePolicy.swift`: single source of resource limits and pass-through decisions. Uses public `os_proc_available_memory` only.
+- `iosapp/PurelineIntegration/FailOpen/PurelineRuntimePolicy.swift`: single source of resource limits and resource admission decisions. Uses public `os_proc_available_memory` only.
 - `iosapp/ImageFilterIntegration/Core/PurelineFilterConfiguration.swift`: versioned Codable contract, built-in combined profile, semantic validation, hard ceilings, and SHA-256 revision identity shared with `ImageFilterCore`.
 - `iosapp/PurelineIntegration/Configuration/*`: atomic App-Group store, active/last-good/revision/acknowledgement files, JSON document import/export, UI state, and bundled default.
-- `iosapp/PurelineIntegration/ImageFiltering/PurelineInspectionAdmissionController.swift`: synchronous pre-buffer reservation plus bounded active/queued bytes and inference admission.
+- `iosapp/PurelineIntegration/ImageFiltering/PurelineInspectionAdmissionController.swift`: synchronous pre-buffer reservation plus bounded active/queued bytes and inference admission. Terminal Flow events release reservations even when no response exists; canceled queued work cannot begin inference.
 - `iosapp/PurelineIntegration/Compatibility/PurelineAntiBotCompatibilityStore.swift`: separate expiring anti-bot evidence store and conservative strong-challenge detector.
+
+- `iosapp/PurelineIntegration/ImageFiltering/PurelineImageResponsePolicy.swift`: downstream image-header admission, unsupported SVG handling, safe placeholder selection, and explicit configured failOpen.
+- `PurelineCompletionFlowSink` in `PurelineBoundedFlowSink.swift`: forwards all terminal Flow records while releasing image reservations, including response-less failures.
 
 ## Existing integration files modified
 
 - `iosapp/PacketTunnel/PacketTunnelProvider.swift`: installs Pureline policy, restores bypasses before listener start, enables normal upstream certificate verification, connects bounded capture/diagnostics, and records lifecycle/settings/runtime events. Depends on HTTrail's generic server/engine seams.
-- `iosapp/PacketTunnel/ImageFilterProxyBridge.swift`: selects plausible raster responses, enforces the image cap, installs the streaming inspector, and fails open. Depends on HTTrail's response-inspection seam and `ImageFilterCore` facade.
-- `iosapp/ImageFilterIntegration/Core/DirectImageSafetyAnalyzer.swift`: extension-safe two-model adapter. It reuses vendor Vision detection, person cropping, `MobileCLIPService`, and `NudeNetService`, while applying Pureline's downstream combined policy and short-circuiting only after a definitive block.
+- `iosapp/PacketTunnel/ImageFilterProxyBridge.swift`: selects image responses, applies the downstream header policy, enforces image/admission limits, and installs caller-selected strict replacement or explicit configured failOpen. OFF streams without reservation/model preparation and is checked again after an admission wait. Depends on HTTrail's generic disposition/inspection seams and `ImageFilterCore` facade.
+- `iosapp/ImageFilterIntegration/Core/DirectImageSafetyAnalyzer.swift`: extension-safe two-model adapter. It reuses vendor Vision detection, person cropping, `MobileCLIPService`, and `NudeNetService`, while applying Pureline's downstream combined policy and short-circuiting only after a definitive block. ImageIO metadata is checked before bounded, oriented thumbnail decoding. Recognized multi-frame sources fail before model preparation; typed invalidImage, unsupportedImage and modelUnavailable failures feed the configured downstream policy.
 - `iosapp/ImageFilterIntegration/Core/ExtensionSafeDiagnosticLogService.swift`: unchanged; remains the app-extension-safe implementation expected by vendor source compiled into `ImageFilterCore`.
 - `iosapp/Sources/SetupView.swift`: exports the bounded PacketTunnel diagnostic ZIP.
 - `iosapp/Sources/ImageFilterTabHostView.swift`: Pureline-owned configuration status/import/export/default controls above the untouched embedded vendor UI.
@@ -117,7 +120,7 @@ NudeNet pipeline, diagnostics, and tests remain intact.
 - Image inspection: 4 MiB per image, one active inspection, two queued reservations, a 16-MiB hard aggregate ceiling, and one inference at a time by default.
 - TLS compatibility bypass TTL: 24 hours, persisted with expiry and restored before listening.
 - Upstream TLS: full verification enabled only by the Pureline PacketTunnel caller.
-- Failure policy: classifier errors, oversized payloads, resource pressure, unsupported bounded inspection, capture limits, and diagnostic failures never truncate or block network payloads. TLS-incompatible hosts are blind-tunneled; force-decrypt remains authoritative.
+- Failure policy: the built-in Swift and bundled JSON profiles now use block for image failure/overflow/unsupported cases. A safe image replaces the response when strict inspection cannot complete. Explicit persisted failOpen values remain valid and retain the availability behavior; upgrading does not silently migrate active.json. OFF, non-image responses, capture-only limits and diagnostic failures retain streaming behavior. Local animated images and SVG are unsupported and use the selected unsupportedEncoding policy. TLS-incompatible hosts remain blind-tunneled; force-decrypt remains authoritative.
 
 # Pureline configuration architecture
 
@@ -146,3 +149,13 @@ This choice is deliberate because the vendor iOS `NudityFilterPolicy.swift` is a
 - Pinning: the 24-hour persistent certificate-pinning evidence store remains separate and is restored before listening.
 - Anti-bot: a normal 403 remains an origin status. A temporary one-hour `antiBotIncompatible` bypass is created only for a 403 with at least two Cloudflare-specific header signals plus a known challenge-body marker. It is persisted separately from pinning, applies only to subsequent connections, and does not attempt to solve or circumvent a challenge. Forced decryption overrides both bypass classes.
 - TLS closes: a complete framed response followed by `uncleanShutdown` is informational (`benignTLSPeerClose`); missing bytes against Content-Length remain a failed/truncated flow.
+
+## 27 November validation boundary
+
+The focused socket and downstream runtime receipts are documented in the native validation report. Resource admission and bounded decoding are code-level safeguards; they do not establish the cause of a physical Network Extension termination, prove Jetsam recovery, or add an absolute Core ML inference deadline. Physical OFF/ON A/B, representative app browsing, reconnect and sustained device use remain separate gates.
+
+## iOS 27 Vision compute-device adaptation (2026-11-27)
+
+`PurelineHumanDetectionService` is a downstream ImageFilterCore source, explicitly included by `iosapp/project.yml`. On iOS 27 and later it selects an advertised CPU device for every supported Vision compute stage, requiring the main stage. If a required CPU device is unavailable the request throws and the configured safe failure policy applies. Older OS versions delegate to the unchanged vendor detector. Request revisions, detection mapping, face-crop expansion, model scores and thresholds are unchanged.
+
+The controlled diagnosis compared the bounded ImageIO image with the exact prior UIImage/Core Image rendering: both failed automatic Vision inference-context creation, while the same bounded input succeeded with the supported CPU device. The original repeated-inference smoke was preserved byte-for-byte and subsequently passed with both actual models. See `validation/NATIVE_PROXY_AND_IMAGE_FILTER_2026-11-27.md` for the failed controls, exact source hashes and accepted 27 distinct runtime cases. This simulator result does not establish physical Network Extension memory behavior or resolve an unobserved iPad Jetsam event.

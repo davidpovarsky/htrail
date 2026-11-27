@@ -1,0 +1,5 @@
+/bin/
+/logs/
+/evidence/*-raw.*
+__pycache__/
+*.secret.json

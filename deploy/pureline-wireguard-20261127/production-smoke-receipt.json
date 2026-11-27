@@ -1,0 +1,343 @@
+{
+  "cache_after": [
+    {
+      "entries": 3,
+      "filename": "decisions.worker-0.sqlite3",
+      "private_fields_present": false,
+      "public_fixture_hashes": [
+        "2b60a52f98219bd878af04c6c7a7cbbd291bae76598bbdf3c1148ce294256869",
+        "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9"
+      ],
+      "slot": 0
+    },
+    {
+      "entries": 2,
+      "filename": "decisions.worker-1.sqlite3",
+      "private_fields_present": false,
+      "public_fixture_hashes": [
+        "2b60a52f98219bd878af04c6c7a7cbbd291bae76598bbdf3c1148ce294256869",
+        "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9"
+      ],
+      "slot": 1
+    }
+  ],
+  "cache_after_jpegs": [
+    {
+      "entries": 2,
+      "filename": "decisions.worker-0.sqlite3",
+      "private_fields_present": false,
+      "public_fixture_hashes": [
+        "2b60a52f98219bd878af04c6c7a7cbbd291bae76598bbdf3c1148ce294256869",
+        "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9"
+      ],
+      "slot": 0
+    },
+    {
+      "entries": 2,
+      "filename": "decisions.worker-1.sqlite3",
+      "private_fields_present": false,
+      "public_fixture_hashes": [
+        "2b60a52f98219bd878af04c6c7a7cbbd291bae76598bbdf3c1148ce294256869",
+        "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9"
+      ],
+      "slot": 1
+    }
+  ],
+  "cache_before": [
+    {
+      "entries": 0,
+      "filename": "decisions.worker-0.sqlite3",
+      "private_fields_present": false,
+      "public_fixture_hashes": [],
+      "slot": 0
+    },
+    {
+      "entries": 0,
+      "filename": "decisions.worker-1.sqlite3",
+      "private_fields_present": false,
+      "public_fixture_hashes": [],
+      "slot": 1
+    }
+  ],
+  "config_sha256": "8198c25521d3064a636215cf399a000dd4dd6030b91f463221d8ba609bc6d4eb",
+  "diagnostics": [
+    {
+      "cache_hits": 2,
+      "events": 5,
+      "inspected": 3,
+      "private_fields_present": false,
+      "slot": 0
+    },
+    {
+      "cache_hits": 2,
+      "events": 4,
+      "inspected": 2,
+      "private_fields_present": false,
+      "slot": 1
+    }
+  ],
+  "finished_utc": "2026-11-27T16:46:58.850678+00:00",
+  "identity_before": {
+    "pid": 1405719,
+    "start_ticks": 732507581
+  },
+  "manifest_sha256": "a6bbb87f9ea665e51ae4f964c843483626195f76caaa57358a76d94b270e641d",
+  "passed": true,
+  "raw_image_persistence": false,
+  "request_retries": 0,
+  "requests": [
+    {
+      "action": "allow",
+      "cache": "miss",
+      "content_encoding": "gzip",
+      "decoded_bytes": 5276,
+      "dimensions": {
+        "decoded": true,
+        "height": 128,
+        "width": 128
+      },
+      "elapsed_ms": 1162.72,
+      "expected_public_source_sha256": "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9",
+      "fixture": "allow",
+      "mime": "image/jpeg",
+      "output_sha256": "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9",
+      "passed": true,
+      "reason": "policy",
+      "representation_bytes": 4981,
+      "status": 200
+    },
+    {
+      "action": "blur",
+      "cache": "miss",
+      "content_encoding": "identity",
+      "decoded_bytes": 979,
+      "dimensions": {
+        "decoded": true,
+        "height": 128,
+        "width": 128
+      },
+      "elapsed_ms": 1095.65,
+      "expected_public_source_sha256": "2b60a52f98219bd878af04c6c7a7cbbd291bae76598bbdf3c1148ce294256869",
+      "fixture": "block",
+      "mime": "image/jpeg",
+      "output_sha256": "e207d17fcebf558e97358e0bae26474770e9c0c96b45fccb10b83e2790e73aec",
+      "passed": true,
+      "reason": "policy",
+      "representation_bytes": 979,
+      "status": 200
+    },
+    {
+      "action": "blur",
+      "cache": "miss",
+      "content_encoding": "identity",
+      "decoded_bytes": 979,
+      "dimensions": {
+        "decoded": true,
+        "height": 128,
+        "width": 128
+      },
+      "elapsed_ms": 953.9,
+      "expected_public_source_sha256": "2b60a52f98219bd878af04c6c7a7cbbd291bae76598bbdf3c1148ce294256869",
+      "fixture": "block",
+      "mime": "image/jpeg",
+      "output_sha256": "e207d17fcebf558e97358e0bae26474770e9c0c96b45fccb10b83e2790e73aec",
+      "passed": true,
+      "reason": "policy",
+      "representation_bytes": 979,
+      "status": 200
+    },
+    {
+      "action": "allow",
+      "cache": "miss",
+      "content_encoding": "gzip",
+      "decoded_bytes": 5276,
+      "dimensions": {
+        "decoded": true,
+        "height": 128,
+        "width": 128
+      },
+      "elapsed_ms": 958.93,
+      "expected_public_source_sha256": "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9",
+      "fixture": "allow",
+      "mime": "image/jpeg",
+      "output_sha256": "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9",
+      "passed": true,
+      "reason": "policy",
+      "representation_bytes": 4981,
+      "status": 200
+    },
+    {
+      "action": "allow",
+      "cache": "hit",
+      "content_encoding": "gzip",
+      "decoded_bytes": 5276,
+      "dimensions": {
+        "decoded": true,
+        "height": 128,
+        "width": 128
+      },
+      "elapsed_ms": 48.57,
+      "expected_public_source_sha256": "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9",
+      "fixture": "allow",
+      "mime": "image/jpeg",
+      "output_sha256": "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9",
+      "passed": true,
+      "reason": "policy",
+      "representation_bytes": 4981,
+      "status": 200
+    },
+    {
+      "action": "blur",
+      "cache": "hit",
+      "content_encoding": "identity",
+      "decoded_bytes": 979,
+      "dimensions": {
+        "decoded": true,
+        "height": 128,
+        "width": 128
+      },
+      "elapsed_ms": 47.82,
+      "expected_public_source_sha256": "2b60a52f98219bd878af04c6c7a7cbbd291bae76598bbdf3c1148ce294256869",
+      "fixture": "block",
+      "mime": "image/jpeg",
+      "output_sha256": "e207d17fcebf558e97358e0bae26474770e9c0c96b45fccb10b83e2790e73aec",
+      "passed": true,
+      "reason": "policy",
+      "representation_bytes": 979,
+      "status": 200
+    },
+    {
+      "action": "blur",
+      "cache": "hit",
+      "content_encoding": "identity",
+      "decoded_bytes": 979,
+      "dimensions": {
+        "decoded": true,
+        "height": 128,
+        "width": 128
+      },
+      "elapsed_ms": 46.99,
+      "expected_public_source_sha256": "2b60a52f98219bd878af04c6c7a7cbbd291bae76598bbdf3c1148ce294256869",
+      "fixture": "block",
+      "mime": "image/jpeg",
+      "output_sha256": "e207d17fcebf558e97358e0bae26474770e9c0c96b45fccb10b83e2790e73aec",
+      "passed": true,
+      "reason": "policy",
+      "representation_bytes": 979,
+      "status": 200
+    },
+    {
+      "action": "allow",
+      "cache": "hit",
+      "content_encoding": "gzip",
+      "decoded_bytes": 5276,
+      "dimensions": {
+        "decoded": true,
+        "height": 128,
+        "width": 128
+      },
+      "elapsed_ms": 46.23,
+      "expected_public_source_sha256": "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9",
+      "fixture": "allow",
+      "mime": "image/jpeg",
+      "output_sha256": "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9",
+      "passed": true,
+      "reason": "policy",
+      "representation_bytes": 4981,
+      "status": 200
+    },
+    {
+      "action": "allow",
+      "cache": "miss",
+      "content_encoding": "gzip",
+      "decoded_bytes": 16160,
+      "dimensions": {
+        "height": "430",
+        "width": "410",
+        "xml_parsed": true
+      },
+      "elapsed_ms": 1333.08,
+      "expected_public_source_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95",
+      "fixture": "svg",
+      "mime": "image/svg+xml",
+      "output_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95",
+      "passed": true,
+      "reason": "policy",
+      "representation_bytes": 5662,
+      "status": 200
+    }
+  ],
+  "resources": {
+    "interval_ms": 100,
+    "kernel_cgroup_lifetime_memory_peak": 936079360,
+    "kernel_cgroup_lifetime_pids_peak": 12,
+    "memory_max": 2147483648,
+    "peak_memory_bytes": 936042496,
+    "peak_processes": 5,
+    "peak_tasks_including_threads": 10,
+    "scope": "Sampled during this probe, not all service startup",
+    "tasks_max": 128
+  },
+  "schema": 1,
+  "scope": "Same-process loopback HTTPS production smoke; not client WireGuard or whole-page acceptance",
+  "source_manifest_sha256": "592dd80686141d54da26dd84eb66d2e60a5dbadc3f3da75733283026a443182b",
+  "started_utc": "2026-11-27T16:46:53.076238+00:00",
+  "startup_guard": {
+    "elapsed_ms": 2.84,
+    "scope": "Read-only observation of exact child main threads reading fd0 after ready; not an API health endpoint",
+    "workers": [
+      {
+        "pid": 1405775,
+        "slot": 0,
+        "stdin_read_observed": true
+      },
+      {
+        "pid": 1405776,
+        "slot": 1,
+        "stdin_read_observed": true
+      }
+    ]
+  },
+  "tls": {
+    "ca_sha256": "7429afe52de2cce4ff7a32120eba1e54d28856eeddc10ec52c3b32219ba15beb",
+    "certificate_verified": true,
+    "hostname_verified": true
+  },
+  "transport_after": {
+    "counts": {
+      "http_request": 8,
+      "http_response:2xx": 7,
+      "tls_client_established": 8,
+      "tls_server_established": 7
+    },
+    "epoch_id": "fab0b43a4106448fb975de9006b96c19",
+    "lifecycle": "running",
+    "pid": 1405719,
+    "recent_error_categories": [],
+    "schema": 2,
+    "started_utc": "2026-11-27T16:46:45.719634+00:00",
+    "updated_utc": "2026-11-27T16:46:57+00:00"
+  },
+  "transport_before": {
+    "counts": {},
+    "epoch_id": "fab0b43a4106448fb975de9006b96c19",
+    "lifecycle": "running",
+    "pid": 1405719,
+    "recent_error_categories": [],
+    "schema": 2,
+    "started_utc": "2026-11-27T16:46:45.719634+00:00",
+    "updated_utc": "2026-11-27T16:46:48+00:00"
+  },
+  "transport_counts_can_lag_final_events": true,
+  "transport_persisted_2xx_delta": 7,
+  "workers_after": [
+    {
+      "pid": 1405775,
+      "slot": 0
+    },
+    {
+      "pid": 1405776,
+      "slot": 1
+    }
+  ]
+}

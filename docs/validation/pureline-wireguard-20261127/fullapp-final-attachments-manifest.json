@@ -1,0 +1,188 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "37BB5235-0E27-4F9E-8479-EA3469C82327.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WireGuard-real-simulator-limitation_0_AC2FB529-9F09-4FD4-8EFB-DF8BD841F5F0.png",
+        "timestamp" : 1795748856.625
+      }
+    ],
+    "testIdentifier" : "PurelineWireGuardUITests/test01SimulatorStatusDoesNotPretendToRunVPN()",
+    "testIdentifierURL" : "test://com.apple.xcode/PurelineRemote/PurelineRemoteWireGuardUITests/PurelineWireGuardUITests/test01SimulatorStatusDoesNotPretendToRunVPN"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "AEB298C0-7CF0-457D-884A-F0316AA7B6D3.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-thumbnails-scrolled_0_B8DEB7FD-0B2A-4554-A7D2-267D04AC14C4.png",
+        "timestamp" : 1795749130.447
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "CE90CEB9-63A7-421A-BE4F-40090FF705CC.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-thumbnails-top_0_427237F4-EC23-44AA-B438-740C4BCC0B90.png",
+        "timestamp" : 1795749128.774
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "5BA8F0B5-065A-46A0-8B26-E4EE24735AF1.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-groups-scrolled_0_BD48165B-8FEB-49C4-AB7D-D2C0D8B0D7AF.png",
+        "timestamp" : 1795749062.18
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "DCD72BE6-3F56-4A88-97DE-C3645B1494AA.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-groups-top_0_26AB87F8-F57D-4F07-8088-7CF2074341A0.png",
+        "timestamp" : 1795749060.589
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "045066C2-EA24-49D7-9917-35190D1A3BD0.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-objects-scrolled_0_6F4A5645-9064-433D-839D-1262EF8C652B.png",
+        "timestamp" : 1795749036.806
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "316D0BDB-2329-47B7-9BD3-2A373F7EAA29.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-objects-top_0_65CBDEC2-60D2-4685-BFA7-700A5C0ED94C.png",
+        "timestamp" : 1795749035.118
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "BC5EC951-0A98-442E-9036-11B198EED95B.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-mixed-scrolled_0_F94E148C-083A-494A-85C4-90D4F4A845D3.png",
+        "timestamp" : 1795748965.162
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "78FCEE2D-766C-4503-9DB7-CB9E7FF13EC6.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-mixed-top_0_53F780DF-0E6E-4A3D-96B7-658D7206F1E2.png",
+        "timestamp" : 1795748963.183
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "C14C1D43-1B19-4C89-A3FB-9E690B46B52E.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-block-scrolled_0_8BCDADB8-959F-448A-8B26-8FC5230BAEE1.png",
+        "timestamp" : 1795748937.056
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "A725F61C-264C-43ED-8417-03DF97912070.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-block-top_0_DBC970AE-0475-48CC-8E55-F541E99D1992.png",
+        "timestamp" : 1795748934.502
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "2ECE6664-99CF-469C-9963-D3D2FD08E09D.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-allow-scrolled_0_062FD7CF-23AE-4F19-899B-AD37C458D030.png",
+        "timestamp" : 1795748900.441
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "FBA713F4-56ED-4D94-A389-1B0FF19B6397.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-allow-top_0_17F05540-2213-4AFF-B2B8-8CC99BC48C0E.png",
+        "timestamp" : 1795748884.769
+      }
+    ],
+    "testIdentifier" : "PurelineWireGuardUITests/test02ActualWebKitBrowsesImageGalleries()",
+    "testIdentifierURL" : "test://com.apple.xcode/PurelineRemote/PurelineRemoteWireGuardUITests/PurelineWireGuardUITests/test02ActualWebKitBrowsesImageGalleries"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "4CAA4617-A27B-44B7-8901-C94D387C8A11.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Native-URLSession-filtered-images_0_740BF698-C7A3-448E-A5E1-993D4C810A83.png",
+        "timestamp" : 1795749143.582
+      }
+    ],
+    "testIdentifier" : "PurelineWireGuardUITests/test03ActualNativeImagesUseSameEncryptedRoute()",
+    "testIdentifierURL" : "test://com.apple.xcode/PurelineRemote/PurelineRemoteWireGuardUITests/PurelineWireGuardUITests/test03ActualNativeImagesUseSameEncryptedRoute"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "045278BD-2E5F-4F22-8FB5-05A125C67AE6.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-highres-scrolled_0_AE218BA7-4361-404A-BAB0-99017EAD9AAB.png",
+        "timestamp" : 1795749180.292
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "4C3D6B4C-3E8D-482F-833B-F9224C02F49D.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-highres-top_0_66E9D9FB-3579-4FC9-B007-EA8734D2DB12.png",
+        "timestamp" : 1795749178.692
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "7D88A563-B919-4D7D-9B74-54D1F6889219.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-svg-scrolled_0_5790619C-5846-484F-98FA-64E9EC69D67C.png",
+        "timestamp" : 1795749163.58
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "deviceName" : "Pureline-WireGuard-QA-20261127",
+        "exportedFileName" : "2982CD88-E06A-445F-B51D-FEDCEB4B6229.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "WebKit-svg-top_0_BBBDC000-366E-4DA1-93A7-8BCE6EC2055D.png",
+        "timestamp" : 1795749161.934
+      }
+    ],
+    "testIdentifier" : "PurelineWireGuardUITests/test04SVGAndHighResolutionImagesRenderThroughFiltering()",
+    "testIdentifierURL" : "test://com.apple.xcode/PurelineRemote/PurelineRemoteWireGuardUITests/PurelineWireGuardUITests/test04SVGAndHighResolutionImagesRenderThroughFiltering"
+  }
+]

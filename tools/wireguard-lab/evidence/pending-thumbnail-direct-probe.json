@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "started_at": "2026-11-27T03:19:40.505482+00:00",
+  "finished_at": "2026-11-27T03:19:40.768288+00:00",
+  "route": "Oracle direct public HTTPS origin",
+  "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/League_of_Nations_Commission_067.tif/lossy-page1-250px-League_of_Nations_Commission_067.tif.jpg?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+  "curl_exit": 0,
+  "curl_summary": "200 0.235881 13205 image/jpeg",
+  "error_class": null,
+  "bytes_received": 13205,
+  "body_sha256": "278464baf5c4acbab03c2a92d63361d5b27bb2da78a61bece3e50c7252f46f5a",
+  "body_magic_hex": "ffd8ffe201a04943",
+  "response_headers": {
+    "content-type": "image/jpeg",
+    "content-length": "13205"
+  },
+  "scope": "One bounded follow-up request; does not retroactively complete the browser capture."
+}

@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "started_at": "2026-11-27T03:19:24.783701+00:00",
+  "finished_at": "2026-11-27T03:19:34.767385+00:00",
+  "route": "Mac HTTP CONNECT -> real WireGuard -> frozen Oracle filter -> public HTTPS origin",
+  "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/League_of_Nations_Commission_067.tif/lossy-page1-250px-League_of_Nations_Commission_067.tif.jpg?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+  "curl_exit": 0,
+  "curl_summary": "200 9.957373 7935 image/png",
+  "error_class": null,
+  "bytes_received": 7935,
+  "body_sha256": "552fa26b845e886b89b7e9dd910361558a5ae0d6974794ffcc6e739e523ac66a",
+  "body_magic_hex": "89504e470d0a1a0a",
+  "response_headers": {
+    "content-type": "image/png",
+    "content-length": "7935",
+    "x-local-image-filter": "blur",
+    "x-local-image-filter-reason": "policy"
+  },
+  "scope": "One bounded follow-up request; does not retroactively complete the browser capture."
+}

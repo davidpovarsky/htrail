@@ -1,0 +1,285 @@
+{
+  "run_id": "chromium-rendered-v1",
+  "started_at": "2026-11-27T01:33:54.805Z",
+  "platform": "darwin",
+  "arch": "arm64",
+  "playwright": "1.65.1",
+  "proxy": "http://127.0.0.1:18520",
+  "local_html_bypass": [
+    "127.0.0.1",
+    "localhost"
+  ],
+  "trust": {
+    "mode": "Chromium SPKI allowlist only",
+    "ca_spki_sha256_base64": "8oH7pg/cFaARtlf2hEbN/y+oMCvFIuE3zG4MXzUB5s0=",
+    "ignoreHTTPSErrors": false,
+    "global_trust_changes": false
+  },
+  "fresh_persistent_profile": "/Users/m1/builds/pureline-wireguard-lab-20261127/browser-runtime/profiles/chromium-rendered-v1",
+  "route": "Chromium HTTP CONNECT -> official WireGuard userspace netstack -> SSH-carried UDP -> isolated Oracle WireGuard mitmproxy -> Pureline CPU candidate -> public HTTPS origin",
+  "limitations": [
+    "Per-browser proxy; not system VPN or iOS NetworkExtension",
+    "WireGuard outer UDP carried over SSH TCP; internet UDP reachability not tested",
+    "Public page outcomes are coverage evidence, not independent labelled accuracy samples"
+  ],
+  "health_before": {
+    "bytes_down": 12810,
+    "bytes_up": 1851,
+    "connected": 3,
+    "errors": 0,
+    "requests": 3,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795743197",
+      "rx_bytes": "16367",
+      "tx_bytes": "9084"
+    }
+  },
+  "pages": [
+    {
+      "id": "allow",
+      "kind": "fixture-gallery",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 14110,
+      "counts": {
+        "dom_images": 10,
+        "decoded_images": 10,
+        "image_network_responses": 10,
+        "actions": {
+          "allow": 10
+        },
+        "labelled_matches": 10,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 0,
+        "failed_requests": 0
+      },
+      "screenshot": "allow.png"
+    },
+    {
+      "id": "block",
+      "kind": "fixture-gallery",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 19078,
+      "counts": {
+        "dom_images": 10,
+        "decoded_images": 4,
+        "image_network_responses": 10,
+        "actions": {
+          "blur": 10
+        },
+        "labelled_matches": 4,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 6,
+        "failed_requests": 0
+      },
+      "screenshot": "block.png"
+    },
+    {
+      "id": "mixed",
+      "kind": "fixture-gallery",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 8946,
+      "counts": {
+        "dom_images": 10,
+        "decoded_images": 5,
+        "image_network_responses": 10,
+        "actions": {
+          "allow": 5,
+          "blur": 5
+        },
+        "labelled_matches": 5,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 5,
+        "failed_requests": 0
+      },
+      "screenshot": "mixed.png"
+    },
+    {
+      "id": "mixed-2",
+      "kind": "fixture-gallery",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 5517,
+      "counts": {
+        "dom_images": 10,
+        "decoded_images": 9,
+        "image_network_responses": 10,
+        "actions": {
+          "allow": 5,
+          "blur": 5
+        },
+        "labelled_matches": 9,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 1,
+        "failed_requests": 0
+      },
+      "screenshot": "mixed-2.png"
+    },
+    {
+      "id": "objects",
+      "kind": "fixture-gallery",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 6022,
+      "counts": {
+        "dom_images": 9,
+        "decoded_images": 9,
+        "image_network_responses": 9,
+        "actions": {
+          "allow": 9
+        },
+        "labelled_matches": 9,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 0,
+        "failed_requests": 0
+      },
+      "screenshot": "objects.png"
+    },
+    {
+      "id": "groups",
+      "kind": "fixture-gallery",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 4439,
+      "counts": {
+        "dom_images": 2,
+        "decoded_images": 2,
+        "image_network_responses": 2,
+        "actions": {
+          "allow": 2
+        },
+        "labelled_matches": 1,
+        "labelled_mismatches": 1,
+        "labelled_unresolved": 0,
+        "failed_requests": 0
+      },
+      "screenshot": "groups.png"
+    },
+    {
+      "id": "thumbnails",
+      "kind": "fixture-gallery",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 14734,
+      "counts": {
+        "dom_images": 10,
+        "decoded_images": 2,
+        "image_network_responses": 10,
+        "actions": {
+          "allow": 2,
+          "blur": 8
+        },
+        "labelled_matches": 2,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 8,
+        "failed_requests": 0
+      },
+      "screenshot": "thumbnails.png"
+    },
+    {
+      "id": "thumbnails-2",
+      "kind": "fixture-gallery",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 6280,
+      "counts": {
+        "dom_images": 6,
+        "decoded_images": 6,
+        "image_network_responses": 6,
+        "actions": {
+          "allow": 6
+        },
+        "labelled_matches": 6,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 0,
+        "failed_requests": 0
+      },
+      "screenshot": "thumbnails-2.png"
+    },
+    {
+      "id": "wikipedia-nature",
+      "kind": "public-page",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 49024,
+      "counts": {
+        "dom_images": 62,
+        "decoded_images": 19,
+        "image_network_responses": 43,
+        "actions": {
+          "allow": 19,
+          "replace": 24
+        },
+        "labelled_matches": 0,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 0,
+        "failed_requests": 0
+      },
+      "screenshot": "wikipedia-nature.png"
+    },
+    {
+      "id": "wikipedia-einstein",
+      "kind": "public-page",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 62096,
+      "counts": {
+        "dom_images": 69,
+        "decoded_images": 22,
+        "image_network_responses": 49,
+        "actions": {
+          "allow": 17,
+          "replace": 25,
+          "blur": 7
+        },
+        "labelled_matches": 0,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 0,
+        "failed_requests": 0
+      },
+      "screenshot": "wikipedia-einstein.png"
+    },
+    {
+      "id": "wikipedia-meir",
+      "kind": "public-page",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 48585,
+      "counts": {
+        "dom_images": 46,
+        "decoded_images": 16,
+        "image_network_responses": 39,
+        "actions": {
+          "allow": 11,
+          "replace": 22,
+          "blur": 6
+        },
+        "labelled_matches": 0,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 0,
+        "failed_requests": 0
+      },
+      "screenshot": "wikipedia-meir.png"
+    }
+  ],
+  "browser": "159.0.8154.6",
+  "finished_at": "2026-11-27T01:38:00.798Z",
+  "health_after": {
+    "bytes_down": 4747029,
+    "bytes_up": 107342,
+    "connected": 41,
+    "errors": 1,
+    "requests": 42,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795743470",
+      "rx_bytes": "6676321",
+      "tx_bytes": "416644"
+    }
+  }
+}

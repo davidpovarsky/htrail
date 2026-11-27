@@ -1,0 +1,194 @@
+{
+  "run_id": "chromium-frozen-v3",
+  "started_at": "2026-11-27T03:08:00.810Z",
+  "platform": "darwin",
+  "arch": "arm64",
+  "playwright": "1.65.1",
+  "proxy": "http://127.0.0.1:18520",
+  "local_html_bypass": [
+    "127.0.0.1",
+    "localhost"
+  ],
+  "trust": {
+    "mode": "Chromium SPKI allowlist only",
+    "ca_spki_sha256_base64": "8oH7pg/cFaARtlf2hEbN/y+oMCvFIuE3zG4MXzUB5s0=",
+    "ignoreHTTPSErrors": false,
+    "global_trust_changes": false
+  },
+  "backend_revision": "2026-11-27-svg-presentation-fc8c4247 / manifest4a6868b7",
+  "fresh_persistent_profile": "/Users/m1/builds/pureline-wireguard-lab-20261127/browser-runtime/profiles/chromium-frozen-v3",
+  "route": "Chromium HTTP CONNECT -> official WireGuard userspace netstack -> SSH-carried UDP -> isolated Oracle WireGuard mitmproxy -> Pureline CPU candidate -> public HTTPS origin",
+  "limitations": [
+    "Per-browser proxy; not system VPN or iOS NetworkExtension",
+    "WireGuard outer UDP carried over SSH TCP; internet UDP reachability not tested",
+    "Public page outcomes are coverage evidence, not independent labelled accuracy samples"
+  ],
+  "health_before": {
+    "bytes_down": 89145,
+    "bytes_up": 678,
+    "connected": 5,
+    "errors": 0,
+    "requests": 5,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795748764",
+      "rx_bytes": "528366",
+      "tx_bytes": "24316"
+    }
+  },
+  "pages": [
+    {
+      "id": "svg",
+      "kind": "fixture-gallery",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 20970,
+      "counts": {
+        "dom_images": 5,
+        "decoded_images": 5,
+        "decoded_inline_images": 0,
+        "attempted_decode_failures": 0,
+        "pending_requested_images": 0,
+        "pending_image_requests_at_capture": 0,
+        "unrequested_images": 0,
+        "browser_cached_responses": 0,
+        "image_network_responses": 5,
+        "actions": {
+          "allow": 4,
+          "blur": 1
+        },
+        "labelled_matches": 5,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 0,
+        "failed_requests": 0
+      },
+      "screenshot": "svg.png"
+    },
+    {
+      "id": "highres",
+      "kind": "fixture-gallery",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 10140,
+      "counts": {
+        "dom_images": 4,
+        "decoded_images": 4,
+        "decoded_inline_images": 0,
+        "attempted_decode_failures": 0,
+        "pending_requested_images": 0,
+        "pending_image_requests_at_capture": 0,
+        "unrequested_images": 0,
+        "browser_cached_responses": 0,
+        "image_network_responses": 4,
+        "actions": {
+          "blur": 2,
+          "allow": 2
+        },
+        "labelled_matches": 4,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 0,
+        "failed_requests": 0
+      },
+      "screenshot": "highres.png"
+    },
+    {
+      "id": "wikipedia-nature",
+      "kind": "public-page",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 35640,
+      "counts": {
+        "dom_images": 62,
+        "decoded_images": 22,
+        "decoded_inline_images": 0,
+        "attempted_decode_failures": 0,
+        "pending_requested_images": 0,
+        "pending_image_requests_at_capture": 0,
+        "unrequested_images": 40,
+        "browser_cached_responses": 3,
+        "image_network_responses": 43,
+        "actions": {
+          "allow": 42,
+          "replace": 1
+        },
+        "labelled_matches": 0,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 0,
+        "failed_requests": 0
+      },
+      "screenshot": "wikipedia-nature.png"
+    },
+    {
+      "id": "wikipedia-einstein",
+      "kind": "public-page",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 100315,
+      "counts": {
+        "dom_images": 69,
+        "decoded_images": 25,
+        "decoded_inline_images": 0,
+        "attempted_decode_failures": 0,
+        "pending_requested_images": 4,
+        "pending_image_requests_at_capture": 1,
+        "unrequested_images": 40,
+        "browser_cached_responses": 33,
+        "image_network_responses": 48,
+        "actions": {
+          "allow": 41,
+          "replace": 1,
+          "blur": 6
+        },
+        "labelled_matches": 0,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 0,
+        "failed_requests": 0
+      },
+      "screenshot": "wikipedia-einstein.png"
+    },
+    {
+      "id": "wikipedia-meir",
+      "kind": "public-page",
+      "status": 200,
+      "error": null,
+      "elapsed_ms": 53564,
+      "counts": {
+        "dom_images": 46,
+        "decoded_images": 20,
+        "decoded_inline_images": 0,
+        "attempted_decode_failures": 0,
+        "pending_requested_images": 0,
+        "pending_image_requests_at_capture": 0,
+        "unrequested_images": 26,
+        "browser_cached_responses": 28,
+        "image_network_responses": 40,
+        "actions": {
+          "allow": 33,
+          "blur": 7
+        },
+        "labelled_matches": 0,
+        "labelled_mismatches": 0,
+        "labelled_unresolved": 0,
+        "failed_requests": 0
+      },
+      "screenshot": "wikipedia-meir.png"
+    }
+  ],
+  "browser": "159.0.8154.6",
+  "finished_at": "2026-11-27T03:11:54.659Z",
+  "health_after": {
+    "bytes_down": 5427366,
+    "bytes_up": 59317,
+    "connected": 29,
+    "errors": 0,
+    "requests": 29,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795749006",
+      "rx_bytes": "6258013",
+      "tx_bytes": "282244"
+    }
+  }
+}

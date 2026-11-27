@@ -1,5 +1,8 @@
 import Darwin
 import Foundation
+import CoreGraphics
+import ImageIO
+import Vision
 import HTTrailCore
 @testable import ImageFilterCore
 import XCTest
@@ -252,7 +255,7 @@ final class IntegratedRuntimeTests: XCTestCase {
         XCTAssertEqual(retryAttempts, 2)
     }
 
-    func testInspectionAdmissionIsBoundedAndOverflowFailsOpen() async {
+    func testInspectionAdmissionRejectsOverflowWithoutExceedingBudget() async {
         let admission = PurelineInspectionAdmissionController()
         var config = PurelineFilterConfiguration.builtIn
         config.runtime.maxConcurrentImageInspections = 1
@@ -268,6 +271,159 @@ final class IntegratedRuntimeTests: XCTestCase {
         XCTAssertLessThanOrEqual(snapshot.inFlightBytes, PurelineInspectionAdmissionController.hardInFlightByteCeiling)
         admission.release(id: "one"); admission.release(id: "two"); admission.release(id: "three")
         XCTAssertEqual(admission.snapshot().inFlightBytes, 0)
+    }
+
+    func testTerminalFlowReleasesReservationEvenWithoutResponse() {
+        let admission = PurelineInspectionAdmissionController()
+        let request = imageRequest()
+        let id = PurelineImageResponsePolicy.inspectionID(request)
+        let downstream = PurelineBoundedFlowSink(limits: .packetTunnel, store: nil)
+        let sink = PurelineCompletionFlowSink(downstream: downstream) {
+            admission.release(id: PurelineImageResponsePolicy.inspectionID($0))
+        }
+        XCTAssertTrue(admission.tryReserve(id: id, bytes: 100))
+        sink.record(Flow(request: request, response: nil, state: .pending, startedAt: Date(), secure: true))
+        XCTAssertEqual(admission.snapshot().active, 1)
+        sink.record(Flow(request: request, response: nil, state: .failed, startedAt: Date(), secure: true))
+        XCTAssertEqual(admission.snapshot().inFlightBytes, 0)
+        XCTAssertTrue(admission.tryReserve(id: id, bytes: 100))
+        sink.record(Flow(request: request, response: nil, state: .completed, startedAt: Date(), secure: true))
+        XCTAssertEqual(admission.snapshot().active, 0)
+        XCTAssertEqual(downstream.retainedFlowsNewestFirst().count, 3)
+    }
+
+    func testReleasedQueuedInspectionDoesNotAcquireOrHang() async {
+        let admission = PurelineInspectionAdmissionController()
+        XCTAssertTrue(admission.tryReserve(id: "active", bytes: 100))
+        XCTAssertTrue(admission.tryReserve(id: "queued", bytes: 100))
+        let finished = expectation(description: "released inspection is cancelled")
+        Task {
+            let acquired = await admission.acquire(id: "queued")
+            XCTAssertFalse(acquired)
+            finished.fulfill()
+        }
+        await Task.yield()
+        admission.release(id: "queued")
+        await fulfillment(of: [finished], timeout: 2)
+        admission.release(id: "active")
+        XCTAssertEqual(admission.snapshot().inFlightBytes, 0)
+    }
+
+    func testReducedConcurrencyWaitsForExistingInspectionsAndInference() async {
+        let admission = PurelineInspectionAdmissionController()
+        var config = PurelineFilterConfiguration.builtIn
+        config.runtime.maxConcurrentImageInspections = 2
+        config.runtime.maxConcurrentInference = 2
+        admission.apply(config.runtime, maximumImageBytes: config.pipeline.maximumImageBytes)
+        for id in ["first", "second", "queued"] { XCTAssertTrue(admission.tryReserve(id: id, bytes: 100)) }
+        await admission.acquireInference()
+        await admission.acquireInference()
+        config.runtime.maxConcurrentImageInspections = 1
+        config.runtime.maxConcurrentInference = 1
+        admission.apply(config.runtime, maximumImageBytes: config.pipeline.maximumImageBytes)
+        let inspection = expectation(description: "queued inspection resumed at new limit")
+        let inference = expectation(description: "queued inference resumed at new limit")
+        Task {
+            let acquired = await admission.acquire(id: "queued")
+            XCTAssertTrue(acquired)
+            inspection.fulfill()
+        }
+        Task { await admission.acquireInference(); inference.fulfill() }
+        await Task.yield()
+        admission.release(id: "first")
+        admission.releaseInference()
+        XCTAssertEqual(admission.snapshot().active, 1)
+        XCTAssertEqual(admission.snapshot().queued, 1)
+        XCTAssertEqual(admission.snapshot().inferenceActive, 1)
+        admission.release(id: "second")
+        admission.releaseInference()
+        await fulfillment(of: [inspection, inference], timeout: 2)
+        admission.release(id: "queued")
+        admission.releaseInference()
+        XCTAssertEqual(admission.snapshot().inFlightBytes, 0)
+        XCTAssertEqual(admission.snapshot().inferenceActive, 0)
+    }
+
+    func testStrictImagePolicyBlocksLimitsAndPreservesExplicitFailOpen() throws {
+        var config = PurelineFilterConfiguration.builtIn
+        config.pipeline.maximumImageBytes = 100
+        config.runtime.maxQueuedImageInspections = 0
+        let admission = PurelineInspectionAdmissionController()
+        admission.apply(config.runtime, maximumImageBytes: 100)
+        let request = imageRequest()
+        func decide(_ length: String?, encoding: String? = nil, memory: UInt64 = .max,
+                    type: String = "image/jpeg") -> PurelineImageResponsePolicy.Decision {
+            var headers = [HeaderPair(name: "Content-Type", value: type)]
+            if let length { headers.append(HeaderPair(name: "Content-Length", value: length)) }
+            if let encoding { headers.append(HeaderPair(name: "Content-Encoding", value: encoding)) }
+            return PurelineImageResponsePolicy.decide(request: request,
+                metadata: .init(statusCode: 200, reasonPhrase: "OK", httpVersion: "HTTP/1.1", headers: headers),
+                configuration: config, enabled: true, availableMemoryBytes: memory, admission: admission)
+        }
+        for decision in [decide("101"), decide("50", memory: 0), decide("50", encoding: "gzip"),
+                         decide("50", type: "image/svg+xml")] {
+            guard case .respond(let response) = decision.disposition else { XCTFail("strict policy must replace rejected images"); continue }
+            XCTAssertEqual(response.contentType, "image/svg+xml; charset=utf-8")
+            XCTAssertEqual(response.header("Cache-Control"), "no-store")
+            XCTAssertNil(response.header("Content-Encoding"))
+            XCTAssertFalse(decision.failsOpen)
+        }
+        XCTAssertTrue(admission.tryReserve(id: "occupant", bytes: 50))
+        guard case .respond = decide("50").disposition else { return XCTFail("strict admission overflow must replace") }
+        admission.release(id: "occupant")
+        config.failurePolicy.imageTooLarge = .failOpen
+        let explicit = decide("101")
+        guard case .stream = explicit.disposition else { return XCTFail("explicit failOpen must be preserved") }
+        XCTAssertTrue(explicit.failsOpen)
+        XCTAssertEqual(admission.snapshot().inFlightBytes, 0)
+        let decoded = try PurelineFilterConfigurationValidator.decodeAndValidate(config.normalizedData())
+        XCTAssertEqual(decoded.failurePolicy.imageTooLarge, .failOpen)
+        XCTAssertEqual(decoded.failurePolicy.modelUnavailable, .block)
+    }
+
+    func testUnknownLengthImageReservesCapWhileOFFReservesNothing() {
+        let config = PurelineFilterConfiguration.builtIn
+        let admission = PurelineInspectionAdmissionController()
+        let request = imageRequest()
+        let metadata = StreamingResponseMetadata(statusCode: 200, reasonPhrase: "OK", httpVersion: "HTTP/1.1",
+                                                  headers: [HeaderPair(name: "Content-Type", value: "image/jpeg")])
+        let off = PurelineImageResponsePolicy.decide(request: request, metadata: metadata, configuration: config,
+                                                    enabled: false, availableMemoryBytes: 0, admission: admission)
+        guard case .stream = off.disposition else { return XCTFail("OFF must stream") }
+        XCTAssertEqual(admission.snapshot().inFlightBytes, 0)
+        let active = PurelineImageResponsePolicy.decide(request: request, metadata: metadata, configuration: config,
+                                                       enabled: true, availableMemoryBytes: .max, admission: admission)
+        guard case .inspect(let maximum, let fallback) = active.disposition else { return XCTFail("unknown length must be bounded") }
+        XCTAssertEqual(maximum, config.pipeline.maximumImageBytes)
+        XCTAssertNotNil(fallback)
+        XCTAssertEqual(admission.snapshot().inFlightBytes, maximum)
+        admission.release(id: PurelineImageResponsePolicy.inspectionID(request))
+    }
+
+    func testIOS27MobileCLIPUsesVerifiedCPUOnlyPolicy() {
+        XCTAssertEqual(MobileCLIPService.computeUnitCandidateNames(forOSMajorVersion: 27), ["cpuOnly"])
+        XCTAssertEqual(MobileCLIPService.computeUnitPolicyReason(forOSMajorVersion: 27), "ios27MPSGraphSDPAWorkaround")
+    }
+
+    func testIOS27HumanAndFaceVisionRequestsUseSupportedCPUDevices() throws {
+        let detector = PurelineHumanDetectionService()
+        let human = try detector.makeHumanRequest()
+        let face = try detector.makeFaceRequest()
+        XCTAssertFalse(human.upperBodyOnly)
+        XCTAssertEqual(human.revision, VNDetectHumanRectanglesRequest().revision)
+        XCTAssertEqual(face.revision, VNDetectFaceRectanglesRequest().revision)
+        if #available(iOS 27.0, *) {
+            let requests: [VNRequest] = [human, face]
+            for request in requests {
+                let supported = try request.supportedComputeStageDevices
+                XCTAssertNotNil(supported[.main])
+                for stage in supported.keys {
+                    guard let selected = request.computeDevice(for: stage), case .cpu = selected else {
+                        return XCTFail("Every supported Vision stage must use its advertised CPU device")
+                    }
+                }
+            }
+        }
     }
 
     func testAntiBotDetectionRequiresStrongChallengeSignals() {
@@ -287,6 +443,78 @@ final class IntegratedRuntimeTests: XCTestCase {
         await analyzer.prepare()
         let attempts = await analyzer.preparationAttemptCount()
         XCTAssertEqual(attempts, 0)
+    }
+
+    func testDisabledDirectFilteringSkipsDecodeAndInference() async throws {
+        let analyzer = DirectImageSafetyAnalyzer()
+        var disabled = PurelineFilterConfiguration.builtIn
+        disabled.enabled = false
+        await analyzer.apply(configuration: disabled, revisionHash: "disabled-classification")
+        let decision = try await analyzer.classify(imageData: Data([0, 1, 2]), mimeType: "image/jpeg")
+        XCTAssertTrue(decision.allowed)
+        XCTAssertEqual(decision.risk, "disabled")
+        XCTAssertTrue(decision.modelsRun.isEmpty)
+        let attempts = await analyzer.preparationAttemptCount()
+        XCTAssertEqual(attempts, 0)
+    }
+
+    func testBoundedImageDecodePreservesOrientationAndDimensionLimit() throws {
+        let data = try encodedTestImage(width: 400, height: 200, orientation: 6)
+        var pipeline = PurelineFilterConfiguration.builtIn.pipeline
+        pipeline.maximumPixelDimension = 64
+        let image = try XCTUnwrap(PurelineImageDecoder.decode(data, pipeline: pipeline))
+        XCTAssertEqual(image.width, 32)
+        XCTAssertEqual(image.height, 64)
+    }
+
+    func testBoundedImageDecodeEnforcesPixelAndEncodedByteLimits() throws {
+        let data = try encodedTestImage(width: 2_000, height: 1_000)
+        var pipeline = PurelineFilterConfiguration.builtIn.pipeline
+        pipeline.maximumPixelDimension = 2_048
+        pipeline.maximumTotalPixels = 20_000
+        let image = try XCTUnwrap(PurelineImageDecoder.decode(data, pipeline: pipeline))
+        XCTAssertLessThanOrEqual(image.width * image.height, 20_000)
+        XCTAssertLessThanOrEqual(image.width, 200)
+        XCTAssertLessThanOrEqual(image.height, 100)
+        pipeline.maximumImageBytes = data.count - 1
+        XCTAssertNil(PurelineImageDecoder.decode(data, pipeline: pipeline))
+        XCTAssertNil(PurelineImageDecoder.decode(Data([0, 1, 2]), pipeline: pipeline))
+    }
+
+    func testAnimatedImageIsUnsupportedBeforeModelsCanApproveFrameZero() async throws {
+        let data = try encodedTestImage(width: 20, height: 20, frameCount: 2)
+        XCTAssertEqual(PurelineImageDecoder.frameCount(data), 2)
+        XCTAssertNil(PurelineImageDecoder.decode(data, pipeline: PurelineFilterConfiguration.builtIn.pipeline))
+        let analyzer = DirectImageSafetyAnalyzer()
+        do {
+            _ = try await analyzer.classify(imageData: data, mimeType: "image/gif")
+            XCTFail("uninspected animation frames must not be approved")
+        } catch DirectImageSafetyError.unsupportedImage { }
+        let attempts = await analyzer.preparationAttemptCount()
+        XCTAssertEqual(attempts, 0)
+    }
+
+    private func imageRequest() -> CapturedRequest {
+        CapturedRequest(method: "GET", url: "https://example.test/image.jpg", scheme: "https", host: "example.test",
+                        port: 443, path: "/image.jpg", httpVersion: "HTTP/1.1", headers: [], body: Data(), timestamp: Date())
+    }
+
+    private func encodedTestImage(width: Int, height: Int, orientation: Int = 1, frameCount: Int = 1) throws -> Data {
+        let context = try XCTUnwrap(CGContext(
+            data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: width * 4,
+            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+        ))
+        context.setFillColor(CGColor(gray: 0.5, alpha: 1))
+        context.fill(CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height)))
+        let image = try XCTUnwrap(context.makeImage())
+        let data = NSMutableData()
+        let type = frameCount > 1 ? "com.compuserve.gif" : "public.jpeg"
+        let destination = try XCTUnwrap(CGImageDestinationCreateWithData(data, type as CFString, frameCount, nil))
+        for _ in 0..<frameCount {
+            CGImageDestinationAddImage(destination, image, [kCGImagePropertyOrientation: orientation] as CFDictionary)
+        }
+        XCTAssertTrue(CGImageDestinationFinalize(destination))
+        return data as Data
     }
 
     func testOriginalFullVendorPipelineRemainsAvailable() async {

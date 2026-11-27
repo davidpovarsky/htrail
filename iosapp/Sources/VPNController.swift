@@ -26,7 +26,10 @@ final class VPNController: ObservableObject {
             forName: .NEVPNStatusDidChange, object: nil, queue: .main
         ) { [weak self] note in
             guard let conn = note.object as? NEVPNConnection else { return }
-            Task { @MainActor in self?.status = conn.status }
+            Task { @MainActor in
+                guard let self, conn === self.manager?.connection else { return }
+                self.status = conn.status
+            }
         }
         Task { await reload() }
     }
@@ -84,9 +87,14 @@ final class VPNController: ObservableObject {
     func reload() async {
         do {
             let managers = try await NETunnelProviderManager.loadAllFromPreferences()
-            self.manager = managers.first
-            self.hasConfiguration = managers.first != nil
-            self.status = managers.first?.connection.status ?? .invalid
+            let local = managers.first { candidate in
+                guard let proto = candidate.protocolConfiguration as? NETunnelProviderProtocol else { return false }
+                return proto.providerBundleIdentifier == Self.providerBundleID
+                    && proto.providerConfiguration?[PurelineWGContract.modeKey] as? String != PurelineWGContract.remoteMode
+            }
+            self.manager = local
+            self.hasConfiguration = local != nil
+            self.status = local?.connection.status ?? .invalid
         } catch {
             self.manager = nil
             self.hasConfiguration = false

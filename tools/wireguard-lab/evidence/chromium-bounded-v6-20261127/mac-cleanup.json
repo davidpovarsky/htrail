@@ -1,0 +1,27 @@
+{
+  "at_utc": "2026-11-27T16:23:46.915440+00:00",
+  "stopped": [
+    {
+      "name": "proxy",
+      "pid": 30662
+    },
+    {
+      "name": "relay",
+      "pid": 30661
+    }
+  ],
+  "remaining_owned_processes": [],
+  "ports": {
+    "18530": {
+      "occupied": false
+    },
+    "18531": {
+      "occupied": false
+    },
+    "18532": {
+      "occupied": false
+    }
+  },
+  "global_trust_or_proxy_changes": false,
+  "old_lab_untouched": true
+}

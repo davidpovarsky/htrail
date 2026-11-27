@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "revision": "2026-11-27-header-bounded-v6",
+  "classifier_base_commit": "5291eedb9b46fa978e36ccec4f5504b017afe809",
+  "entrypoint": "downstream/pureline_addon_candidate.py",
+  "reference_config": "candidate.toml",
+  "parent_manifest": "runtime-candidate-20261127-bounded-v5.json",
+  "parent_manifest_sha256": "e9b4424cce6a376c9ac2620cf5b5ad0ac0680264e5653042dc29eb812b13711b",
+  "files": {
+    "approved-ui-rasters.json": "ade4980fb508c632fff654f81fe2f5a7c10c34d35ceb70ab5d022d04730c2cff",
+    "candidate.toml": "b53f002e883414ccba6011e07bde9297481f75538c85c5cefab0c6a16c4ad617",
+    "downstream/animation_pipeline.py": "13eb1d0fb5cfc478c6701c4abfeb1454228e87609c5832e794d722a61e317866",
+    "downstream/face_fallback.py": "291365c7e1745ac1cecfcf9bd8a2a74955ca9d3bc3ecb93ed4318dd8a11b1399",
+    "downstream/http_body_bounds.py": "021cf12d42a46d3ebfacfe77f320317ba44c8d141cfeb9def88b14e8e51bdf86",
+    "downstream/http_input.py": "089f3f7f86fbca039f4d01bfc277382f9b02887d4ebe30f5277be7249e99cde4",
+    "downstream/pipeline_worker.py": "393f5c98fbef9f0f9cb9b7ea15de7060c0dbb693ac7568fb71bc5ccc06b50b5c",
+    "downstream/process_pool.py": "adda3f8212d45962a0e3ab504651b1c3dcde1e22bc80b8d8436991bdad63c952",
+    "downstream/pureline_addon_candidate.py": "84c258349b8808c4340f29a899c4f1807411426405d3607d94b56d988628dd23",
+    "downstream/pureline_addon_v2.py": "ffcf4f64a7c1501b9cb30411c3125e885ded367f24a7ef83748cd87f87291aec",
+    "downstream/pureline_http_addon.py": "358be1d5af3ab2561d01f2e4af25b17ecfef4e46d0709140061698842d10dead",
+    "downstream/runtime_factory.py": "0d80bf3fb391ba408a7f9c67fe1ef43158e87f190501e4752a6342feecf29e56",
+    "downstream/strong_blur.py": "51a34aec315cc3035dcc7d00312d229e5ea02725f43e8eb921b098eef94ccf42",
+    "downstream/svg_pipeline.py": "fc8c4247e44e0468331d21a6cdba9ff90b7e013e3081353bbf59f9037eda8f97",
+    "downstream/svg_worker.py": "6c7e4fc2c6ff1d109710f090b3e4eccf4b622566ed928c20019a00b41603b393",
+    "downstream/worker_protocol.py": "ad5665429f3dd69586e8595603d67738078dec1116653a0b48ccb213741a8ecb",
+    "install_svg_dependencies.py": "04be80eed54b46c29d0234467e5b92a1ff08f40422be629f608de187e8f66352",
+    "requirements-svg.lock": "929c0511abb64b41765ba78a46ddabc2d89b362e5df18e5c2bdd3aaf6036cf03",
+    "runtime-contract.json": "78d496d76a65a2a4c582e9fa0bf61b500e37da413bbb6e1fcdc3d8ad15fb041a",
+    "runtime_contract.py": "11d20dfda902910d0db24ae35b2e08a0b483919259d6c622b908779054498a2e"
+  },
+  "scope": "Immutable runtime source identity. Real-model handler validation is separate from browser, physical iOS and production deployment acceptance.",
+  "execution": {
+    "workers_default": 2,
+    "queued_default": 8,
+    "timeout_seconds_from_config": 18,
+    "timeout_scope": "image/ambiguous response headers + body acquisition + admission queue + bounded content decoding + model inference + rewrite",
+    "raw_image_disk_spool": false,
+    "cancellation": "kill private process group, reap parent, retain slot until termination",
+    "nonimage_streaming": true,
+    "image_streaming": false,
+    "request_body_streaming": true,
+    "header_admissions_default": 10,
+    "raw_body_limit_bytes": 4194304,
+    "decoded_body_limit_bytes": 4194304,
+    "body_deadline": "weakly routed core wakeup; protocol-error abort and origin cancellation",
+    "pre_header_network_deadline": false
+  },
+  "animation": {
+    "formats": [
+      "GIF",
+      "APNG",
+      "WebP"
+    ],
+    "mode": "every-composited-frame",
+    "maximum_frames": 128,
+    "maximum_frame_pixels": 4194304,
+    "maximum_total_pixels": 33554432,
+    "maximum_bytes": 4194304,
+    "allow_representation": "unchanged original bytes after every frame allows"
+  },
+  "transport": {
+    "mitmproxy_version": "12.2.3",
+    "brotli_version_tested": "1.2.0",
+    "private_api_adapter": "downstream/http_body_bounds.py",
+    "installed_vendor_files_modified": false,
+    "global_options_modified_by_adapter": false,
+    "unverified_source_exit_code": 78,
+    "image_oversize_or_body_timeout": "HTTP protocol-error refusal; no original image bytes",
+    "header_overload_or_unready": "flow killed at responseheaders boundary",
+    "content_decoding_failure": "safe decoded no-store placeholder",
+    "ambiguous_binary_limit_applies": true,
+    "compression_support": [
+      "identity",
+      "gzip",
+      "deflate",
+      "br"
+    ],
+    "maximum_content_encoding_layers": 2
+  }
+}

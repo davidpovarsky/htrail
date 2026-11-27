@@ -1,0 +1,14 @@
+{
+  "finished_at": "2026-11-27T15:07:56.296859+00:00",
+  "stopped": [
+    {
+      "role": "proxy",
+      "pid": 9839
+    },
+    {
+      "role": "relay",
+      "pid": 9838
+    }
+  ],
+  "old_lab_changed": false
+}

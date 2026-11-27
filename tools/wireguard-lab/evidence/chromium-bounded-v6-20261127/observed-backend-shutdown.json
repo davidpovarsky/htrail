@@ -1,0 +1,38 @@
+{
+  "old_pid": 1300980,
+  "before": {
+    "schema": 2,
+    "pid": 1300980,
+    "epoch_id": "0b147dc489f94671b8c49dc91dc94d6d",
+    "lifecycle": "running",
+    "started_utc": "2026-11-27T16:09:07.598448+00:00",
+    "updated_utc": "2026-11-27T16:09:49+00:00",
+    "counts": {
+      "dns_query": 1,
+      "dns_response": 1,
+      "http_request": 2,
+      "http_response:2xx": 1,
+      "tls_client_established": 1,
+      "tls_server_established": 1
+    },
+    "recent_error_categories": []
+  },
+  "after": {
+    "schema": 2,
+    "pid": 1300980,
+    "epoch_id": "0b147dc489f94671b8c49dc91dc94d6d",
+    "lifecycle": "stopped",
+    "started_utc": "2026-11-27T16:09:07.598448+00:00",
+    "updated_utc": "2026-11-27T16:20:18+00:00",
+    "counts": {
+      "dns_query": 1,
+      "dns_response": 1,
+      "http_request": 2,
+      "http_response:2xx": 2,
+      "tls_client_established": 1,
+      "tls_server_established": 1
+    },
+    "recent_error_categories": []
+  },
+  "termination": "SIGTERM graceful"
+}

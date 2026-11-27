@@ -1,0 +1,261 @@
+{
+  "classification_samples_independent": false,
+  "rows": [
+    {
+      "id": "wiki-svg-00",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-00.svg",
+      "source_url": "https://en.wikipedia.org/static/images/icons/enwiki-25.svg",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "095fb188212ac25419535feb7aee7a6a7b2d58270ae42a168abf9942d1b44315"
+    },
+    {
+      "id": "wiki-svg-01",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-01.svg",
+      "source_url": "https://en.wikipedia.org/static/images/mobile/copyright/wikipedia-tagline-en-25.svg",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "400508c091b4e9cd71f55512b8c871e08e4ad6ddfc54597c6ec0733d67d064ca"
+    },
+    {
+      "id": "wiki-svg-02",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-02.svg",
+      "source_url": "https://en.wikipedia.org/static/images/mobile/copyright/wikipedia-wordmark-en-25.svg",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "169241aebac0b1222230274878e82c34fd51865f825c29516386810fcdbf6fc2"
+    },
+    {
+      "id": "wiki-svg-03",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-03.svg",
+      "source_url": "https://en.wikipedia.org/w/load.php?modules=ext.readingLists.bookmark.icons&image=bookmarkOutline&format=original&lang=en&skin=vector-2022&version=1i05e",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "c9d48fe94fcc8b35c3365f8f10cb8bda421b34413d1ddf7d77238955de52c8cb"
+    },
+    {
+      "id": "wiki-svg-04",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-04.svg",
+      "source_url": "https://en.wikipedia.org/w/load.php?modules=skins.vector.icons&image=language&format=original&lang=en&skin=vector-2022&version=1dgu9",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "d4b3557c4c558f63ad70775cf2df2946c3908f935d9072bf560a99a5efddcf6d"
+    },
+    {
+      "id": "wiki-svg-05",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-05.svg",
+      "source_url": "https://en.wikipedia.org/w/load.php?modules=skins.vector.icons&image=language&variant=progressive&format=original&lang=en&skin=vector-2022&version=1dgu9",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "b665bdf3802a04109a9c5aac7ad6a085856250bb64b6276e997d6f7e55199ac6"
+    },
+    {
+      "id": "wiki-svg-06",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-06.svg",
+      "source_url": "https://en.wikipedia.org/w/load.php?modules=skins.vector.icons&image=menu&format=original&lang=en&skin=vector-2022&version=1dgu9",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "f95bdd835f49a42def318ad8c291d14b46a3fdfb12b4a69031c94367dc663765"
+    },
+    {
+      "id": "wiki-svg-07",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-07.svg",
+      "source_url": "https://en.wikipedia.org/w/load.php?modules=skins.vector.icons&image=search&format=original&lang=en&skin=vector-2022&version=1dgu9",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "e3c3f409daed8b352e66c602eacaa02e8e553ffa8909868ca7b79089bbcf7a51"
+    },
+    {
+      "id": "wiki-svg-08",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-08.svg",
+      "source_url": "https://en.wikipedia.org/w/load.php?modules=skins.vector.icons&image=star&format=original&lang=en&skin=vector-2022&version=1dgu9",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "988b2eaf8eebb08e0569bb54b30712e3b3aaf84c27c879c5dba88d81012829bb"
+    },
+    {
+      "id": "wiki-svg-09",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-09.svg",
+      "source_url": "https://en.wikipedia.org/w/load.php?modules=skins.vector.icons&image=verticalEllipsis&format=original&lang=en&skin=vector-2022&version=1dgu9",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "38fc8ec3eda14fdfccc26a0ef0297217f728b8469466153eeded3c9aaad3e363"
+    },
+    {
+      "id": "wiki-svg-10",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-10.svg",
+      "source_url": "https://en.wikipedia.org/w/load.php?modules=skins.vector.icons.js&image=article&format=original&lang=en&skin=vector-2022&version=1uzdb",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "0fc126a7378b4558f339153300eab86781c694f8ff241af2051ac93146ab818e"
+    },
+    {
+      "id": "wiki-svg-11",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-11.svg",
+      "source_url": "https://en.wikipedia.org/w/load.php?modules=skins.vector.icons.js&image=edit&format=original&lang=en&skin=vector-2022&version=1uzdb",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "ee31a752fe8d629efef36be01c36187b098ab8e32dd55aa27f38aaec0999cbfd"
+    },
+    {
+      "id": "wiki-svg-12",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-12.svg",
+      "source_url": "https://en.wikipedia.org/w/load.php?modules=skins.vector.icons.js&image=editLock&format=original&lang=en&skin=vector-2022&version=1uzdb",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "ba897bd82fd111b177c3845e855c7df1c8efefb868f23963ca4e826ef0f00c65"
+    },
+    {
+      "id": "wiki-svg-13",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-13.svg",
+      "source_url": "https://en.wikipedia.org/w/load.php?modules=skins.vector.icons.js&image=history&format=original&lang=en&skin=vector-2022&version=1uzdb",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "421a48d0136750c92543dc811d7f677192733d4e29d045776810036eff6c29be"
+    },
+    {
+      "id": "wiki-svg-14",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-14.svg",
+      "source_url": "https://en.wikipedia.org/w/load.php?modules=skins.vector.icons.js&image=speechBubbleAdd&variant=progressive&format=original&lang=en&skin=vector-2022&version=1uzdb",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "526a5b1b8e27b825ba3f23aabac139355878f71591d3e0b5403b6490a66d0244"
+    },
+    {
+      "id": "wiki-svg-15",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-15.svg",
+      "source_url": "https://en.wikipedia.org/w/load.php?modules=skins.vector.icons.js&image=speechBubbles&format=original&lang=en&skin=vector-2022&version=1uzdb",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "547d8760d5506ab46737054f7ce32560f9c8cd90d3ce7548da05e42a6429181e"
+    },
+    {
+      "id": "wiki-svg-16",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-16.svg",
+      "source_url": "https://en.wikipedia.org/w/load.php?modules=skins.vector.icons.js&image=wikiText&format=original&lang=en&skin=vector-2022&version=1uzdb",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "b8346820e0e25b4551156800900ebb1555420742cb3a2c7d6c861acf745feeae"
+    },
+    {
+      "id": "wiki-svg-17",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-17.svg",
+      "source_url": "https://en.wikipedia.org/w/resources/src/mediawiki.skinning/images/magnify-clip-ltr.svg?8330e",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "78f5ef3e585b3073c58b955ace7c662e51ee29bb2ff4ef4b0769bc46e8d7110c"
+    },
+    {
+      "id": "wiki-svg-18",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-18.svg",
+      "source_url": "https://en.wikipedia.org/w/skins/Vector/resources/skins.vector.styles/images/arrow-down-progressive.svg?5cd6d",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "57e3ab07391cd97b6b0c95e7d0142f34af796bff0932d8a83179b0638256a188"
+    },
+    {
+      "id": "wiki-svg-19",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-19.svg",
+      "source_url": "https://en.wikipedia.org/w/skins/Vector/resources/skins.vector.styles/images/link-external-small-ltr-progressive.svg?fb64d",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "b324430a72a978ffc29853c1dbb95679833c58b30e5b5d10e5063f96f98c5ba2"
+    },
+    {
+      "id": "wiki-svg-20",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-20.svg",
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Lock-green.svg",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "494500174898f04b1f826584221b2a88220bf1ee130221fe6b1ad892dbd84b8d"
+    },
+    {
+      "id": "wiki-svg-21",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-21.svg",
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/a/aa/Lock-red-alt-2.svg",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "173faf34d7d2cf53a5c015af700edef3baf779a910acbdcbb0b22c61b211e7ab"
+    },
+    {
+      "id": "wiki-svg-22",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/wiki-svg-22.svg",
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Lock-gray-alt-2.svg",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "sha256": "05f4643b05b101110bfb1883843ce6f6b41dc88d289e6e8eff73590d1b0765cc"
+    },
+    {
+      "id": "randomuser-men-28-svg",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/randomuser-men-28.svg",
+      "source_url": "https://randomuser.me/api/portraits/men/28.jpg",
+      "expected": "allow",
+      "source": "embedded calibration portrait",
+      "original_id": "randomuser-men-28",
+      "sha256": "28d95570f1075c5897251b65aacb2a2e1300b41dff0dad21b307ec371d121130"
+    },
+    {
+      "id": "randomuser-men-31-svg",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/randomuser-men-31.svg",
+      "source_url": "https://randomuser.me/api/portraits/men/31.jpg",
+      "expected": "allow",
+      "source": "embedded calibration portrait",
+      "original_id": "randomuser-men-31",
+      "sha256": "a74c9841e112cd01160ff3cefafbd65ea5bec91bc8f2c7eca78cc0e227ff0aba"
+    },
+    {
+      "id": "randomuser-men-44-svg",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/randomuser-men-44.svg",
+      "source_url": "https://randomuser.me/api/portraits/men/44.jpg",
+      "expected": "allow",
+      "source": "embedded calibration portrait",
+      "original_id": "randomuser-men-44",
+      "sha256": "7ab5aedcd9a033724dae6a1597e0112a7b004337200e3c3d2d0813b6b7cb07d1"
+    },
+    {
+      "id": "randomuser-men-54-svg",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/randomuser-men-54.svg",
+      "source_url": "https://randomuser.me/api/portraits/men/54.jpg",
+      "expected": "allow",
+      "source": "embedded calibration portrait",
+      "original_id": "randomuser-men-54",
+      "sha256": "c020161c24527213b385fa4f62148ab98be700db69b518ef6499801f118769a4"
+    },
+    {
+      "id": "randomuser-women-02-svg",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/randomuser-women-02.svg",
+      "source_url": "https://randomuser.me/api/portraits/women/2.jpg",
+      "expected": "block",
+      "source": "embedded calibration portrait",
+      "original_id": "randomuser-women-02",
+      "sha256": "ef57c6b4f041b0fdb588b06b72b02b1c90208fe27c3bcaa649f2e88f59ea9a5f"
+    },
+    {
+      "id": "randomuser-women-26-svg",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/randomuser-women-26.svg",
+      "source_url": "https://randomuser.me/api/portraits/women/26.jpg",
+      "expected": "block",
+      "source": "embedded calibration portrait",
+      "original_id": "randomuser-women-26",
+      "sha256": "8076ecdf7913ec8e64c391d9ab341e04fb3db295cf12290ace482a1c7389ed02"
+    },
+    {
+      "id": "randomuser-women-48-svg",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/randomuser-women-48.svg",
+      "source_url": "https://randomuser.me/api/portraits/women/48.jpg",
+      "expected": "block",
+      "source": "embedded calibration portrait",
+      "original_id": "randomuser-women-48",
+      "sha256": "fb0f1088482cb6f7defedfbce9b52491813a11d9a19481dca06416cdd6419f12"
+    },
+    {
+      "id": "randomuser-women-77-svg",
+      "path": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality/results/svg/fixtures/randomuser-women-77.svg",
+      "source_url": "https://randomuser.me/api/portraits/women/77.jpg",
+      "expected": "block",
+      "source": "embedded calibration portrait",
+      "original_id": "randomuser-women-77",
+      "sha256": "f3e33f152876775df5174e2e1a3c494a60c8ea822df06c5993cc530d928bb227"
+    }
+  ]
+}

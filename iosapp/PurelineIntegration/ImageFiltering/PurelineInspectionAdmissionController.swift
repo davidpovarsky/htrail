@@ -9,12 +9,13 @@ public struct PurelineInspectionAdmissionSnapshot: Equatable, Sendable {
 }
 
 /// Reserves memory before HTTrail begins buffering a response. The synchronous
-/// reservation seam is intentional: a rejected response streams transparently.
+/// reservation seam lets the downstream policy replace or stream a rejected
+/// response before any origin bytes have reached the client.
 public final class PurelineInspectionAdmissionController: @unchecked Sendable {
     public static let shared = PurelineInspectionAdmissionController()
     public static let hardInFlightByteCeiling = 16 * 1_024 * 1_024
 
-    private struct Reservation { var bytes: Int; var active: Bool; var waiter: CheckedContinuation<Void, Never>? }
+    private struct Reservation { var bytes: Int; var active: Bool; var waiter: CheckedContinuation<Bool, Never>? }
     private let lock = NSLock()
     private var reservations: [String: Reservation] = [:]
     private var order: [String] = []
@@ -49,27 +50,30 @@ public final class PurelineInspectionAdmissionController: @unchecked Sendable {
         return true
     }
 
-    public func acquire(id: String) async {
+    public func acquire(id: String) async -> Bool {
         let immediate = locked { reservations[id]?.active == true }
-        if immediate { return }
-        await withCheckedContinuation { continuation in
+        if immediate { return true }
+        return await withCheckedContinuation { continuation in
             lock.lock(); defer { lock.unlock() }
-            guard var reservation = reservations[id], !reservation.active else { continuation.resume(); return }
+            guard var reservation = reservations[id] else { continuation.resume(returning: false); return }
+            guard !reservation.active else { continuation.resume(returning: true); return }
             reservation.waiter = continuation
             reservations[id] = reservation
         }
     }
 
     public func release(id: String) {
-        var resume: CheckedContinuation<Void, Never>?
+        var resume: CheckedContinuation<Bool, Never>?
         lock.lock()
-        let wasActive = reservations.removeValue(forKey: id)?.active == true
+        let removed = reservations.removeValue(forKey: id)
         order.removeAll { $0 == id }
-        if wasActive, let next = order.first(where: { reservations[$0]?.active == false }), var reservation = reservations[next] {
+        if removed?.active == true, reservations.values.filter(\.active).count < maximumActive,
+           let next = order.first(where: { reservations[$0]?.active == false }), var reservation = reservations[next] {
             reservation.active = true; resume = reservation.waiter; reservation.waiter = nil; reservations[next] = reservation
         }
         lock.unlock()
-        resume?.resume()
+        removed?.waiter?.resume(returning: false)
+        resume?.resume(returning: true)
     }
 
     public func acquireInference() async {
@@ -87,7 +91,9 @@ public final class PurelineInspectionAdmissionController: @unchecked Sendable {
 
     public func releaseInference() {
         let continuation: CheckedContinuation<Void, Never>? = locked {
-            if inferenceWaiters.isEmpty { inferenceActive = max(0, inferenceActive - 1); return nil }
+            inferenceActive = max(0, inferenceActive - 1)
+            guard inferenceActive < maximumInference, !inferenceWaiters.isEmpty else { return nil }
+            inferenceActive += 1
             return inferenceWaiters.removeFirst()
         }
         continuation?.resume()

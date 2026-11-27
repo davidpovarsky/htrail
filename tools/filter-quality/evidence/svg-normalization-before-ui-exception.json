@@ -1,0 +1,111 @@
+{
+  "passed": false,
+  "cases": 6,
+  "actual_models": true,
+  "mock_classification": false,
+  "raster_holdout_reclassified": false,
+  "rows": [
+    {
+      "id": "wiki-svg-00",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "action": "blur",
+      "reason": "policy",
+      "mime": "image/png",
+      "ms": 5487.63,
+      "dimensions": [
+        100,
+        100
+      ],
+      "decoded": true,
+      "content_length_correct": true,
+      "pass": false,
+      "replacement_sha256": "8411774e92b40bfa1684b004f9a019c75b99cf65e862c680e46e1b4fe7e0cd3c"
+    },
+    {
+      "id": "security-external-http",
+      "expected": "reject",
+      "source": "security-boundary",
+      "action": "replace",
+      "reason": "model-failure",
+      "mime": "image/png",
+      "ms": 1000.69,
+      "dimensions": [
+        320,
+        180
+      ],
+      "decoded": true,
+      "content_length_correct": true,
+      "pass": true,
+      "replacement_sha256": "df220b7f51dc1335fdc6351303867925b83a0b125e28bbec54d744c416c9e204"
+    },
+    {
+      "id": "security-external-file",
+      "expected": "reject",
+      "source": "security-boundary",
+      "action": "replace",
+      "reason": "model-failure",
+      "mime": "image/png",
+      "ms": 677.08,
+      "dimensions": [
+        320,
+        180
+      ],
+      "decoded": true,
+      "content_length_correct": true,
+      "pass": true,
+      "replacement_sha256": "df220b7f51dc1335fdc6351303867925b83a0b125e28bbec54d744c416c9e204"
+    },
+    {
+      "id": "security-foreign-object",
+      "expected": "reject",
+      "source": "security-boundary",
+      "action": "replace",
+      "reason": "model-failure",
+      "mime": "image/png",
+      "ms": 718.6,
+      "dimensions": [
+        320,
+        180
+      ],
+      "decoded": true,
+      "content_length_correct": true,
+      "pass": true,
+      "replacement_sha256": "df220b7f51dc1335fdc6351303867925b83a0b125e28bbec54d744c416c9e204"
+    },
+    {
+      "id": "security-filter-image",
+      "expected": "reject",
+      "source": "security-boundary",
+      "action": "replace",
+      "reason": "model-failure",
+      "mime": "image/png",
+      "ms": 1749.09,
+      "dimensions": [
+        320,
+        180
+      ],
+      "decoded": true,
+      "content_length_correct": true,
+      "pass": true,
+      "replacement_sha256": "df220b7f51dc1335fdc6351303867925b83a0b125e28bbec54d744c416c9e204"
+    },
+    {
+      "id": "security-css-external",
+      "expected": "reject",
+      "source": "security-boundary",
+      "action": "replace",
+      "reason": "model-failure",
+      "mime": "image/png",
+      "ms": 1704.58,
+      "dimensions": [
+        320,
+        180
+      ],
+      "decoded": true,
+      "content_length_correct": true,
+      "pass": true,
+      "replacement_sha256": "df220b7f51dc1335fdc6351303867925b83a0b125e28bbec54d744c416c9e204"
+    }
+  ]
+}

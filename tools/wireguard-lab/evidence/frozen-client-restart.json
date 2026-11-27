@@ -1,0 +1,14 @@
+{
+  "restarted_at": "2026-11-27T03:04:31.815338+00:00",
+  "reason": "Force fresh WireGuard session after frozen backend restart; paired relay source binding refresh",
+  "processes": {
+    "proxy": {
+      "old_pid": 80721,
+      "new_pid": 63922
+    },
+    "relay": {
+      "old_pid": 80717,
+      "new_pid": 63920
+    }
+  }
+}

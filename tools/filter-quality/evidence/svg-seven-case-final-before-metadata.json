@@ -1,0 +1,132 @@
+{
+  "passed": true,
+  "cases": 7,
+  "actual_models": true,
+  "mock_classification": false,
+  "raster_holdout_reclassified": false,
+  "rows": [
+    {
+      "id": "wiki-svg-00",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "action": "allow",
+      "policy_exception": "wikipedia-enwiki-25",
+      "reason": "curated-public-ui-asset",
+      "mime": "image/png",
+      "ms": 3325.27,
+      "original_representation_unchanged": false,
+      "rasterized_allow": true,
+      "exact_inspected_raster_returned": true,
+      "pass": true
+    },
+    {
+      "id": "changed-pixel-globe",
+      "expected": "no_exception",
+      "source": "policy-boundary",
+      "action": "blur",
+      "policy_exception": null,
+      "reason": "policy",
+      "mime": "image/png",
+      "ms": 2698.56,
+      "dimensions": [
+        100,
+        100
+      ],
+      "decoded": true,
+      "content_length_correct": true,
+      "pass": true,
+      "replacement_sha256": "0e9718cce129a165fec5ba54c1393712d10d2959369e78a16c68c5a76eb329da",
+      "changed_raster_sha256": "9d6b3c0c605237f934c666c2e365f2bf869fff60d4541eca7a6e1df9f7f19619"
+    },
+    {
+      "id": "security-external-http",
+      "expected": "reject",
+      "source": "security-boundary",
+      "action": "replace",
+      "policy_exception": null,
+      "reason": "model-failure",
+      "mime": "image/png",
+      "ms": 431.74,
+      "dimensions": [
+        320,
+        180
+      ],
+      "decoded": true,
+      "content_length_correct": true,
+      "pass": true,
+      "replacement_sha256": "df220b7f51dc1335fdc6351303867925b83a0b125e28bbec54d744c416c9e204"
+    },
+    {
+      "id": "security-external-file",
+      "expected": "reject",
+      "source": "security-boundary",
+      "action": "replace",
+      "policy_exception": null,
+      "reason": "model-failure",
+      "mime": "image/png",
+      "ms": 925.53,
+      "dimensions": [
+        320,
+        180
+      ],
+      "decoded": true,
+      "content_length_correct": true,
+      "pass": true,
+      "replacement_sha256": "df220b7f51dc1335fdc6351303867925b83a0b125e28bbec54d744c416c9e204"
+    },
+    {
+      "id": "security-foreign-object",
+      "expected": "reject",
+      "source": "security-boundary",
+      "action": "replace",
+      "policy_exception": null,
+      "reason": "model-failure",
+      "mime": "image/png",
+      "ms": 1108.13,
+      "dimensions": [
+        320,
+        180
+      ],
+      "decoded": true,
+      "content_length_correct": true,
+      "pass": true,
+      "replacement_sha256": "df220b7f51dc1335fdc6351303867925b83a0b125e28bbec54d744c416c9e204"
+    },
+    {
+      "id": "security-filter-image",
+      "expected": "reject",
+      "source": "security-boundary",
+      "action": "replace",
+      "policy_exception": null,
+      "reason": "model-failure",
+      "mime": "image/png",
+      "ms": 757.5,
+      "dimensions": [
+        320,
+        180
+      ],
+      "decoded": true,
+      "content_length_correct": true,
+      "pass": true,
+      "replacement_sha256": "df220b7f51dc1335fdc6351303867925b83a0b125e28bbec54d744c416c9e204"
+    },
+    {
+      "id": "security-css-external",
+      "expected": "reject",
+      "source": "security-boundary",
+      "action": "replace",
+      "policy_exception": null,
+      "reason": "model-failure",
+      "mime": "image/png",
+      "ms": 714.54,
+      "dimensions": [
+        320,
+        180
+      ],
+      "decoded": true,
+      "content_length_correct": true,
+      "pass": true,
+      "replacement_sha256": "df220b7f51dc1335fdc6351303867925b83a0b125e28bbec54d744c416c9e204"
+    }
+  ]
+}

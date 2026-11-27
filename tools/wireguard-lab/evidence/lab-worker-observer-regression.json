@@ -1,0 +1,75 @@
+{
+  "mitmproxy_version": "12.2.3",
+  "network_requests": 0,
+  "passed": true,
+  "real_models_run": false,
+  "renderer_processes": 0,
+  "schema": 1,
+  "source_sha256": {
+    "check_lab_worker_observer.py": "b41358c8b121f68dfdab79541d0d33694c579d8b7fa0c73e17c6c826425d26e5",
+    "lab_observed_pipeline_worker.py": "c1fbf7bb20c8c0c92e43707fd9e10e6616f3b927581b1661c6e0302d06928d1b",
+    "lab_worker_observer.py": "c90717afc7153d224492c24f3720d3132ab08deba1d4e8a5449ea74af9d0bc68"
+  },
+  "tests": [
+    {
+      "name": "ready_protocol_bytes_unchanged",
+      "passed": true
+    },
+    {
+      "name": "success_protocol_bytes_unchanged",
+      "passed": true
+    },
+    {
+      "name": "failure_protocol_bytes_unchanged",
+      "passed": true
+    },
+    {
+      "name": "renderer_result_and_arguments_unchanged",
+      "passed": true
+    },
+    {
+      "name": "renderer_stdin_sha_and_length_recorded",
+      "passed": true
+    },
+    {
+      "name": "other_subprocess_passthrough",
+      "passed": true
+    },
+    {
+      "name": "renderer_exception_identity_preserved",
+      "passed": true
+    },
+    {
+      "name": "worker_diagnostics_redacted",
+      "passed": true
+    },
+    {
+      "name": "ledger_is_bounded",
+      "passed": true
+    },
+    {
+      "name": "only_worker_launcher_is_substituted",
+      "passed": true
+    },
+    {
+      "name": "parent_result_and_arguments_unchanged",
+      "passed": true
+    },
+    {
+      "name": "parent_exception_identity_preserved",
+      "passed": true
+    },
+    {
+      "name": "parent_diagnostics_redacted",
+      "passed": true
+    },
+    {
+      "name": "unrelated_flow_not_observed",
+      "passed": true
+    },
+    {
+      "name": "real_mitm_request_transparent_host_authority",
+      "passed": true
+    }
+  ]
+}

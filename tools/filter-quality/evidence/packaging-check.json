@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "classifier_files_verified": 38,
+  "diagnostics_disabled_safe": true,
+  "diagnostic_io_failure_safe": true,
+  "python": "3.12.3",
+  "versions": {
+    "onnxruntime": "1.27.0",
+    "numpy": "2.3.5",
+    "Pillow": "12.3.0",
+    "mitmproxy": "12.2.3"
+  }
+}

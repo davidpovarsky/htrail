@@ -1,11 +1,11 @@
 {
   "enabled" : true,
   "failurePolicy" : {
-    "classifierError" : "failOpen",
-    "imageTooLarge" : "failOpen",
-    "memoryPressure" : "failOpen",
-    "modelUnavailable" : "failOpen",
-    "unsupportedEncoding" : "failOpen"
+    "classifierError" : "block",
+    "imageTooLarge" : "block",
+    "memoryPressure" : "block",
+    "modelUnavailable" : "block",
+    "unsupportedEncoding" : "block"
   },
   "mobileCLIP2Policy" : {
     "blockWomanWithoutMarginIfScoreAtLeast" : 0.7,
@@ -41,7 +41,7 @@
     "maximumTotalPixels" : 12000000, "shortCircuitOnBlock" : true
   },
   "runtime" : {
-    "inspectionQueueOverflowAction" : "failOpen", "maxConcurrentImageInspections" : 1,
+    "inspectionQueueOverflowAction" : "block", "maxConcurrentImageInspections" : 1,
     "maxConcurrentInference" : 1, "maxQueuedImageInspections" : 2,
     "minimumAvailableMemoryBytes" : 33554432
   },

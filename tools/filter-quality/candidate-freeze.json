@@ -1,0 +1,33 @@
+{
+  "frozen_utc": "2026-11-27T01:14:39Z",
+  "source_base_sha": "5291eedb9b46fa978e36ccec4f5504b017afe809",
+  "policy_changed_after_calibration": false,
+  "mock_models": false,
+  "gpu": false,
+  "files": [
+    {
+      "path": "/mnt/development/projects/pureline-quality-20261127/experiments/pureline-quality-20261127/candidate.toml",
+      "sha256": "b53f002e883414ccba6011e07bde9297481f75538c85c5cefab0c6a16c4ad617"
+    },
+    {
+      "path": "/mnt/development/projects/pureline-quality-20261127/experiments/pureline-quality-20261127/downstream/face_fallback.py",
+      "sha256": "291365c7e1745ac1cecfcf9bd8a2a74955ca9d3bc3ecb93ed4318dd8a11b1399"
+    },
+    {
+      "path": "/mnt/development/projects/pureline-quality-20261127/experiments/pureline-quality-20261127/downstream/pureline_addon_v2.py",
+      "sha256": "52b34ca1a62dcb0bb95b179b3ef7400d6da2332d00609f8386e15a4f31a31c70"
+    },
+    {
+      "path": "/mnt/development/projects/pureline-quality-20261127/experiments/pureline-quality-20261127/downstream/pureline_addon_candidate.py",
+      "sha256": "ae3c68d71e8b414f06d68100a96a6ab3b3f004c9a7fe31ee7ea1fcdd7443238a"
+    },
+    {
+      "path": "/srv/pureline-poc/models/runtime-manifest-fully-official.json",
+      "sha256": "afd305910f8952169e515cb18e25d9b550636eff1c8b222a2d6ed9aec355fd3b"
+    },
+    {
+      "path": "/srv/pureline-poc/official-candidate/face_yunet_2026may.onnx",
+      "sha256": "ebafce4e3c118d6554634be5c27ab333b4c047a9a8c3faf1d7cf93101c22f0f0"
+    }
+  ]
+}

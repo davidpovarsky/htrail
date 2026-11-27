@@ -25,6 +25,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
     private let requestInspectionBodyCap: Int
     private let requestCaptureBodyCap: Int
     private let responseInspectionPolicy: StreamingResponseInspectionPolicy?
+    private let responseDispositionPolicy: StreamingResponseDispositionPolicy?
     private let responseInspector: StreamingResponseInspector?
     private let responseObserver: StreamingResponseObserver?
     private let runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)?
@@ -49,6 +50,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
          requestInspectionBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
          requestCaptureBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
          responseInspectionPolicy: StreamingResponseInspectionPolicy? = nil,
+         responseDispositionPolicy: StreamingResponseDispositionPolicy? = nil,
           responseInspector: StreamingResponseInspector? = nil,
           responseObserver: StreamingResponseObserver? = nil,
           runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)? = nil,
@@ -65,6 +67,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         self.requestInspectionBodyCap = requestInspectionBodyCap
         self.requestCaptureBodyCap = requestCaptureBodyCap
         self.responseInspectionPolicy = responseInspectionPolicy
+        self.responseDispositionPolicy = responseDispositionPolicy
         self.responseInspector = responseInspector
         self.responseObserver = responseObserver
         self.runtimeEventHandler = runtimeEventHandler
@@ -78,7 +81,11 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             requestBody = context.channel.allocator.buffer(capacity: 0)
             startedAt = Date()
             keepAlive = head.isKeepAlive
-            if streamRequestBodies, let provisional = makeRequest(head: head, body: ByteBuffer()),
+            // Streaming is a request-body policy, not a separate route for every
+            // request. Bodyless requests must reach forward() so they retain
+            // connection pooling and WebSocket upgrade handling.
+            if streamRequestBodies, requestHasBody(head), !isWebSocketUpgrade(head),
+               let provisional = makeRequest(head: head, body: ByteBuffer()),
                !engine.requiresBufferedRequest(for: provisional) {
                 startStreamingUpload(context: context, head: head, initialBody: nil, inspectBody: true)
             }
@@ -98,6 +105,8 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
                 if let upstream = streamingUpstream {
                     upstream.writeAndFlush(NIOAny(HTTPClientRequestPart.end(nil)), promise: nil)
                     finishStreamingUploadState()
+                    _ = context.channel.setOption(ChannelOptions.autoRead, value: true)
+                    context.read()
                 } else {
                     streamingEndPending = true
                 }
@@ -189,6 +198,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             keepAlive: keepAlive, captureCap: captureBodyCap, sink: sink,
             completeRequestOnActive: false, capturedRequestProvider: { capture.snapshot() },
             responseInspectionPolicy: responseInspectionPolicy,
+            responseDispositionPolicy: responseDispositionPolicy,
             responseInspector: responseInspector,
             responseObserver: responseObserver,
             targetHost: target.host, targetUsesTLS: target.tls,
@@ -221,6 +231,8 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
                     if self.streamingEndPending {
                         upstream.writeAndFlush(NIOAny(HTTPClientRequestPart.end(nil)), promise: nil)
                         self.finishStreamingUploadState()
+                        _ = clientChannel.setOption(ChannelOptions.autoRead, value: true)
+                        clientChannel.read()
                         return
                     }
                     upstream.flush()
@@ -432,6 +444,7 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             captured: request, flowID: flowID, startedAt: startedAt, secure: secure,
             keepAlive: keepAlive, captureCap: captureBodyCap, sink: sink,
             responseInspectionPolicy: responseInspectionPolicy,
+            responseDispositionPolicy: responseDispositionPolicy,
             responseInspector: responseInspector,
             responseObserver: responseObserver,
             targetHost: target.host, targetUsesTLS: target.tls,
@@ -541,6 +554,13 @@ final class DecryptedProxyHandler: ChannelInboundHandler, RemovableChannelHandle
             body: Data(message.utf8), timestamp: Date()
         )
         Task { await relay(channel: channel, allocator: channel.allocator, response: response, keepAlive: false) }
+    }
+
+    /// HTTP/1 request framing determines whether an upload exists, regardless of
+    /// method (GET can carry a body, and POST can have Content-Length: 0).
+    private func requestHasBody(_ head: HTTPRequestHead) -> Bool {
+        if !head.headers[canonicalForm: "transfer-encoding"].isEmpty { return true }
+        return head.headers.first(name: "Content-Length").flatMap(Int.init).map { $0 > 0 } ?? false
     }
 
     /// True for an RFC 6455 upgrade handshake (`GET` + `Upgrade: websocket` +

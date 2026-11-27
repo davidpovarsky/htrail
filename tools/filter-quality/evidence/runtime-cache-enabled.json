@@ -1,0 +1,206 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-27T15:11:00.360041+00:00",
+  "passed": true,
+  "cases": 12,
+  "actual_models": true,
+  "new_independent_accuracy_samples": 0,
+  "runtime_uid": 1002,
+  "runtime_user": "chatgpt-agent",
+  "manifest_sha256": "e9b4424cce6a376c9ac2620cf5b5ad0ac0680264e5653042dc29eb812b13711b",
+  "package_files_unchanged": true,
+  "package_file_count": 304,
+  "workers": 2,
+  "worker_processes_reaped": 4,
+  "config_sha256": "47df41b7851062882e62a6c9384ec5b68f570079384f73f074b902f5b4994556",
+  "temporary_stores_removed": true,
+  "raw_image_disk_spool": false,
+  "rows": [
+    {
+      "phase": "initial",
+      "worker_slot": 0,
+      "expected_action": "allow",
+      "action": "allow",
+      "expected_cache_hit": false,
+      "cache_hit": false,
+      "replacement_decodes": null,
+      "elapsed_ms": 2466.89,
+      "passed": true
+    },
+    {
+      "phase": "initial",
+      "worker_slot": 1,
+      "expected_action": "allow",
+      "action": "allow",
+      "expected_cache_hit": false,
+      "cache_hit": false,
+      "replacement_decodes": null,
+      "elapsed_ms": 3077.02,
+      "passed": true
+    },
+    {
+      "phase": "initial",
+      "worker_slot": 0,
+      "expected_action": "blur",
+      "action": "blur",
+      "expected_cache_hit": false,
+      "cache_hit": false,
+      "replacement_decodes": true,
+      "elapsed_ms": 2254.8,
+      "passed": true
+    },
+    {
+      "phase": "initial",
+      "worker_slot": 1,
+      "expected_action": "blur",
+      "action": "blur",
+      "expected_cache_hit": false,
+      "cache_hit": false,
+      "replacement_decodes": true,
+      "elapsed_ms": 3321.62,
+      "passed": true
+    },
+    {
+      "phase": "initial",
+      "worker_slot": 0,
+      "expected_action": "allow",
+      "action": "allow",
+      "expected_cache_hit": true,
+      "cache_hit": true,
+      "replacement_decodes": null,
+      "elapsed_ms": 9.78,
+      "passed": true
+    },
+    {
+      "phase": "initial",
+      "worker_slot": 1,
+      "expected_action": "allow",
+      "action": "allow",
+      "expected_cache_hit": true,
+      "cache_hit": true,
+      "replacement_decodes": null,
+      "elapsed_ms": 3.1,
+      "passed": true
+    },
+    {
+      "phase": "initial",
+      "worker_slot": 0,
+      "expected_action": "blur",
+      "action": "blur",
+      "expected_cache_hit": true,
+      "cache_hit": true,
+      "replacement_decodes": true,
+      "elapsed_ms": 15.11,
+      "passed": true
+    },
+    {
+      "phase": "initial",
+      "worker_slot": 1,
+      "expected_action": "blur",
+      "action": "blur",
+      "expected_cache_hit": true,
+      "cache_hit": true,
+      "replacement_decodes": true,
+      "elapsed_ms": 13.4,
+      "passed": true
+    },
+    {
+      "phase": "restart",
+      "worker_slot": 0,
+      "expected_action": "allow",
+      "action": "allow",
+      "expected_cache_hit": true,
+      "cache_hit": true,
+      "replacement_decodes": null,
+      "elapsed_ms": 22.13,
+      "passed": true
+    },
+    {
+      "phase": "restart",
+      "worker_slot": 1,
+      "expected_action": "allow",
+      "action": "allow",
+      "expected_cache_hit": true,
+      "cache_hit": true,
+      "replacement_decodes": null,
+      "elapsed_ms": 8.02,
+      "passed": true
+    },
+    {
+      "phase": "restart",
+      "worker_slot": 0,
+      "expected_action": "blur",
+      "action": "blur",
+      "expected_cache_hit": true,
+      "cache_hit": true,
+      "replacement_decodes": true,
+      "elapsed_ms": 59.96,
+      "passed": true
+    },
+    {
+      "phase": "restart",
+      "worker_slot": 1,
+      "expected_action": "blur",
+      "action": "blur",
+      "expected_cache_hit": true,
+      "cache_hit": true,
+      "replacement_decodes": true,
+      "elapsed_ms": 27.88,
+      "passed": true
+    }
+  ],
+  "stores": [
+    {
+      "worker_slot": 0,
+      "filename": "decisions-20261127-bounded-v5.worker-0.sqlite3",
+      "entries": 2,
+      "owner_uid": 1002,
+      "raw_image_fields": false
+    },
+    {
+      "worker_slot": 1,
+      "filename": "decisions-20261127-bounded-v5.worker-1.sqlite3",
+      "entries": 2,
+      "owner_uid": 1002,
+      "raw_image_fields": false
+    }
+  ],
+  "diagnostics": [
+    {
+      "worker_slot": 0,
+      "relative_directory": "diagnostics/worker-0",
+      "events": 6,
+      "cache_hits": 4,
+      "total_inspected": 2,
+      "private_fields_present": false
+    },
+    {
+      "worker_slot": 1,
+      "relative_directory": "diagnostics/worker-1",
+      "events": 6,
+      "cache_hits": 4,
+      "total_inspected": 2,
+      "private_fields_present": false
+    }
+  ],
+  "source_sha256": {
+    "approved-ui-rasters.json": "ade4980fb508c632fff654f81fe2f5a7c10c34d35ceb70ab5d022d04730c2cff",
+    "candidate.toml": "b53f002e883414ccba6011e07bde9297481f75538c85c5cefab0c6a16c4ad617",
+    "downstream/animation_pipeline.py": "13eb1d0fb5cfc478c6701c4abfeb1454228e87609c5832e794d722a61e317866",
+    "downstream/face_fallback.py": "291365c7e1745ac1cecfcf9bd8a2a74955ca9d3bc3ecb93ed4318dd8a11b1399",
+    "downstream/pipeline_worker.py": "393f5c98fbef9f0f9cb9b7ea15de7060c0dbb693ac7568fb71bc5ccc06b50b5c",
+    "downstream/process_pool.py": "7666165fc4d4eb4ec53f3c06a95aeae3179c1796af481171804042111505f58a",
+    "downstream/pureline_addon_candidate.py": "bd8877eefd072416c70353adc600e9aec62228c7be66b19f95c430288dfd16bf",
+    "downstream/pureline_addon_v2.py": "466bdb7519fd2ccce9fc7a744e01d15196e1a2616fb206f9ae723b8df6cf9746",
+    "downstream/pureline_http_addon.py": "024246202a29e817e0c17f1da7a7c2e05c79b9d67ae8fb5c619c837ba1e27230",
+    "downstream/runtime_factory.py": "0d80bf3fb391ba408a7f9c67fe1ef43158e87f190501e4752a6342feecf29e56",
+    "downstream/strong_blur.py": "51a34aec315cc3035dcc7d00312d229e5ea02725f43e8eb921b098eef94ccf42",
+    "downstream/svg_pipeline.py": "fc8c4247e44e0468331d21a6cdba9ff90b7e013e3081353bbf59f9037eda8f97",
+    "downstream/svg_worker.py": "6c7e4fc2c6ff1d109710f090b3e4eccf4b622566ed928c20019a00b41603b393",
+    "downstream/worker_protocol.py": "ad5665429f3dd69586e8595603d67738078dec1116653a0b48ccb213741a8ecb",
+    "install_svg_dependencies.py": "04be80eed54b46c29d0234467e5b92a1ff08f40422be629f608de187e8f66352",
+    "requirements-svg.lock": "929c0511abb64b41765ba78a46ddabc2d89b362e5df18e5c2bdd3aaf6036cf03",
+    "runtime-contract.json": "78d496d76a65a2a4c582e9fa0bf61b500e37da413bbb6e1fcdc3d8ad15fb041a",
+    "runtime_contract.py": "11d20dfda902910d0db24ae35b2e08a0b483919259d6c622b908779054498a2e"
+  }
+}

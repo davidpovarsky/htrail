@@ -1,0 +1,314 @@
+{
+  "native_fix_commit": "245f67ecbcb59ee52aa047d6ead84ee4b47d62ca",
+  "unit_tests_passed": 13,
+  "unit_test_failures": 0,
+  "latest_receipts": {
+    "device-archive-guards-receipt.json": {
+      "started_at": "2026-11-27T02:36:23.352431+00:00",
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/m1/builds/pureline-wireguard-app-20261127/iosapp/PurelineRemote.xcodeproj",
+        "-scheme",
+        "PurelineRemote",
+        "-configuration",
+        "Release",
+        "-destination",
+        "generic/platform=iOS",
+        "-derivedDataPath",
+        "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Remote",
+        "-archivePath",
+        "/Users/m1/builds/_artifacts/pureline-remote-20261127/PurelineRemote-245f67e.xcarchive",
+        "-jobs",
+        "2",
+        "CODE_SIGNING_ALLOWED=NO",
+        "archive"
+      ],
+      "archive": "/Users/m1/builds/_artifacts/pureline-remote-20261127/PurelineRemote-245f67e.xcarchive",
+      "signed": false,
+      "runtime_tested": false,
+      "native_fix_commit": "245f67ecbcb59ee52aa047d6ead84ee4b47d62ca",
+      "project_spec_sha256": "d85f0c4d60f10f1749c4c34251ac92d2b4cc47fd18c8afd22d70eccb2ef79ed1",
+      "source_sha256": {
+        "iosapp/WireGuardIntegration/Shared/PurelineWGProfile.swift": "a6e30e0a836beca17c57404a7f9a04fc002933ea8d898b4cd6cfbfeabd961112",
+        "iosapp/WireGuardIntegration/App/PurelineWGController.swift": "88dd581cade33263c98e184f79b05055e0c5519280971add2baa6916ce6dacc8"
+      },
+      "supersedes": "device-archive-final-receipt.json",
+      "returncode": 0,
+      "finished_at": "2026-11-27T02:38:42.117738+00:00",
+      "log": "/Users/m1/builds/_preflight/pureline-remote-20261127/device-archive-guards.log"
+    },
+    "device-artifact-guards-verification.json": {
+      "verified_at": "2026-11-27T02:42:48.036624+00:00",
+      "app": "/Users/m1/builds/_artifacts/pureline-remote-20261127/PurelineRemote-245f67e.xcarchive/Products/Applications/PurelineRemote.app",
+      "bundle_identifier": "com.davidpovarsky.pureline",
+      "build_mode": "remote-wireguard",
+      "extension_identifier": "com.davidpovarsky.pureline.PacketTunnel",
+      "binary_sha256": {
+        "PurelineRemote": "1d5d176176699dc02287056edc5f267ca6919fa841830725597c0496d6f862d1",
+        "PlugIns/PacketTunnel.appex/PacketTunnel": "a32581423600394aa0179505c87a23912aee36e9c94ddac1219b51b4c06240b9"
+      },
+      "localized_names": {
+        "ar.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "bn.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "en.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "es.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "fr.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "hi.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "pt-BR.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "ru.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "th.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "ur.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "zh-Hans.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        }
+      },
+      "packaged_ml_models": [],
+      "embedded_frameworks": [
+        "ImageFilterCore.framework"
+      ],
+      "platform": "/Users/m1/builds/_artifacts/pureline-remote-20261127/PurelineRemote-245f67e.xcarchive/Products/Applications/PurelineRemote.app/PurelineRemote:\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform IOS\n    minos 26.5\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n",
+      "app_size_kib": 17684,
+      "linked_wireguard_symbols": [
+        "00000001001406b4 T _wgGetConfig",
+        "0000000100140640 T _wgSetConfig",
+        "00000001001405e8 T _wgTurnOff",
+        "000000010014057c T _wgTurnOn"
+      ],
+      "archive_size_kib": 80652,
+      "archive": "/Users/m1/builds/_artifacts/pureline-remote-20261127/PurelineRemote-245f67e.xcarchive",
+      "archive_manifest_sha256": "273e29c15a205fc31f36aa8cf160bdb58684e78133adcd4a15d0f4c9075dc9b3",
+      "archive_file_count": 58
+    },
+    "device-archive-guards-manifest.json": {
+      "archive": "/Users/m1/builds/_artifacts/pureline-remote-20261127/PurelineRemote-245f67e.xcarchive",
+      "manifest_sha256": "273e29c15a205fc31f36aa8cf160bdb58684e78133adcd4a15d0f4c9075dc9b3",
+      "algorithm": "SHA256 of UTF-8 JSON mapping relative file paths to content SHA256; sort_keys=True,separators=(comma,colon)",
+      "files": {
+        "Info.plist": "5a17ffc6e6ee7d62f8624b485ee6ac7a8e9355309bd9e54a27aeb614788c2c71",
+        "Products/Applications/PurelineRemote.app/AppIcon60x60@2x.png": "22a892513d977ac0100fac100028efc6c6f1eea8ea0b3d746851bd895af80be7",
+        "Products/Applications/PurelineRemote.app/AppIcon76x76@2x~ipad.png": "89722bed4696fc95d25f92c55b6fc5bbf81a44d7c234804cbab9471847d462a3",
+        "Products/Applications/PurelineRemote.app/Assets.car": "3a409aa171c52e85d4222a44e67172677ff26185292310f605062273ef956540",
+        "Products/Applications/PurelineRemote.app/Frameworks/ImageFilterCore.framework/ImageFilterCore": "2afbda3015f5b10fd970180ff4807e537dd35217d648a889c30c1ad136236464",
+        "Products/Applications/PurelineRemote.app/Frameworks/ImageFilterCore.framework/Info.plist": "062c47c3a088105e329f4801505de20717e3dd2240e8d6fff4c81bb348c7d01a",
+        "Products/Applications/PurelineRemote.app/Info.plist": "43bbe869d9dab393a80e45b5114feb3a8f8ed2f461be56f3b62760c08fcbcbb9",
+        "Products/Applications/PurelineRemote.app/JetBrainsMono.ttf": "48715a42ec242c21e9f02692891e147d022299a52e48d5e413e1a942193ffeda",
+        "Products/Applications/PurelineRemote.app/PkgInfo": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+        "Products/Applications/PurelineRemote.app/PlugIns/PacketTunnel.appex/Info.plist": "0caa4afec5b2b8b6cfb3b9ad94065b39ad3713cf26ae6e7cae691b44f4e00914",
+        "Products/Applications/PurelineRemote.app/PlugIns/PacketTunnel.appex/PacketTunnel": "a32581423600394aa0179505c87a23912aee36e9c94ddac1219b51b4c06240b9",
+        "Products/Applications/PurelineRemote.app/PurelineDefaultFilterConfiguration.json": "6dced211f9ca82a042f9f2f7ca905aa2641116cb0b8a8c363be2c7270b3da3ca",
+        "Products/Applications/PurelineRemote.app/PurelineRemote": "1d5d176176699dc02287056edc5f267ca6919fa841830725597c0496d6f862d1",
+        "Products/Applications/PurelineRemote.app/ar.lproj/InfoPlist.strings": "3fea7303dccb0896582aea9533031a4686cf75d24564987d404fca43160f673c",
+        "Products/Applications/PurelineRemote.app/ar.lproj/Localizable.strings": "df31533939f0f9c2e77c463d2a81de6e61bf749741ea1035a9071f0ad807c40a",
+        "Products/Applications/PurelineRemote.app/bn.lproj/InfoPlist.strings": "2763a3a4ff2063dfdc54d503128a143423235b56192915c665f391d38da4118f",
+        "Products/Applications/PurelineRemote.app/bn.lproj/Localizable.strings": "d1b8b2f88ed7c915a7fb37f3cac9b4dcc926c074297bdd00b5b647fa7cf50f9a",
+        "Products/Applications/PurelineRemote.app/en.lproj/InfoPlist.strings": "7e1e2d3881768047fd3f8c9a249a8b05d683fda5d8f18981e493489c0c5f34c5",
+        "Products/Applications/PurelineRemote.app/en.lproj/Localizable.strings": "05e07883a9169a129c81236e9b145d2909a612f208b1101ad95f98ec3f29a516",
+        "Products/Applications/PurelineRemote.app/es.lproj/InfoPlist.strings": "637c176bcb9859b345e3fb7087ab9911ba5ab0f32e9ef28555526c50105914a6",
+        "Products/Applications/PurelineRemote.app/es.lproj/Localizable.strings": "233f800a3884d72d7375446cd0577bb27b4ec32c849dc62ba9181fa4e24d450f",
+        "Products/Applications/PurelineRemote.app/fr.lproj/InfoPlist.strings": "56a05a26095f54527d19bce81ea5e25098ceb1f80a018d32e82978ede6b81376",
+        "Products/Applications/PurelineRemote.app/fr.lproj/Localizable.strings": "58f018146c08f86bb9e08e63b1a9c3514ff3d870ae04e781fd2e6544c662555e",
+        "Products/Applications/PurelineRemote.app/hi.lproj/InfoPlist.strings": "7e5d73bac12c538de65aecdb92c31a716c826ff8a3b4e43b2b7a0b25ae27eabc",
+        "Products/Applications/PurelineRemote.app/hi.lproj/Localizable.strings": "510a25e55bfdffd5868f21dedb36ec76e6040539f7fb63c8f9cec0b90136b58e",
+        "Products/Applications/PurelineRemote.app/pt-BR.lproj/InfoPlist.strings": "9f3d69a72f9fd241deacf3ff7c8c1b343de76d7e563c9e5e96e2a756331c7a56",
+        "Products/Applications/PurelineRemote.app/pt-BR.lproj/Localizable.strings": "bf40d216c2187c50c1c4742bcb30e0d5073baf24119adf3bebef070ba998d9f7",
+        "Products/Applications/PurelineRemote.app/ru.lproj/InfoPlist.strings": "cf4703cb2a913b4b49a845ef49af2606f141ba45afa0b711fb322595df572259",
+        "Products/Applications/PurelineRemote.app/ru.lproj/Localizable.strings": "7e36b8cec915bac613ecefe83536f86b851cbee1d131495009912d60103be016",
+        "Products/Applications/PurelineRemote.app/swift-crypto_CCryptoBoringSSL.bundle/Info.plist": "fd21461e63ec2cd844aafaab5de70c8d3c38c78ddb007785834ebb16dfd94615",
+        "Products/Applications/PurelineRemote.app/swift-crypto_CCryptoBoringSSL.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+        "Products/Applications/PurelineRemote.app/swift-crypto_CCryptoBoringSSLShims.bundle/Info.plist": "b10246df41b2299f0d67e1681ce201cf760236a06f99958b00016e11ca2b7732",
+        "Products/Applications/PurelineRemote.app/swift-crypto_CCryptoBoringSSLShims.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+        "Products/Applications/PurelineRemote.app/swift-crypto_Crypto.bundle/Info.plist": "00074dfa2258314163781fe9cc64f20cb8ef206c01a2ae83ac19772464322e8b",
+        "Products/Applications/PurelineRemote.app/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+        "Products/Applications/PurelineRemote.app/swift-crypto_CryptoBoringWrapper.bundle/Info.plist": "1b6073710d0dde3a39c816d2ed1b54522277dbdf8f3e4599e844288390c94c7e",
+        "Products/Applications/PurelineRemote.app/swift-crypto_CryptoBoringWrapper.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+        "Products/Applications/PurelineRemote.app/swift-crypto__CryptoExtras.bundle/Info.plist": "7a5a661b0e58f715565501ec5f6c53f38dbe4ccadc12862c41bad14d0ea3637b",
+        "Products/Applications/PurelineRemote.app/swift-crypto__CryptoExtras.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+        "Products/Applications/PurelineRemote.app/swift-nio-ssl_NIOSSL.bundle/Info.plist": "e0a095e9011550c85218e8474ca2c8a6a9ec1ff9367b743c8c0c82463b19a1e2",
+        "Products/Applications/PurelineRemote.app/swift-nio-ssl_NIOSSL.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+        "Products/Applications/PurelineRemote.app/swift-nio_NIOPosix.bundle/Info.plist": "02adbfcc1dde37f17fa356be60a8a8ab5158211cdaecb7b199dcdac4a091730e",
+        "Products/Applications/PurelineRemote.app/swift-nio_NIOPosix.bundle/PrivacyInfo.xcprivacy": "982f20d820bc4460acc9d4116c3e6c8ec837f717dc82edbb7308f7400515c909",
+        "Products/Applications/PurelineRemote.app/th.lproj/InfoPlist.strings": "01be20f01ea2ab4deacccbac5b86c058f29affc472b53ee8033fda4c56714fc0",
+        "Products/Applications/PurelineRemote.app/th.lproj/Localizable.strings": "5149a94501a76820fb4d442df90bf1fad1b9948669388cba7c950102ba76d419",
+        "Products/Applications/PurelineRemote.app/ur.lproj/InfoPlist.strings": "07b7da7ceed8ec5615cea698fe13b2f2a1068e91446f314644269b4c53dac47d",
+        "Products/Applications/PurelineRemote.app/ur.lproj/Localizable.strings": "952baf0d65e6724222bde2e4ef30a5df7bab87dc51f9f10768abcfe56221f351",
+        "Products/Applications/PurelineRemote.app/zh-Hans.lproj/InfoPlist.strings": "91715899ba23d153e852da3ceb5fa8026411e4181ea3048089a9bb6ce923de65",
+        "Products/Applications/PurelineRemote.app/zh-Hans.lproj/Localizable.strings": "ce0f9d8383808b9a71c89b63bc6d026c0efd1b0388fbb35373e588a0f09214f7",
+        "dSYMs/ImageFilterCore.framework.dSYM/Contents/Info.plist": "c390d436e6334dce3adf0771b2b3cb4b7449d183beaecb476159bbfd43ce43c8",
+        "dSYMs/ImageFilterCore.framework.dSYM/Contents/Resources/DWARF/ImageFilterCore": "3072cc1ac576c02a7fcb488232c05b3a67d459e483b3e02b97f5ed11300f693f",
+        "dSYMs/ImageFilterCore.framework.dSYM/Contents/Resources/Relocations/aarch64/ImageFilterCore.yml": "bc6d0521d44bc15ed694054d95dd8dcfed51057c3591edc11cd8c7dd1b34da8e",
+        "dSYMs/PacketTunnel.appex.dSYM/Contents/Info.plist": "af410f5c3371701aaa975176cb77871f9e187aa4aa39695c5c984927c27726e0",
+        "dSYMs/PacketTunnel.appex.dSYM/Contents/Resources/DWARF/PacketTunnel": "161821ed095ff4a3e0a63588f757a1abfbca15ceb65b7bdcf7ab14e2b02b3aa4",
+        "dSYMs/PacketTunnel.appex.dSYM/Contents/Resources/Relocations/aarch64/PacketTunnel.yml": "a191098f7e9861d568e39f8632bf8d4dd55b7ad2f0ded025cb8b0ffa4697b879",
+        "dSYMs/PurelineRemote.app.dSYM/Contents/Info.plist": "9fb735ac4c7b96b2867af3dd6c8ca09e2cbf6511f938cd885014ce1a7c7f5a48",
+        "dSYMs/PurelineRemote.app.dSYM/Contents/Resources/DWARF/PurelineRemote": "8d9bd56cebccef5a336a2a195fd2a49f44b6eddd419e949f56b74a976c02a92b",
+        "dSYMs/PurelineRemote.app.dSYM/Contents/Resources/Relocations/aarch64/PurelineRemote.yml": "5740494417f2e9dacfc7669181b9b9f4b5571df9e6e2d3e94f6ee6d8f58778b5"
+      }
+    },
+    "ui-build-guards-receipt.json": {
+      "started_at": "2026-11-27T02:33:00.877057+00:00",
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/m1/builds/pureline-wireguard-app-20261127/iosapp/PurelineRemote.xcodeproj",
+        "-scheme",
+        "PurelineRemoteWireGuardUI",
+        "-configuration",
+        "Debug",
+        "-destination",
+        "generic/platform=iOS Simulator",
+        "-derivedDataPath",
+        "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Remote",
+        "-jobs",
+        "2",
+        "ARCHS=arm64",
+        "CODE_SIGNING_ALLOWED=NO",
+        "build-for-testing"
+      ],
+      "tests_executed": false,
+      "app_installed": false,
+      "project_spec_sha256": "d85f0c4d60f10f1749c4c34251ac92d2b4cc47fd18c8afd22d70eccb2ef79ed1",
+      "source_sha256": {
+        "iosapp/WireGuardIntegration/Shared/PurelineWGProfile.swift": "a6e30e0a836beca17c57404a7f9a04fc002933ea8d898b4cd6cfbfeabd961112",
+        "iosapp/WireGuardIntegration/App/PurelineWGController.swift": "88dd581cade33263c98e184f79b05055e0c5519280971add2baa6916ce6dacc8",
+        "iosapp/WireGuardUITests/PurelineWireGuardUITests.swift": "52fb8c00f7a355605388f44451b9c67277f7d5e0764542cc8edafcb17a610502"
+      },
+      "returncode": 0,
+      "finished_at": "2026-11-27T02:33:13.769823+00:00",
+      "log": "/Users/m1/builds/_preflight/pureline-remote-20261127/ui-build-guards.log",
+      "xctestrun_files": [
+        "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Remote/Build/Products/PurelineRemoteWireGuardUI_iphonesimulator27.0-arm64.xctestrun"
+      ]
+    },
+    "simulator-artifact-guards-verification.json": {
+      "verified_at": "2026-11-27T02:42:48.157297+00:00",
+      "app": "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Remote/Build/Products/Debug-iphonesimulator/PurelineRemote.app",
+      "bundle_identifier": "com.davidpovarsky.pureline",
+      "build_mode": "remote-wireguard",
+      "extension_identifier": "com.davidpovarsky.pureline.PacketTunnel",
+      "binary_sha256": {
+        "PurelineRemote": "c35b702413974dfc99361f3e0c3307b402efba226eb9d2b8192f39df7b33a04f",
+        "PurelineRemote.debug.dylib": "995e583f1f0d1ec1d030763b0a5843a081755035075260cfc562c902a17a6520",
+        "PlugIns/PacketTunnel.appex/PacketTunnel": "fb4af977f98d48e158a352c0107bb98b15a19b741a1e914eb90a622c6118d13f",
+        "PlugIns/PacketTunnel.appex/PacketTunnel.debug.dylib": "ae4a3f425fb04e8a46c09621aa1b9c7e55b7c674d48e2138eae760d6b147ef24"
+      },
+      "localized_names": {
+        "ar.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "bn.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "en.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "es.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "fr.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "hi.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "pt-BR.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "ru.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "th.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "ur.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        },
+        "zh-Hans.lproj": {
+          "CFBundleDisplayName": "Pureline Remote",
+          "CFBundleName": "Pureline Remote"
+        }
+      },
+      "packaged_ml_models": [],
+      "embedded_frameworks": [
+        "ImageFilterCore.framework"
+      ],
+      "platform": "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Remote/Build/Products/Debug-iphonesimulator/PurelineRemote.app/PurelineRemote:\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform IOSSIMULATOR\n    minos 26.5\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n",
+      "app_size_kib": 44976
+    },
+    "guard-unit-tests-receipt.json": {
+      "started_at": "2026-11-27T02:30:48.971370+00:00",
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/m1/builds/pureline-wireguard-app-20261127/iosapp/PurelineWireGuardValidation.xcodeproj",
+        "-scheme",
+        "PurelineWireGuardValidation",
+        "-configuration",
+        "Debug",
+        "-destination",
+        "id=6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+        "-derivedDataPath",
+        "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Validation",
+        "-jobs",
+        "2",
+        "-collect-test-diagnostics",
+        "never",
+        "-resultBundlePath",
+        "/Users/m1/builds/_artifacts/pureline-remote-20261127/WGGuardRegressions-20261127T023048Z.xcresult",
+        "CODE_SIGNING_ALLOWED=NO",
+        "test"
+      ],
+      "result_bundle": "/Users/m1/builds/_artifacts/pureline-remote-20261127/WGGuardRegressions-20261127T023048Z.xcresult",
+      "source_sha256": {
+        "iosapp/WireGuardIntegration/Shared/PurelineWGProfile.swift": "a6e30e0a836beca17c57404a7f9a04fc002933ea8d898b4cd6cfbfeabd961112",
+        "iosapp/WireGuardIntegration/App/PurelineWGController.swift": "88dd581cade33263c98e184f79b05055e0c5519280971add2baa6916ce6dacc8",
+        "iosapp/WireGuardTests/PurelineWireGuardTests.swift": "09731e3578df3955c2e5a8e8cd625a1823525ac90dc06cb850457292b7c94695"
+      },
+      "scope": "Native parser and preference-state regressions; no UI suite",
+      "returncode": 0,
+      "finished_at": "2026-11-27T02:31:02.295344+00:00",
+      "log": "/Users/m1/builds/_preflight/pureline-remote-20261127/guard-unit-tests.log"
+    }
+  }
+}

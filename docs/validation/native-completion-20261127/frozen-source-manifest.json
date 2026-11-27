@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "repository": "davidpovarsky/htrail",
+  "base_commit": "f53ff65711af1b5f2552f44c5c24c8e5244a2cb0",
+  "generic_core_commit": "dbf70afbe89f40dbd73ddf8b31a9c8c9b1b876d6",
+  "vendor_gitlink": "5291eedb9b46fa978e36ccec4f5504b017afe809",
+  "source_sha256": {
+    "Sources/HTTrailCore/Proxy/DecryptedProxyHandler.swift": "258b5de5d80608b216ff93f3673845b3a2db9f6bf546c6e4835296ff2d88618f",
+    "Sources/HTTrailCore/Proxy/ProxyHandlers.swift": "169d3fb9840f0de8c03d2b788ae9f29885529b3be51d813b3b268cb6233425d6",
+    "Sources/HTTrailCore/Proxy/ProxyServer.swift": "b90ed826fea960eff220613e52b4ab1282008252d11b63877f084e5e85c1a6e5",
+    "Sources/HTTrailCore/Proxy/StreamingProxyHandler.swift": "9f2194eaa6640b1d2ab5230dfa6e001dc697b3b7c3afc5a931a38ef3a633bb8b",
+    "Tests/HTTrailCoreTests/StreamingProxyTests.swift": "719baba6cf1cfdbd2e5fd10e247e5aa6c95d4c130282d1c3a2698fea79293855",
+    "Tests/HTTrailCoreTests/WebSocketCaptureTests.swift": "4a02c5db78bea936c18340b815063925e6d20de5ff0131dd73044ed97508d680",
+    "iosapp/ImageFilterIntegration/Core/DirectImageSafetyAnalyzer.swift": "fec595744ae640af1997c70b0809811a0c3f59cc3fa0c82a6eb2e40126cd9cd2",
+    "iosapp/ImageFilterIntegration/Core/PurelineHumanDetectionService.swift": "108daaacd96d130a97c6723b7aeff64f6de1b7122274a7cc640a2c24936e32ce",
+    "iosapp/ImageFilterIntegration/Core/PurelineFilterConfiguration.swift": "9ecf839fa57484ce8c435bcfe91189b62321da53639abe6c27c647e3a7a97120",
+    "iosapp/PacketTunnel/ImageFilterProxyBridge.swift": "5079c0757bfc8c2801d1b71518f5e689d8bd75d8e1896df1673dcc2e1da91409",
+    "iosapp/PacketTunnel/PacketTunnelProvider.swift": "2ddc7017a7c55669efa58b77584d334cfd8496255b3021a34050f268c8eb308f",
+    "iosapp/PurelineIntegration/Capture/PurelineBoundedFlowSink.swift": "12476ba5a4543d346d8d23e34389cfc1c32becafa094d102955527deb1a30c31",
+    "iosapp/PurelineIntegration/Configuration/PurelineDefaultFilterConfiguration.json": "35d68e332028532de683d5d3bff2a5d3e00a907bb9c07e0ad5ce3eddeef2aec8",
+    "iosapp/PurelineIntegration/ImageFiltering/PurelineImageResponsePolicy.swift": "2aa47f76985f9a7825db837db5082653d22fef478d44a1812dfe2ee4c00b43e4",
+    "iosapp/PurelineIntegration/ImageFiltering/PurelineInspectionAdmissionController.swift": "a49578ecab87bedc1057d9f106a4ee4431bbaca7c413adbc42274efba0007242",
+    "iosapp/RuntimeTests/IntegratedRuntimeTests.swift": "25b3ce8437ec2522435d5ee3b296c69fca140ac5d4d9a22fd60bb21ca60fb346",
+    "iosapp/project.yml": "7d6494f41636e9f3b2c31dd64962616c6a9df611c644e367d4f6a8d85d36d8dd"
+  },
+  "original_model_smoke_body_sha256": "aee2576678be0321a551c737bb8b4c5629356e995ce59f10ae6510fe5085fcdd",
+  "unique_accepted_core_cases": 29,
+  "unique_accepted_runtime_cases": 27,
+  "full_app_and_extension_compile": "pending Apple archive gate",
+  "physical_device_acceptance": "not established by these simulator/socket checks"
+}

@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-27T15:36:24.650736+00:00",
+  "passed": true,
+  "cases": 26,
+  "actual_mitmproxy": true,
+  "real_loopback_sockets": true,
+  "actual_models": false,
+  "accuracy_samples_added": 0,
+  "test_deadline_seconds": 0.8,
+  "runtime_default_deadline_seconds": 18,
+  "raw_body_limit_bytes": 4194304,
+  "rows": [
+    {
+      "id": "image-during-warmup-refused",
+      "passed": true,
+      "status": 0
+    },
+    {
+      "id": "gzip-svg-allow-unchanged",
+      "passed": true,
+      "elapsed_ms": 5
+    },
+    {
+      "id": "brotli-gif-allow-unchanged",
+      "passed": true,
+      "elapsed_ms": 5
+    },
+    {
+      "id": "brotli-large-svg-allow-unchanged",
+      "passed": true,
+      "elapsed_ms": 11
+    },
+    {
+      "id": "deflate-gif-allow-unchanged",
+      "passed": true,
+      "elapsed_ms": 5
+    },
+    {
+      "id": "oversize-known-refused-before-origin-bytes",
+      "passed": true,
+      "status": 502,
+      "elapsed_ms": 4
+    },
+    {
+      "id": "oversize-chunked-refused-before-origin-bytes",
+      "passed": true,
+      "status": 502,
+      "elapsed_ms": 17
+    },
+    {
+      "id": "ambiguous-chunked-refused-before-origin-bytes",
+      "passed": true,
+      "status": 502,
+      "elapsed_ms": 17
+    },
+    {
+      "id": "gzip-bomb-safe-replacement",
+      "passed": true,
+      "reason": "image-decoded-too-large",
+      "elapsed_ms": 41
+    },
+    {
+      "id": "brotli-bomb-safe-replacement",
+      "passed": true,
+      "reason": "image-decoded-too-large",
+      "elapsed_ms": 21
+    },
+    {
+      "id": "malformed-gzip-safe-replacement",
+      "passed": true,
+      "reason": "image-decode-error",
+      "elapsed_ms": 11
+    },
+    {
+      "id": "silent-body-deadline",
+      "passed": true,
+      "status": 502,
+      "elapsed_ms": 806,
+      "origin_connection_aborted": true
+    },
+    {
+      "id": "body-and-worker-share-deadline",
+      "passed": true,
+      "elapsed_ms": 813
+    },
+    {
+      "id": "header-admission-bounded",
+      "passed": true,
+      "status": 0,
+      "peak_reserved": 10
+    },
+    {
+      "id": "body-disconnect-releases-reservations",
+      "passed": true
+    },
+    {
+      "id": "inspection-disconnect-kills-worker",
+      "passed": true
+    },
+    {
+      "id": "large-upload-streamed-and-preserved",
+      "passed": true,
+      "bytes": 8388625,
+      "parent_body_buffer_bytes": 0,
+      "elapsed_ms": 30
+    },
+    {
+      "id": "large-nonimage-preserved",
+      "passed": true,
+      "bytes": 8388625,
+      "elapsed_ms": 31
+    },
+    {
+      "id": "sse-first-event-streams",
+      "passed": true,
+      "first_event_ms": 4
+    },
+    {
+      "id": "https-connect-allow-unchanged",
+      "passed": true,
+      "scoped_ca_verification": true,
+      "elapsed_ms": 651
+    },
+    {
+      "id": "https-completion-weak-routing",
+      "passed": true,
+      "retained_bytes": 0
+    },
+    {
+      "id": "https-connect-silent-body-deadline",
+      "passed": true,
+      "status": 502,
+      "elapsed_ms": 813,
+      "origin_connection_aborted": true
+    },
+    {
+      "id": "completed-image-not-retained-by-wakeup",
+      "passed": true,
+      "retained_bytes": 0,
+      "strong_wakeup_routes": 0,
+      "measured_before_deadline": true
+    },
+    {
+      "id": "completion-and-late-wakeup-safe",
+      "passed": true
+    },
+    {
+      "id": "raw-buffer-ceiling",
+      "passed": true,
+      "metrics": {
+        "ready": true,
+        "reserved": 0,
+        "peak_reserved": 10,
+        "counts": {
+          "image_runtime_not_ready": 1,
+          "transport_errors": 18,
+          "streamed_nonimage": 28,
+          "image_allow": 7,
+          "image_pipeline_failure": 4,
+          "image_replace": 1,
+          "image_header_capacity_rejections": 1
+        },
+        "pool": {
+          "admitted": 9,
+          "peak_admitted": 1,
+          "active": 0,
+          "peak_active": 1,
+          "completed": 7,
+          "last_elapsed_ms": 1,
+          "timed_out": 1,
+          "cancelled": 1
+        },
+        "workers": [
+          1212006,
+          1212103
+        ],
+        "peak_buffer_bytes": 4194304,
+        "size_aborts": 3,
+        "body_timeouts": 2,
+        "upload_streamed": true,
+        "upload_buffered_bytes": 0,
+        "finished_image_bytes_retained": 0,
+        "strong_image_wakeup_routes": 0
+      }
+    },
+    {
+      "id": "unverified-source-startup-fatal",
+      "passed": true,
+      "returncode": 78
+    }
+  ],
+  "source_sha256": {
+    "downstream/animation_pipeline.py": "13eb1d0fb5cfc478c6701c4abfeb1454228e87609c5832e794d722a61e317866",
+    "downstream/face_fallback.py": "291365c7e1745ac1cecfcf9bd8a2a74955ca9d3bc3ecb93ed4318dd8a11b1399",
+    "downstream/http_body_bounds.py": "021cf12d42a46d3ebfacfe77f320317ba44c8d141cfeb9def88b14e8e51bdf86",
+    "downstream/http_input.py": "089f3f7f86fbca039f4d01bfc277382f9b02887d4ebe30f5277be7249e99cde4",
+    "downstream/pipeline_worker.py": "393f5c98fbef9f0f9cb9b7ea15de7060c0dbb693ac7568fb71bc5ccc06b50b5c",
+    "downstream/process_pool.py": "adda3f8212d45962a0e3ab504651b1c3dcde1e22bc80b8d8436991bdad63c952",
+    "downstream/pureline_addon_candidate.py": "84c258349b8808c4340f29a899c4f1807411426405d3607d94b56d988628dd23",
+    "downstream/pureline_addon_v2.py": "ffcf4f64a7c1501b9cb30411c3125e885ded367f24a7ef83748cd87f87291aec",
+    "downstream/pureline_http_addon.py": "358be1d5af3ab2561d01f2e4af25b17ecfef4e46d0709140061698842d10dead",
+    "downstream/runtime_factory.py": "0d80bf3fb391ba408a7f9c67fe1ef43158e87f190501e4752a6342feecf29e56",
+    "downstream/strong_blur.py": "51a34aec315cc3035dcc7d00312d229e5ea02725f43e8eb921b098eef94ccf42",
+    "downstream/svg_pipeline.py": "fc8c4247e44e0468331d21a6cdba9ff90b7e013e3081353bbf59f9037eda8f97",
+    "downstream/svg_worker.py": "6c7e4fc2c6ff1d109710f090b3e4eccf4b622566ed928c20019a00b41603b393",
+    "downstream/worker_protocol.py": "ad5665429f3dd69586e8595603d67738078dec1116653a0b48ccb213741a8ecb"
+  }
+}

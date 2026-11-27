@@ -1,0 +1,10 @@
+{
+  "purpose": "Negative TLS trust control; no SPKI allowlist and no certificate bypass",
+  "started_at": "2026-11-27T01:56:25.723Z",
+  "url": "https://example.com",
+  "ignoreHTTPSErrors": false,
+  "proxy": "http://127.0.0.1:18520",
+  "error": "Error: page.goto: net::ERR_CERT_AUTHORITY_INVALID at https://example.com/",
+  "passed": true,
+  "finished_at": "2026-11-27T01:56:26.231Z"
+}

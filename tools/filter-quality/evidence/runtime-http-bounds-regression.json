@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-27T14:53:06.785072+00:00",
+  "passed": true,
+  "cases": 11,
+  "actual_mitmproxy_serialization": true,
+  "actual_models": false,
+  "accuracy_samples_added": 0,
+  "rows": [
+    {
+      "id": "startup-unready-fails-closed",
+      "passed": true
+    },
+    {
+      "id": "unready-ambiguous-image-fails-closed",
+      "passed": true
+    },
+    {
+      "id": "allow-preserves-compressed-representation",
+      "passed": true
+    },
+    {
+      "id": "stream-text/html",
+      "passed": true
+    },
+    {
+      "id": "stream-text/css",
+      "passed": true
+    },
+    {
+      "id": "stream-application/javascript",
+      "passed": true
+    },
+    {
+      "id": "stream-text/event-stream",
+      "passed": true
+    },
+    {
+      "id": "timeout-serves-valid-placeholder",
+      "elapsed_ms": 208,
+      "passed": true
+    },
+    {
+      "id": "capacity-serves-valid-placeholder",
+      "passed": true
+    },
+    {
+      "id": "disconnect-cancels-and-reaps",
+      "passed": true
+    },
+    {
+      "id": "flow-error-cancels-and-reaps",
+      "passed": true
+    }
+  ],
+  "sources": {
+    "pureline_http_addon.py": "024246202a29e817e0c17f1da7a7c2e05c79b9d67ae8fb5c619c837ba1e27230",
+    "pureline_addon_v2.py": "466bdb7519fd2ccce9fc7a744e01d15196e1a2616fb206f9ae723b8df6cf9746",
+    "pureline_addon_candidate.py": "bd8877eefd072416c70353adc600e9aec62228c7be66b19f95c430288dfd16bf",
+    "process_pool.py": "7666165fc4d4eb4ec53f3c06a95aeae3179c1796af481171804042111505f58a"
+  }
+}

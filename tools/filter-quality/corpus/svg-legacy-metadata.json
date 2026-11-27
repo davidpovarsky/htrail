@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "scope": "Targeted compatibility control; separate from the frozen raster holdout and v3 SVG evidence.",
+  "rows": [
+    {
+      "id": "wikisource-logo-legacy-cc",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Wikisource-logo.svg",
+      "source_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95",
+      "source_bytes": 16160,
+      "expected": "allow",
+      "label_basis": "Public Wikimedia interface logo; expected nonperson UI asset, established independently of model output.",
+      "cache_filename": "wikisource-logo-public-source.svg"
+    }
+  ]
+}

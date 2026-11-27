@@ -52,6 +52,7 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
     private let capturedRequestProvider: (() -> CapturedRequest)?
     private let completeRequestOnActive: Bool
     private let responseInspectionPolicy: StreamingResponseInspectionPolicy?
+    private let responseDispositionPolicy: StreamingResponseDispositionPolicy?
     private let responseInspector: StreamingResponseInspector?
     private let responseObserver: StreamingResponseObserver?
     private let targetHost: String?
@@ -77,6 +78,7 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
     private var completed = false
     private var lastWrite: EventLoopFuture<Void>?
     private var inspectionLimit: Int?
+    private var inspectionFailureResponse: CapturedResponse?
     private var inspectionBuffer = Data()
     private var upstreamHead: HTTPResponseHead?
     private var requestSent = false
@@ -91,6 +93,7 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
          completeRequestOnActive: Bool = true,
          capturedRequestProvider: (() -> CapturedRequest)? = nil,
          responseInspectionPolicy: StreamingResponseInspectionPolicy? = nil,
+         responseDispositionPolicy: StreamingResponseDispositionPolicy? = nil,
          responseInspector: StreamingResponseInspector? = nil,
          responseObserver: StreamingResponseObserver? = nil,
          targetHost: String? = nil, targetUsesTLS: Bool = false,
@@ -103,6 +106,7 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         self.capturedRequestProvider = capturedRequestProvider
         self.completeRequestOnActive = completeRequestOnActive
         self.responseInspectionPolicy = responseInspectionPolicy
+        self.responseDispositionPolicy = responseDispositionPolicy
         self.responseInspector = responseInspector
         self.responseObserver = responseObserver
         self.targetHost = targetHost
@@ -164,24 +168,42 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
                 httpVersion: "HTTP/\(head.version.major).\(head.version.minor)", headers: capturedHeaders
             )
             let request = capturedRequestProvider?() ?? captured
-            if let limit = responseInspectionPolicy?(request, metadata), limit > 0,
-               responseInspector != nil {
-                inspectionLimit = limit
-                inspectionBuffer.reserveCapacity(min(limit, 512 * 1024))
-            } else {
+            let disposition: StreamingResponseDisposition
+            if let policy = responseDispositionPolicy { disposition = policy(request, metadata) }
+            else if let limit = responseInspectionPolicy?(request, metadata) { disposition = .inspect(maximumBytes: limit) }
+            else { disposition = .stream }
+            switch disposition {
+            case .stream:
                 sendHead(head)
+            case .respond(let response):
+                finishReplacement(response, context: context)
+            case .inspect(let limit, let failureResponse):
+                if isHeadRequest || head.status.code == 204 || head.status.code == 304 {
+                    sendHead(head)
+                } else if limit > 0, responseInspector != nil {
+                    inspectionLimit = limit
+                    inspectionFailureResponse = failureResponse
+                    inspectionBuffer.reserveCapacity(min(limit, 512 * 1024))
+                } else if let failureResponse {
+                    finishReplacement(failureResponse, context: context)
+                } else {
+                    sendHead(head)
+                }
             }
 
         case .body(var chunk):
             let available = chunk.readableBytes
             responseBytes += available
             if let limit = inspectionLimit {
-                if inspectionBuffer.count + available <= limit {
+                if available <= limit - inspectionBuffer.count {
                     if let bytes = chunk.readBytes(length: available) { inspectionBuffer.append(contentsOf: bytes) }
                     break
                 }
-                // Unknown/chunked response crossed the safe inspection limit:
-                // release the held prefix and continue transparent streaming.
+                if let failureResponse = inspectionFailureResponse {
+                    finishReplacement(failureResponse, context: context)
+                    return
+                }
+                // Legacy/explicit fail-open: release the prefix at the cap.
                 inspectionLimit = nil
                 if let head = upstreamHead { sendHead(head) }
                 if !inspectionBuffer.isEmpty {
@@ -254,6 +276,13 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
 
     private func finish(context: ChannelHandlerContext, success: Bool) {
         guard !completed else { return }
+        if inspectionLimit != nil {
+            if success { finishInspection(context: context); return }
+            if let failureResponse = inspectionFailureResponse {
+                finishReplacement(failureResponse, context: context)
+                return
+            }
+        }
         completed = true
 
         if success && headSent {
@@ -293,17 +322,35 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         )
         let request = capturedRequestProvider?() ?? captured
         let upstreamChannel = context.channel
+        let failureResponse = inspectionFailureResponse
+        let reusable = responseEnded
+        inspectionBuffer.removeAll(keepingCapacity: false)
         Task {
             let output: CapturedResponse
             do { output = try await inspector(request, original) ?? original }
-            catch { output = original }
+            catch { output = failureResponse ?? original }
             self.sink.record(Flow(id: self.flowID, request: request, response: self.captureVersion(output),
                                   state: .completed, startedAt: self.startedAt, endedAt: Date(), secure: self.secure))
             self.responseObserver?(request, self.captureVersion(output))
-            self.finishUpstream(channel: upstreamChannel, reusable: true) {
+            self.finishUpstream(channel: upstreamChannel, reusable: reusable) {
                 self.sendInspected(output)
             }
         }
+    }
+
+    /// Discard an origin whose body was not fully consumed. Returning that
+    /// channel to the pool could mix the unread bytes into a later response.
+    private func finishReplacement(_ response: CapturedResponse, context: ChannelHandlerContext) {
+        guard !completed else { return }
+        completed = true
+        inspectionLimit = nil
+        inspectionBuffer.removeAll(keepingCapacity: false)
+        let request = capturedRequestProvider?() ?? captured
+        let preview = captureVersion(response)
+        sink.record(Flow(id: flowID, request: request, response: preview,
+                         state: .completed, startedAt: startedAt, endedAt: Date(), secure: secure))
+        responseObserver?(request, preview)
+        finishUpstream(context: context, reusable: false) { self.sendInspected(response) }
     }
 
     private var framingComplete: Bool {
@@ -378,7 +425,7 @@ final class StreamingProxyHandler: ChannelInboundHandler, RemovableChannelHandle
         headers.replaceOrAdd(name: "Connection", value: keepAlive ? "keep-alive" : "close")
         let status = HTTPResponseStatus(statusCode: response.statusCode, reasonPhrase: response.reasonPhrase)
         clientChannel.write(NIOAny(HTTPServerResponsePart.head(HTTPResponseHead(version: .http1_1, status: status, headers: headers))), promise: nil)
-        if !response.body.isEmpty {
+        if !isHeadRequest && response.statusCode != 204 && response.statusCode != 304 && !response.body.isEmpty {
             var body = clientChannel.allocator.buffer(capacity: response.body.count); body.writeBytes(response.body)
             clientChannel.write(NIOAny(HTTPServerResponsePart.body(.byteBuffer(body))), promise: nil)
         }

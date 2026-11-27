@@ -1,0 +1,66 @@
+[
+  {
+    "name": "globe",
+    "url": "https://en.wikipedia.org/static/images/icons/enwiki-25.svg?pureline_qa=20261127_frozen_v3",
+    "started_at": "2026-11-27T03:05:12.813772+00:00",
+    "finished_at": "2026-11-27T03:05:15.867360+00:00",
+    "exit": 0,
+    "error": "",
+    "headers": [
+      "HTTP/1.1 200 Connection Established",
+      "HTTP/2 200 ",
+      "cache-control: no-store",
+      "content-type: image/png",
+      "x-local-image-filter: allow",
+      "x-local-image-filter-cache: miss",
+      "x-local-image-filter-reason: curated-public-ui-asset",
+      "content-length: 12996",
+      "x-local-image-filter-presentation: rasterized_allow",
+      "x-local-image-filter-policy-exception: wikipedia-enwiki-25"
+    ],
+    "body_bytes": 12996,
+    "sha256": "bb0e4b77e584215801290c003052a2aa2b0a760adcba1894a2fcddcbad9a8153"
+  },
+  {
+    "name": "embedded-woman",
+    "url": "http://192.0.2.1/pureline-lab-20261127/fixtures/randomuser-women-77.svg?pureline_qa=20261127_frozen_v3",
+    "started_at": "2026-11-27T03:05:15.868405+00:00",
+    "finished_at": "2026-11-27T03:05:17.582157+00:00",
+    "exit": 0,
+    "error": "",
+    "headers": [
+      "HTTP/1.1 200 OK",
+      "Cache-Control: no-store",
+      "Content-Length: 7518",
+      "Content-Type: image/png",
+      "X-Local-Image-Filter: blur",
+      "X-Local-Image-Filter-Cache: miss",
+      "X-Local-Image-Filter-Reason: policy",
+      "X-Pureline-Lab-Origin: oracle-controlled-fixture",
+      "X-Pureline-Lab-Source-Sha256: f3e33f152876775df5174e2e1a3c494a60c8ea822df06c5993cc530d928bb227"
+    ],
+    "body_bytes": 7518,
+    "sha256": "38142b55bc8f348e04772c01da7a80b20937bdac27556d81aaa0fbc0938f44e6"
+  },
+  {
+    "name": "large-block",
+    "url": "http://192.0.2.1/pureline-lab-20261127/fixtures/wikipedia-1111265-1536.jpg?pureline_qa=20261127_frozen_v3",
+    "started_at": "2026-11-27T03:05:17.583103+00:00",
+    "finished_at": "2026-11-27T03:05:19.266767+00:00",
+    "exit": 0,
+    "error": "",
+    "headers": [
+      "HTTP/1.1 200 OK",
+      "Cache-Control: no-store",
+      "Content-Length: 65365",
+      "Content-Type: image/png",
+      "X-Local-Image-Filter: blur",
+      "X-Local-Image-Filter-Cache: miss",
+      "X-Local-Image-Filter-Reason: policy",
+      "X-Pureline-Lab-Origin: oracle-controlled-fixture",
+      "X-Pureline-Lab-Source-Sha256: 6dd02622b699326b37253010c55e43125b4f01e11c0c6555495c0c706b5e0a4c"
+    ],
+    "body_bytes": 65365,
+    "sha256": "004d0e1d608e95404a9a21ab4313d7f6a1c9c28f56788be8a04d77dcba8cdcb5"
+  }
+]

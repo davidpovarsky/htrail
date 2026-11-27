@@ -1,0 +1,35 @@
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/System/Library/Frameworks/Vision.framework/Modules/Vision.swiftmodule/arm64-apple-ios-simulator.swiftinterface
+2690: }
+2691: @available(macOS 14.0, iOS 17.0, tvOS 17.0, *)
+2692: @available(watchOS, unavailable)
+2693: extension Vision::VNRequest {
+2694:   @nonobjc public var supportedComputeStageDevices: [Vision::VNComputeStage : [CoreML::MLComputeDevice]] {
+2695:     get throws
+2696:   }
+2697:   @nonobjc public func computeDevice(for computeStage: Vision::VNComputeStage) -> CoreML::MLComputeDevice?
+2698:   @nonobjc public func setComputeDevice(_ computeDevice: CoreML::MLComputeDevice?, for computeStage: Vision::VNComputeStage)
+2699: }
+2700: @available(macOS 15.0, iOS 18.0, tvOS 18.0, visionOS 2.0, watchOS 27.0, *)
+2701: public struct RecognizeAnimalsRequest : Vision::ImageProcessingRequest {
+2702:   public typealias Result = [Vision::RecognizedObjectObservation]
+2703:   public enum Revision : Swift::Comparable, Swift::Sendable, Swift::Equatable, Swift::Codable, Swift::Hashable {
+2704:     case revision2
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/System/Library/Frameworks/CoreML.framework/Modules/CoreML.swiftmodule/arm64-apple-ios-simulator.swiftinterface
+738:   public init(_ multiArray: CoreML::MLMultiArray) throws
+739: }
+740: @available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *)
+741: public enum MLComputeDevice : Swift::Equatable, Swift::Hashable, Swift::CustomStringConvertible, Swift::Sendable {
+742:   case cpu(CoreML::MLCPUComputeDevice)
+743:   case gpu(CoreML::MLGPUComputeDevice)
+744:   case neuralEngine(CoreML::MLNeuralEngineComputeDevice)
+745:   public var description: Swift::String {
+746:     get
+747:   }
+748:   public static var allComputeDevices: [CoreML::MLComputeDevice] {
+749:     get
+750:   }
+751:   public static func == (a: CoreML::MLComputeDevice, b: CoreML::MLComputeDevice) -> Swift::Bool
+752:   public func hash(into hasher: inout Swift::Hasher)
+753:   public var hashValue: Swift::Int {
+754:     get

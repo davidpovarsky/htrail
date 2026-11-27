@@ -1,0 +1,300 @@
+{
+  "id": "thumbnails-2",
+  "kind": "fixture-gallery",
+  "requested_url": "http://127.0.0.1:18524/thumbnails-2.html",
+  "navigation_status": 200,
+  "navigation_error": null,
+  "elapsed_ms": 6280,
+  "all_dom_images_settled": true,
+  "screenshot": "thumbnails-2.png",
+  "screenshot_error": null,
+  "dom": {
+    "title": "Pureline QA — thumbnails",
+    "url": "http://127.0.0.1:18524/thumbnails-2.html",
+    "image_count": 6,
+    "images": [
+      {
+        "url": "https://randomuser.me/api/portraits/med/men/31.jpg",
+        "alt": "randomuser-men-31-published-med",
+        "complete": true,
+        "naturalWidth": 72,
+        "naturalHeight": 72,
+        "renderedWidth": 225,
+        "renderedHeight": 210,
+        "loading": "eager",
+        "cssBackground": "rgb(233, 237, 243)",
+        "expected": "allow",
+        "observed_action": "allow",
+        "http_status": 200,
+        "decoded": true,
+        "policy_match": true
+      },
+      {
+        "url": "https://randomuser.me/api/portraits/thumb/men/31.jpg",
+        "alt": "randomuser-men-31-published-thumb",
+        "complete": true,
+        "naturalWidth": 48,
+        "naturalHeight": 48,
+        "renderedWidth": 225,
+        "renderedHeight": 210,
+        "loading": "eager",
+        "cssBackground": "rgb(233, 237, 243)",
+        "expected": "allow",
+        "observed_action": "allow",
+        "http_status": 200,
+        "decoded": true,
+        "policy_match": true
+      },
+      {
+        "url": "https://randomuser.me/api/portraits/med/men/44.jpg",
+        "alt": "randomuser-men-44-published-med",
+        "complete": true,
+        "naturalWidth": 72,
+        "naturalHeight": 72,
+        "renderedWidth": 225,
+        "renderedHeight": 210,
+        "loading": "eager",
+        "cssBackground": "rgb(233, 237, 243)",
+        "expected": "allow",
+        "observed_action": "allow",
+        "http_status": 200,
+        "decoded": true,
+        "policy_match": true
+      },
+      {
+        "url": "https://randomuser.me/api/portraits/thumb/men/44.jpg",
+        "alt": "randomuser-men-44-published-thumb",
+        "complete": true,
+        "naturalWidth": 48,
+        "naturalHeight": 48,
+        "renderedWidth": 225,
+        "renderedHeight": 210,
+        "loading": "eager",
+        "cssBackground": "rgb(233, 237, 243)",
+        "expected": "allow",
+        "observed_action": "allow",
+        "http_status": 200,
+        "decoded": true,
+        "policy_match": true
+      },
+      {
+        "url": "https://randomuser.me/api/portraits/med/men/28.jpg",
+        "alt": "randomuser-men-28-published-med",
+        "complete": true,
+        "naturalWidth": 72,
+        "naturalHeight": 72,
+        "renderedWidth": 225,
+        "renderedHeight": 210,
+        "loading": "eager",
+        "cssBackground": "rgb(233, 237, 243)",
+        "expected": "allow",
+        "observed_action": "allow",
+        "http_status": 200,
+        "decoded": true,
+        "policy_match": true
+      },
+      {
+        "url": "https://randomuser.me/api/portraits/thumb/men/28.jpg",
+        "alt": "randomuser-men-28-published-thumb",
+        "complete": true,
+        "naturalWidth": 48,
+        "naturalHeight": 48,
+        "renderedWidth": 225,
+        "renderedHeight": 210,
+        "loading": "eager",
+        "cssBackground": "rgb(233, 237, 243)",
+        "expected": "allow",
+        "observed_action": "allow",
+        "http_status": 200,
+        "decoded": true,
+        "policy_match": true
+      }
+    ],
+    "load_status_text": "6 / 6 loaded; 0 errors",
+    "body_height": 859
+  },
+  "responses": [
+    {
+      "url": "http://127.0.0.1:18524/thumbnails-2.html",
+      "resourceType": "document",
+      "status": 200,
+      "contentType": "text/html",
+      "action": null,
+      "reason": null,
+      "cache": null,
+      "elapsed_ms": 8
+    },
+    {
+      "url": "https://randomuser.me/api/portraits/med/men/44.jpg",
+      "resourceType": "image",
+      "status": 200,
+      "contentType": "image/jpeg",
+      "action": "allow",
+      "reason": "policy",
+      "cache": "miss",
+      "elapsed_ms": 1593,
+      "body_bytes": 3735,
+      "body_sha256": "66d4211ad7cef6d98a6f25d29bc41fa8134bcd0a9ad3090628a9f746775bcdb8"
+    },
+    {
+      "url": "https://randomuser.me/api/portraits/thumb/men/31.jpg",
+      "resourceType": "image",
+      "status": 200,
+      "contentType": "image/jpeg",
+      "action": "allow",
+      "reason": "policy",
+      "cache": "miss",
+      "elapsed_ms": 2071,
+      "body_bytes": 2628,
+      "body_sha256": "ad3a9f2e5c25a1ef5a35033e919680de6a9ff75489c29f5174d4494d11eaaa63"
+    },
+    {
+      "url": "https://randomuser.me/api/portraits/thumb/men/44.jpg",
+      "resourceType": "image",
+      "status": 200,
+      "contentType": "image/jpeg",
+      "action": "allow",
+      "reason": "policy",
+      "cache": "miss",
+      "elapsed_ms": 2930,
+      "body_bytes": 2617,
+      "body_sha256": "09f2926265ce693b8f816e12f4e6733fbfb5f83be90b6f04eb3db37249c525a3"
+    },
+    {
+      "url": "https://randomuser.me/api/portraits/med/men/31.jpg",
+      "resourceType": "image",
+      "status": 200,
+      "contentType": "image/jpeg",
+      "action": "allow",
+      "reason": "policy",
+      "cache": "miss",
+      "elapsed_ms": 3420,
+      "body_bytes": 3737,
+      "body_sha256": "f2364cf5e4721a7b59ea56214b19ab045a9b49d69381ccf7055bd7f4ceb71b6a"
+    },
+    {
+      "url": "https://randomuser.me/api/portraits/med/men/28.jpg",
+      "resourceType": "image",
+      "status": 200,
+      "contentType": "image/jpeg",
+      "action": "allow",
+      "reason": "policy",
+      "cache": "miss",
+      "elapsed_ms": 4511,
+      "body_bytes": 3530,
+      "body_sha256": "98888c39a4f6408c1490826d153f054db4811ae51627db3f393c7880d4b32cd5"
+    },
+    {
+      "url": "https://randomuser.me/api/portraits/thumb/men/28.jpg",
+      "resourceType": "image",
+      "status": 200,
+      "contentType": "image/jpeg",
+      "action": "allow",
+      "reason": "policy",
+      "cache": "miss",
+      "elapsed_ms": 4973,
+      "body_bytes": 2543,
+      "body_sha256": "e79f9d2a5bf5985b4c8a0d5642f4e4df59b229262aa9a1ce06f4a1b2282cec7f"
+    }
+  ],
+  "failed_requests": [],
+  "javascript_errors": [],
+  "network": [
+    {
+      "url": "http://127.0.0.1:18524/thumbnails-2.html",
+      "resourceType": "Document",
+      "status": 200,
+      "mimeType": "text/html",
+      "fromDiskCache": false,
+      "fromServiceWorker": false,
+      "protocol": "http/1.0",
+      "encodedDataLength": 3969
+    },
+    {
+      "url": "https://randomuser.me/api/portraits/med/men/44.jpg",
+      "resourceType": "Image",
+      "status": 200,
+      "mimeType": "image/jpeg",
+      "fromDiskCache": false,
+      "fromServiceWorker": false,
+      "protocol": "h2",
+      "encodedDataLength": 3579
+    },
+    {
+      "url": "https://randomuser.me/api/portraits/thumb/men/31.jpg",
+      "resourceType": "Image",
+      "status": 200,
+      "mimeType": "image/jpeg",
+      "fromDiskCache": false,
+      "fromServiceWorker": false,
+      "protocol": "h2",
+      "encodedDataLength": 2438
+    },
+    {
+      "url": "https://randomuser.me/api/portraits/thumb/men/44.jpg",
+      "resourceType": "Image",
+      "status": 200,
+      "mimeType": "image/jpeg",
+      "fromDiskCache": false,
+      "fromServiceWorker": false,
+      "protocol": "h2",
+      "encodedDataLength": 2427
+    },
+    {
+      "url": "https://randomuser.me/api/portraits/med/men/31.jpg",
+      "resourceType": "Image",
+      "status": 200,
+      "mimeType": "image/jpeg",
+      "fromDiskCache": false,
+      "fromServiceWorker": false,
+      "protocol": "h2",
+      "encodedDataLength": 3552
+    },
+    {
+      "url": "https://randomuser.me/api/portraits/med/men/28.jpg",
+      "resourceType": "Image",
+      "status": 200,
+      "mimeType": "image/jpeg",
+      "fromDiskCache": false,
+      "fromServiceWorker": false,
+      "protocol": "h2",
+      "encodedDataLength": 3354
+    },
+    {
+      "url": "https://randomuser.me/api/portraits/thumb/men/28.jpg",
+      "resourceType": "Image",
+      "status": 200,
+      "mimeType": "image/jpeg",
+      "fromDiskCache": false,
+      "fromServiceWorker": false,
+      "protocol": "h2",
+      "encodedDataLength": 2354
+    }
+  ],
+  "health_after": {
+    "bytes_down": 35130,
+    "bytes_up": 25008,
+    "connected": 19,
+    "errors": 0,
+    "requests": 19,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795743197",
+      "rx_bytes": "2761197",
+      "tx_bytes": "153036"
+    }
+  },
+  "counts": {
+    "dom_images": 6,
+    "decoded_images": 6,
+    "image_network_responses": 6,
+    "actions": {
+      "allow": 6
+    },
+    "labelled_matches": 6,
+    "labelled_mismatches": 0,
+    "labelled_unresolved": 0,
+    "failed_requests": 0
+  }
+}

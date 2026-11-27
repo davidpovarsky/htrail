@@ -1,0 +1,76 @@
+{
+  "run_id": "pureline-wg-lab-20261127",
+  "backend": "V2 CPU baseline",
+  "tests": [
+    {
+      "test": "http_fallback",
+      "url": "http://example.com/",
+      "proxy": true,
+      "exit": 0,
+      "measure": "200 577 0.256228",
+      "error": "",
+      "sha256": "25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484",
+      "filter_headers": [
+        "Content-Type: text/html; charset=utf-8"
+      ]
+    },
+    {
+      "test": "man_direct",
+      "url": "https://randomuser.me/api/portraits/men/77.jpg",
+      "proxy": false,
+      "exit": 0,
+      "measure": "200 3705 0.056840",
+      "error": "",
+      "sha256": "53019a4c9b16b1a008b15d6addfe1f03987c358f3b416a28810bd2098555633e",
+      "filter_headers": [
+        "content-type: image/jpeg",
+        "content-length: 3705"
+      ]
+    },
+    {
+      "test": "man_filtered",
+      "url": "https://randomuser.me/api/portraits/men/77.jpg",
+      "proxy": true,
+      "exit": 0,
+      "measure": "200 3705 0.838324",
+      "error": "",
+      "sha256": "53019a4c9b16b1a008b15d6addfe1f03987c358f3b416a28810bd2098555633e",
+      "filter_headers": [
+        "content-type: image/jpeg",
+        "content-length: 3705",
+        "x-local-image-filter: allow",
+        "x-local-image-filter-cache: miss",
+        "x-local-image-filter-reason: policy"
+      ]
+    },
+    {
+      "test": "woman_direct",
+      "url": "https://randomuser.me/api/portraits/women/77.jpg",
+      "proxy": false,
+      "exit": 0,
+      "measure": "200 4082 0.029240",
+      "error": "",
+      "sha256": "2b60a52f98219bd878af04c6c7a7cbbd291bae76598bbdf3c1148ce294256869",
+      "filter_headers": [
+        "content-type: image/jpeg",
+        "content-length: 4082"
+      ]
+    },
+    {
+      "test": "woman_filtered",
+      "url": "https://randomuser.me/api/portraits/women/77.jpg",
+      "proxy": true,
+      "exit": 0,
+      "measure": "200 4082 0.765482",
+      "error": "",
+      "sha256": "2b60a52f98219bd878af04c6c7a7cbbd291bae76598bbdf3c1148ce294256869",
+      "filter_headers": [
+        "content-type: image/jpeg",
+        "content-length: 4082",
+        "x-local-image-filter: allow",
+        "x-local-image-filter-cache: miss",
+        "x-local-image-filter-reason: policy"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "at_utc": "2026-11-27T16:35:31.815091+00:00",
+  "only_change": "register pureline-poc status/restart/is-active/is-enabled",
+  "all_other_configuration_unchanged": true,
+  "policy_sha256_after": "34cbecea2956df3beb23bc4b2d26c02b05b20160a648983262111b193928c710",
+  "agent_pid_before_reload": 3709888,
+  "file_mode": "0o644",
+  "source_of_authorization": "explicit current owner request for full Pureline completion and server administration",
+  "documented_route": "SentinelX add_service registration using existing structured editor, registered agent restart, capability confirmation"
+}

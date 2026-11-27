@@ -57,38 +57,27 @@ enum ImageFilterProxyBridge {
 
     static func configure(server: ProxyServer, diagnostics: PurelinePacketTunnelDiagnostics) {
         Task { await refreshRuntimeConfiguration(diagnostics: diagnostics) }
-        server.streamingResponseInspectionPolicy = { request, metadata in
-            guard DirectImageFilterSettings.isEnabled,
-                  let snapshot = withStateLock({ currentSnapshot }), snapshot.configuration.enabled,
-                  (200..<300).contains(metadata.statusCode),
-                  Self.isPlausibleRaster(request: request, metadata: metadata) else { return nil }
-            if let encoding = metadata.header("Content-Encoding")?.lowercased(),
-               !encoding.isEmpty, encoding != "identity" { return nil }
-            let config = snapshot.configuration
-            guard let length = metadata.header("Content-Length").flatMap(Int.init),
-                  length > 0, length <= config.pipeline.maximumImageBytes,
-                  PurelineRuntimePolicy.currentAvailableMemoryBytes() >= config.runtime.minimumAvailableMemoryBytes else {
-                diagnostics.record(category: "image-filter", event: "image inspection fail-open before buffering", details: [
-                    "host": request.host, "contentLength": metadata.header("Content-Length") ?? "unknown",
-                    "limit": String(config.pipeline.maximumImageBytes),
-                    "availableMemoryBytes": String(PurelineRuntimePolicy.currentAvailableMemoryBytes())
+        server.streamingResponseDispositionPolicy = { request, metadata in
+            let config = withStateLock { currentSnapshot?.configuration } ?? .builtIn
+            let decision = PurelineImageResponsePolicy.decide(
+                request: request, metadata: metadata, configuration: config,
+                enabled: DirectImageFilterSettings.isEnabled,
+                availableMemoryBytes: PurelineRuntimePolicy.currentAvailableMemoryBytes(), admission: admission
+            )
+            if let reason = decision.reason {
+                diagnostics.record(category: "image-filter", event: "inspection policy applied", details: [
+                    "host": request.host, "reason": reason,
+                    "action": decision.failsOpen ? "configured-fail-open" : "safe-placeholder"
                 ])
-                return nil
             }
-            let id = inspectionID(request)
-            guard admission.tryReserve(id: id, bytes: length) else {
-                let counters = admission.snapshot()
-                diagnostics.record(category: "image-filter", event: "inspection admission overflow; fail open", details: [
-                    "host": request.host, "bytes": String(length), "active": String(counters.active),
-                    "queued": String(counters.queued), "inFlightBytes": String(counters.inFlightBytes)
-                ])
-                return nil
-            }
-            return config.pipeline.maximumImageBytes
+            return decision.disposition
         }
         server.streamingResponseInspector = { request, response in
-            let id = inspectionID(request)
-            await admission.acquire(id: id)
+            let id = PurelineImageResponsePolicy.inspectionID(request)
+            guard await admission.acquire(id: id) else {
+                guard DirectImageFilterSettings.isEnabled else { return nil }
+                return PurelineImageResponsePolicy.placeholder(response: response, reason: "inspection-cancelled")
+            }
             defer { admission.release(id: id) }
             guard DirectImageFilterSettings.isEnabled else {
                 diagnostics.record(category: "image-filter", event: "inspection cancelled because direct filtering is off")
@@ -96,6 +85,10 @@ enum ImageFilterProxyBridge {
             }
             await admission.acquireInference()
             defer { admission.releaseInference() }
+            guard DirectImageFilterSettings.isEnabled else {
+                diagnostics.record(category: "image-filter", event: "inspection cancelled while waiting for inference")
+                return nil
+            }
             let analyzer = DirectImageSafetyAnalyzer.shared
             guard let edit = await transform(
                 response: response, request: request, analyzer: analyzer, diagnostics: diagnostics
@@ -105,7 +98,7 @@ enum ImageFilterProxyBridge {
     }
 
     static func responseCompleted(_ request: CapturedRequest) {
-        admission.release(id: inspectionID(request))
+        admission.release(id: PurelineImageResponsePolicy.inspectionID(request))
     }
 
     private static func transform(
@@ -114,35 +107,29 @@ enum ImageFilterProxyBridge {
         analyzer: DirectImageSafetyAnalyzer,
         diagnostics: PurelinePacketTunnelDiagnostics
     ) async -> BreakpointEdit? {
-        guard let snapshot = withStateLock({ currentSnapshot }) else { return nil }
-        let maximumImageBytes = snapshot.configuration.pipeline.maximumImageBytes
-        guard response.statusCode >= 200, response.statusCode < 300,
-              !response.body.isEmpty,
-              response.body.count <= maximumImageBytes else { return nil }
-
+        let config = withStateLock { currentSnapshot?.configuration } ?? .builtIn
+        guard DirectImageFilterSettings.isEnabled, config.enabled else { return nil }
         let contentType = response.contentType?.split(separator: ";", maxSplits: 1).first
             .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
-        guard ImageSniffer.isRaster(data: response.body, contentType: contentType) else { return nil }
-
-        if let encoding = response.header("Content-Encoding")?.lowercased(),
-           !encoding.isEmpty, encoding != "identity" {
-            logger.debug("Skipping encoded image response \(request.url, privacy: .private(mask: .hash))")
-            return nil
+        guard !response.body.isEmpty, response.body.count <= config.pipeline.maximumImageBytes else {
+            return failureEdit(action: config.failurePolicy.imageTooLarge, response: response, reason: "image-size")
         }
-
+        guard ImageSniffer.isRaster(data: response.body, contentType: contentType) else {
+            return failureEdit(action: config.failurePolicy.classifierError, response: response, reason: "invalid-image")
+        }
         do {
             let before = PurelineRuntimePolicy.currentAvailableMemoryBytes()
             let counters = admission.snapshot()
             let lifecycle = await analyzer.modelLifecycleSnapshots()
-            if snapshot.configuration.models.mobileCLIP2, lifecycle.mobileCLIP.0 != .ready {
+            if config.models.mobileCLIP2, lifecycle.mobileCLIP.0 != .ready {
                 diagnostics.record(category: "image-filter", event: "model preparation pending before inference", details: [
-                    "model": "MobileCLIP2-S2", "revision": snapshot.revision.hash,
+                    "model": "MobileCLIP2-S2", "revision": withStateLock { currentSnapshot?.revision.hash } ?? "built-in",
                     "availableMemoryBytes": String(before)
                 ])
             }
-            if snapshot.configuration.models.nudeNet, lifecycle.nudeNet.0 != .ready {
+            if config.models.nudeNet, lifecycle.nudeNet.0 != .ready {
                 diagnostics.record(category: "image-filter", event: "model preparation pending before inference", details: [
-                    "model": "NudeNet320n", "revision": snapshot.revision.hash,
+                    "model": "NudeNet320n", "revision": withStateLock { currentSnapshot?.revision.hash } ?? "built-in",
                     "availableMemoryBytes": String(before)
                 ])
             }
@@ -176,30 +163,27 @@ enum ImageFilterProxyBridge {
             logger.notice(
                 "Blocked image risk=\(decision.risk, privacy: .public) class=\(decision.triggeredClass ?? "unknown", privacy: .public) confidence=\(decision.confidence, privacy: .public)"
             )
-            var blocked = response
-            blocked.body = blockedPlaceholderData()
-            blocked.bodyTruncated = nil
-            blocked.headers.removeAll { header in
-                ["Content-Type", "Content-Length", "Content-Encoding", "Content-MD5", "ETag"]
-                    .contains { $0.caseInsensitiveCompare(header.name) == .orderedSame }
-            }
-            blocked.headers.append(HeaderPair(name: "Content-Type", value: "image/svg+xml; charset=utf-8"))
-            blocked.headers.append(HeaderPair(name: "Cache-Control", value: "no-store"))
-            blocked.headers.append(HeaderPair(name: "X-HTTrail-Image-Filter", value: "blocked"))
-            return BreakpointEdit(response: blocked)
+            return BreakpointEdit(response: PurelineImageResponsePolicy.placeholder(response: response, reason: "blocked"))
         } catch {
-            // Fail open: classifier trouble must never turn a previously working
-            // HTTrail capture session into broken browsing.
+            let action: PurelineFilterConfiguration.FailureAction
+            switch error {
+            case DirectImageSafetyError.modelUnavailable: action = config.failurePolicy.modelUnavailable
+            case DirectImageSafetyError.unsupportedImage: action = config.failurePolicy.unsupportedEncoding
+            default: action = config.failurePolicy.classifierError
+            }
             logger.error("Direct image classification failed: \(String(describing: error), privacy: .public)")
-            diagnostics.record(category: "image-filter", event: "inference failure; fail open", details: [
-                "host": request.host, "error": String(describing: error)
+            diagnostics.record(category: "image-filter", event: "inference failure", details: [
+                "host": request.host, "error": String(describing: error),
+                "action": action == .block ? "safe-placeholder" : "configured-fail-open"
             ])
-            return nil
+            guard DirectImageFilterSettings.isEnabled else { return nil }
+            return failureEdit(action: action, response: response, reason: "inference-failure")
         }
     }
 
-    private static func inspectionID(_ request: CapturedRequest) -> String {
-        "\(request.timestamp.timeIntervalSince1970)-\(request.method)-\(request.url)"
+    private static func failureEdit(action: PurelineFilterConfiguration.FailureAction,
+                                    response: CapturedResponse, reason: String) -> BreakpointEdit? {
+        action == .block ? BreakpointEdit(response: PurelineImageResponsePolicy.placeholder(response: response, reason: reason)) : nil
     }
 
     private static func recordEffectiveState(snapshot: PurelineFilterConfigurationSnapshot, requested: Bool,
@@ -228,24 +212,4 @@ enum ImageFilterProxyBridge {
         stateLock.lock(); defer { stateLock.unlock() }; return body()
     }
 
-    private static func isPlausibleRaster(request: CapturedRequest, metadata: StreamingResponseMetadata) -> Bool {
-        if let contentType = metadata.header("Content-Type")?.lowercased() {
-            if contentType.hasPrefix("image/") && !contentType.contains("svg") { return true }
-            if !contentType.isEmpty && !contentType.hasPrefix("application/octet-stream") { return false }
-        }
-        let path = request.path.lowercased().split(separator: "?", maxSplits: 1).first.map(String.init) ?? request.path
-        return [".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".tif", ".tiff", ".heic", ".heif", ".avif"]
-            .contains { path.hasSuffix($0) }
-    }
-
-    private static func blockedPlaceholderData() -> Data {
-        Data("""
-        <svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
-          <rect width="640" height="400" fill="#111827"/>
-          <path d="M320 105l92 34v70c0 58-38 111-92 132-54-21-92-74-92-132v-70z" fill="#374151"/>
-          <path d="M286 200l25 25 48-55" fill="none" stroke="#9CA3AF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-          <text x="320" y="365" text-anchor="middle" fill="#D1D5DB" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="24">Blocked by Image Filter</text>
-        </svg>
-        """.utf8)
-    }
 }

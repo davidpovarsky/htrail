@@ -1,0 +1,36 @@
+{
+  "checks": [
+    "syntax",
+    "identity_decode",
+    "gzip_decode",
+    "bounded_gzip_expansion",
+    "privacy_fields_and_loopback_port"
+  ],
+  "checks_passed": 5,
+  "default_cli": {
+    "network_requests": 0,
+    "overall_max_seconds": 180,
+    "planned_sequence": [
+      "allow",
+      "block",
+      "block",
+      "allow",
+      "allow",
+      "block",
+      "block",
+      "allow",
+      "svg"
+    ],
+    "prepared_only": true,
+    "request_max_seconds": 30,
+    "startup_max_seconds": 60
+  },
+  "fixture_source_manifest_sha256": "592dd80686141d54da26dd84eb66d2e60a5dbadc3f3da75733283026a443182b",
+  "model_processes_started": 0,
+  "network_requests": 0,
+  "prepared_only": true,
+  "production_executed": false,
+  "renderer_processes_started": 0,
+  "schema": 1,
+  "source_sha256": "0fcab2dc78362fe4c8222bbe9595f09411e9098ebad21e30db89c9b40092554b"
+}

@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-27T15:03:08.010865+00:00",
+  "passed": true,
+  "workers": 2,
+  "client_concurrency": 3,
+  "request_deadline_seconds": 18,
+  "actual_models": true,
+  "new_independent_accuracy_samples": 0,
+  "browser_navigation": false,
+  "scope": "real-model pipeline and actual mitmproxy response-object load; not physical VPN or browser navigation",
+  "startup_ms": 1888,
+  "providers": [
+    {
+      "ready": true,
+      "providers": {
+        "personDetector": [
+          "CPUExecutionProvider"
+        ],
+        "mobileCLIP2": [
+          "CPUExecutionProvider"
+        ],
+        "nudeNet": [
+          "CPUExecutionProvider"
+        ]
+      }
+    },
+    {
+      "ready": true,
+      "providers": {
+        "personDetector": [
+          "CPUExecutionProvider"
+        ],
+        "mobileCLIP2": [
+          "CPUExecutionProvider"
+        ],
+        "nudeNet": [
+          "CPUExecutionProvider"
+        ]
+      }
+    }
+  ],
+  "animation_rows": [],
+  "load_images": 3,
+  "load_successes": 3,
+  "overload_or_timeout": 0,
+  "p50_ms": 1897.75,
+  "p95_ms": 2001.12,
+  "p99_ms": 2001.12,
+  "memory": {
+    "peak_combined_rss_bytes": 858828800,
+    "peak_worker_rss_bytes": {
+      "1048635": 394489856,
+      "1048636": 392003584
+    },
+    "parent_pid": 1048611
+  },
+  "within_2gib_rss": true,
+  "metrics": {
+    "admitted": 3,
+    "peak_admitted": 3,
+    "active": 0,
+    "peak_active": 2,
+    "completed": 3,
+    "last_elapsed_ms": 2001
+  },
+  "load_rows": [
+    {
+      "id": "wikipedia-105962",
+      "sha256": "16d351b5342b0b50995964f61c8ada58b05937745b92126abf482f6c067c7db4",
+      "expected_label": "allow",
+      "previous_action": "allow",
+      "action": "allow",
+      "reason": "policy",
+      "elapsed_ms": 1053.57,
+      "decoded": true,
+      "unchanged_allowed_bytes": true,
+      "overload_or_timeout": false,
+      "passed": true
+    },
+    {
+      "id": "wikipedia-29558742",
+      "sha256": "78f24a1fcaa4ce387a07ce5ca487d7a11eeee7cfbc7b8338f52daeb1f8f8d3e0",
+      "expected_label": "allow",
+      "previous_action": "allow",
+      "action": "allow",
+      "reason": "policy",
+      "elapsed_ms": 2001.12,
+      "decoded": true,
+      "unchanged_allowed_bytes": true,
+      "overload_or_timeout": false,
+      "passed": true
+    },
+    {
+      "id": "wikipedia-41856392",
+      "sha256": "537a8f22c869b3e57af4b08a9404be96e810d4e0bae3cc476c1b1a4eb2d23d51",
+      "expected_label": "block",
+      "previous_action": "blur",
+      "action": "blur",
+      "reason": "policy",
+      "elapsed_ms": 1897.75,
+      "decoded": true,
+      "unchanged_allowed_bytes": null,
+      "overload_or_timeout": false,
+      "passed": true
+    }
+  ],
+  "source_sha256": {
+    "downstream/animation_pipeline.py": "13eb1d0fb5cfc478c6701c4abfeb1454228e87609c5832e794d722a61e317866",
+    "downstream/face_fallback.py": "291365c7e1745ac1cecfcf9bd8a2a74955ca9d3bc3ecb93ed4318dd8a11b1399",
+    "downstream/pipeline_worker.py": "393f5c98fbef9f0f9cb9b7ea15de7060c0dbb693ac7568fb71bc5ccc06b50b5c",
+    "downstream/process_pool.py": "7666165fc4d4eb4ec53f3c06a95aeae3179c1796af481171804042111505f58a",
+    "downstream/pureline_addon_candidate.py": "bd8877eefd072416c70353adc600e9aec62228c7be66b19f95c430288dfd16bf",
+    "downstream/pureline_addon_v2.py": "466bdb7519fd2ccce9fc7a744e01d15196e1a2616fb206f9ae723b8df6cf9746",
+    "downstream/pureline_http_addon.py": "024246202a29e817e0c17f1da7a7c2e05c79b9d67ae8fb5c619c837ba1e27230",
+    "downstream/runtime_factory.py": "0d80bf3fb391ba408a7f9c67fe1ef43158e87f190501e4752a6342feecf29e56",
+    "downstream/strong_blur.py": "51a34aec315cc3035dcc7d00312d229e5ea02725f43e8eb921b098eef94ccf42",
+    "downstream/svg_pipeline.py": "fc8c4247e44e0468331d21a6cdba9ff90b7e013e3081353bbf59f9037eda8f97",
+    "downstream/svg_worker.py": "6c7e4fc2c6ff1d109710f090b3e4eccf4b622566ed928c20019a00b41603b393",
+    "downstream/worker_protocol.py": "ad5665429f3dd69586e8595603d67738078dec1116653a0b48ccb213741a8ecb"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "run_id": "pureline-wg-lab-20261127",
+  "artifacts": {
+    "/srv/pureline-poc/pureline_addon_v3_candidate.py": "f1cb9153a439a286d41a1d110e8816c20ee424b8d28beda2772384ca5905ae19",
+    "/srv/pureline-poc/pureline_addon_v2.py": "52b34ca1a62dcb0bb95b179b3ef7400d6da2332d00609f8386e15a4f31a31c70",
+    "/srv/pureline-poc/config/pureline-all-official-tuned-staging.toml": "ecfb7f6c377c14793cfbd02a50079f30f236807a7934cbd759a3948488f16340",
+    "/srv/pureline-poc/official-candidate/face_fallback.py": "291365c7e1745ac1cecfcf9bd8a2a74955ca9d3bc3ecb93ed4318dd8a11b1399",
+    "/srv/pureline-poc/models/runtime-manifest-fully-official.json": "afd305910f8952169e515cb18e25d9b550636eff1c8b222a2d6ed9aec355fd3b"
+  },
+  "quality_reference": "/mnt/development/projects/pureline-quality-20261127/experiments/pureline-quality-20261127/candidate-freeze.json",
+  "policy_tuned_in_transport_lane": false,
+  "candidate_derived_from": "existing official CPU staging candidate",
+  "visual_check": "woman_candidate.jpg 128x128; fully blurred, no recognizable face; inspected through native image reader",
+  "production_main_pid": "3542726"
+}
