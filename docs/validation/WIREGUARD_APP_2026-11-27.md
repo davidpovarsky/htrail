@@ -12,12 +12,14 @@ See [native bridge verification](WIREGUARD_BRIDGE_2026-11-27.md), [browser trans
 
 ## Profile and secret handling
 
-- Profile input is bounded to 64 KiB, one interface, and one to four peers. Unknown directives, shell hooks, duplicate singleton fields, duplicate peer keys, invalid keys, missing DNS, and split IPv4 routes are rejected.
+- Profile input is bounded to 64 KiB, one interface, and exactly one peer. Unknown directives, shell hooks, duplicate singleton fields, duplicate peer keys, invalid keys, missing DNS, and split IPv4 routes are rejected.
 - Only the keychain persistent reference enters Network Extension preferences. The complete profile is stored in the existing App Group keychain, accessible after first unlock on this device, with synchronization disabled.
 - The application selects only its own provider and remote-mode marker. Starting remote mode disables on-demand only on its own local capture configuration.
 - Raw WireGuard runtime configuration and backend logs are not exposed. Runtime messages return only byte counters and the most recent handshake.
 - An IPv4-only profile is explicitly shown as lacking IPv6 coverage. A VPN connected state is not described as proof that filtering is operating.
 - The simulator cannot start the iOS packet tunnel. Connect stays disabled and the actual interface says a physical device is required.
+
+Remote profiles are restricted to one peer so the displayed endpoint cannot disagree with a different default-route peer. Preference loads used by install/connect now throw on failure; the controller clears its manager, profile, endpoint, IPv6 flag, status and counters before surfacing the error. UI-only reload remains nonthrowing. A dependency-injected failing preference read tests this state clearing without overriding simulator support or pretending to start a VPN.
 
 The keychain entitlement and real iOS VPN lifecycle still require physical-device acceptance.
 
@@ -30,7 +32,7 @@ The focused host compiles the production WireGuard UI, parser, keychain helper, 
 | Check | Observed result |
 |---|---|
 | Focused application, extension, and UI test build | Passed |
-| Profile / state / counter unit tests | 11 passed, 0 failed |
+| Final profile / state / counter unit tests | 13 passed, 0 failed |
 | Post-HTTP-fix UI suite | 3 passed, 0 failed; 151 seconds of test cases |
 | WebKit pages | allow, block, mixed, objects, groups, thumbnails |
 | WebKit decoded image instances | 51 / 51 across six pages, including actual scrolling |
@@ -43,7 +45,7 @@ UI decoding counts measure delivery and rendering, not classification accuracy. 
 
 The before-fix UI run reproduced 4/10 decoded images on the block page and 2/4 in URLSession. Chromium independently reproduced the same failure. The server assigned rewritten response content while an old Content-Encoding header was present, then removed the header after mitmproxy had recompressed the body. This also produced a mismatched Content-Length. Invalidating representation headers before assignment fixed delivery. A separate actual-mitmproxy regression covers identity, gzip, and Brotli for both replacement paths and unchanged allowed images.
 
-An initial unit-test launch referenced a bundle that had not been built by that scheme. A subsequent actual build-and-test passed all eleven cases. Only the successful built run is used as unit-test evidence. An incorrect wording assertion in the first UI run was aligned with the real physical-device-required status; Connect remained disabled throughout.
+An initial unit-test launch referenced a bundle that had not been built by that scheme. A subsequent actual build-and-test passed all eleven cases. The later native guard suite passed all thirteen cases; its summary is unit-guards-summary.json and its full result is /Users/m1/builds/_artifacts/pureline-remote-20261127/WGGuardRegressions-20261127T023048Z.xcresult. Only successful built runs are used as unit-test evidence. An incorrect wording assertion in the first UI run was aligned with the real physical-device-required status; Connect remained disabled throughout.
 
 Primary Mac evidence is under:
 
@@ -84,6 +86,10 @@ The full Remote generator and build receipts are documented separately. It creat
 A physical iPhone or iPad is required to validate profile import into the shared keychain, system VPN permission, actual packet-tunnel start/stop, direct UDP, sleep/wake, reconnect, DNS and IPv6 behavior, and other installed applications. The existing iPad blocker remains open.
 
 HTTPS inspection also depends on the device trusting the filtering CA. Certificate-pinned apps, cached content, video/animation policy, and unsupported formats cannot be inferred from a portrait benchmark or successful WebKit image delivery. The independent quality report provides the measured scope and failures; no universal 90% or perfect-filtering claim is made.
+
+## Production promotion
+
+The production V2 service was not replaced. SentinelX returned service_not_allowed for pureline-poc; the registered service-management capabilities do not include it. [Prepared production configuration and rollback](PRODUCTION_ROLLOUT_2026-11-27.md) record the concrete next steps and the unchanged live baseline. The tested laboratory service is separate.
 
 ## Representative observed screens
 

@@ -8,6 +8,19 @@ SentinelX returned `service_not_allowed` for the purpose-built service status op
 
 The exact proposed configuration and systemd drop-in are retained under `deploy/pureline-wireguard-20261127/`. They are reviewable artifacts, not installed settings. The candidate entry point is the complete downstream wrapper; deploying only the base HTTP correction would lose MIME/stream handling and the model/SVG adapters.
 
+The operator can register a narrow service entry using the existing SentinelX policy workflow, then reload the agent and verify its capabilities. This entry is provided for operator review and was not applied by the assistant:
+
+```yaml
+pureline-poc:
+  unit: pureline-poc
+  backend: service
+  actions: [status, restart, is-active, is-enabled]
+  requires_sudo: true
+  description: Pureline image-filtering service
+```
+
+Place that entry under the existing `services:` map without replacing its other entries. No stop capability is needed for the prepared restart/rollback workflow.
+
 ## Prepared release layout
 
 The intended immutable release directory is:
