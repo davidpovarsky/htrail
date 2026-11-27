@@ -1,0 +1,64 @@
+{
+  "run_id": "pureline-wg-lab-20261127",
+  "backend": "official CPU candidate AppleS2+decodedYOLOX+YuNet+NudeNet",
+  "tests": [
+    {
+      "test": "man_candidate",
+      "url": "https://randomuser.me/api/portraits/men/77.jpg",
+      "exit": 0,
+      "measure": "200 3705 1.547239",
+      "error": "",
+      "sha256": "53019a4c9b16b1a008b15d6addfe1f03987c358f3b416a28810bd2098555633e",
+      "same_as_original": true,
+      "filter_headers": [
+        "content-type: image/jpeg",
+        "content-length: 3705",
+        "x-local-image-filter: allow",
+        "x-local-image-filter-cache: miss",
+        "x-local-image-filter-reason: policy"
+      ]
+    },
+    {
+      "test": "woman_candidate",
+      "url": "https://randomuser.me/api/portraits/women/77.jpg",
+      "exit": 0,
+      "measure": "200 979 1.547293",
+      "error": "",
+      "sha256": "e207d17fcebf558e97358e0bae26474770e9c0c96b45fccb10b83e2790e73aec",
+      "same_as_original": false,
+      "filter_headers": [
+        "content-type: image/jpeg",
+        "content-length: 979",
+        "x-local-image-filter: blur",
+        "x-local-image-filter-cache: miss",
+        "x-local-image-filter-reason: policy"
+      ]
+    },
+    {
+      "test": "html_candidate",
+      "url": "https://example.com/",
+      "exit": 0,
+      "measure": "200 577 0.556015",
+      "error": "",
+      "sha256": "25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484",
+      "same_as_original": null,
+      "filter_headers": [
+        "content-type: text/html; charset=utf-8"
+      ]
+    }
+  ],
+  "health": {
+    "bytes_down": 12810,
+    "bytes_up": 1851,
+    "connected": 3,
+    "errors": 0,
+    "requests": 3,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795742063",
+      "rx_bytes": "15539",
+      "tx_bytes": "5992"
+    }
+  }
+}
