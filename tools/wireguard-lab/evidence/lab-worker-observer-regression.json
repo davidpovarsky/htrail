@@ -1,0 +1,66 @@
+{
+  "network_requests": 0,
+  "passed": true,
+  "real_models_run": false,
+  "renderer_processes": 0,
+  "schema": 1,
+  "source_sha256": {
+    "check_lab_worker_observer.py": "955c51a7b0d6e16a41443f7886fbfd6b7ff2d31b288aff87795e3c3e61bdd539",
+    "lab_observed_pipeline_worker.py": "0068bb734d21d464a2c8dffbd0279e65afeb9427c9cd94aa33f34860bb944eb4",
+    "lab_worker_observer.py": "50733b1a7338ee753d99e09f22c7f5474ea704d0204732a6bd1efea04cf7cfe7"
+  },
+  "tests": [
+    {
+      "name": "ready_protocol_bytes_unchanged",
+      "passed": true
+    },
+    {
+      "name": "success_protocol_bytes_unchanged",
+      "passed": true
+    },
+    {
+      "name": "failure_protocol_bytes_unchanged",
+      "passed": true
+    },
+    {
+      "name": "renderer_result_and_arguments_unchanged",
+      "passed": true
+    },
+    {
+      "name": "other_subprocess_passthrough",
+      "passed": true
+    },
+    {
+      "name": "renderer_exception_identity_preserved",
+      "passed": true
+    },
+    {
+      "name": "worker_diagnostics_redacted",
+      "passed": true
+    },
+    {
+      "name": "ledger_is_bounded",
+      "passed": true
+    },
+    {
+      "name": "only_worker_launcher_is_substituted",
+      "passed": true
+    },
+    {
+      "name": "parent_result_and_arguments_unchanged",
+      "passed": true
+    },
+    {
+      "name": "parent_exception_identity_preserved",
+      "passed": true
+    },
+    {
+      "name": "parent_diagnostics_redacted",
+      "passed": true
+    },
+    {
+      "name": "unrelated_flow_not_observed",
+      "passed": true
+    }
+  ]
+}
