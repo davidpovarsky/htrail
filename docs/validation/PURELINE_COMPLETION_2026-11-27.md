@@ -19,7 +19,7 @@ matched four dSYM UUIDs to the signed binaries.
 | Exported build 602 IPA | 170,165,569 bytes; package/signature verification passed |
 | IPA SHA256 | `c08dd6284f13270b5a786d1a01c56f2417cc59f30e0cfc917c42df3a817b9c48` |
 | Apple validation | altool 27.0.5, exit 0, `VERIFY SUCCEEDED`, no errors |
-| Upload and processing | Successful; ASC build c99a9917-9a8b-4fad-9297-cb6a061b126a, VALID at2026-11-27 16:20:29UTC |
+| Upload and processing | Successful; ASC build c99a9917-9a8b-4fad-9297-cb6a061b126a, VALID at 2026-11-27 16:20:29 UTC |
 
 ## Native repairs and model qualification
 
@@ -118,14 +118,14 @@ loaded the SVG in 1,918 ms with decoded SHA256
 `211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95`.
 Thus five distinct cases have successful evidence **across runs**; this is not one
 clean 5/5 v6 run. The initial failure is retained, its cause remains unknown and
-unreproduced. The observer wiring was corrected for transparent-host semantics; a final targeted1856ms SVG run proved identical parent input, renderer stdin and browser output hashes without changing the candidate. See the [v6 browser report](BROWSER_BOUNDED_V6_2026-11-27.md). The earlier
+unreproduced. The observer wiring was corrected for transparent-host semantics; a final targeted 1,856 ms SVG run proved identical parent input, renderer stdin and browser output hashes without changing the candidate. See the [v6 browser report](BROWSER_BOUNDED_V6_2026-11-27.md). The earlier
 [clean v5 browser run](BROWSER_BOUNDED_V5_2026-11-27.md) retains its own identity.
 
-The 310-file, root-owned/read-only v6 package was activated at16:46:43UTC through the registered SentinelX service operation. All nine verified-HTTPS requests passed with zero retries, both worker caches behaved correctly, all seven profile/CA files stayed byte-identical and the service retained its2GiB/128-task limits. Peak cgroup memory was about893MiB, with no OOM or limit events. See the [production rollout and retained rollback](PRODUCTION_ROLLOUT_2026-11-27.md). This same-process check does not establish client WireGuard or physical browsing acceptance. Remaining gates are:
+The 310-file, root-owned/read-only v6 package was activated at 16:46:43 UTC through the registered SentinelX service operation. All nine verified-HTTPS requests passed with zero retries, both worker caches behaved correctly, all seven profile/CA files stayed byte-identical and the service retained its 2 GiB/128-task limits. Peak cgroup memory was about 893 MiB, with no OOM or limit events. See the [production rollout and retained rollback](PRODUCTION_ROLLOUT_2026-11-27.md). This same-process check does not establish client WireGuard or physical browsing acceptance. Remaining gates are:
 - Physical iPad availability and synchronized browsing/filtering, effective OFF
   configuration, reconnect, CA/network behavior, memory/termination evidence and
   soak. Simulator and Mac/Oracle transport results do not satisfy these gates.
-- Confirm tester-group installation access separately from the uploaded/processed build. The current key returnedHTTP403 for the group relationship read.
+- Confirm tester-group installation access separately from the uploaded/processed build. The current key returned HTTP403 for the group relationship read.
 - The separate workflow-only commit `676d317039815f7b97131a35d96c3ab2c30701d7`
   remains preserved locally; OAuth workflow scope still blocks its publication.
 - Saved workspace usage/net-spend caps remain unverified. The supported SDK
@@ -135,6 +135,24 @@ The 310-file, root-owned/read-only v6 package was activated at16:46:43UTC throug
   distinguishes these controls.
 
 No universal interception, flawless classification or physical VPN success is inferred from the completed software, production smoke and laboratory checks above.
+
+## Asana reconciliation
+
+Final readback at **2026-11-27 17:00:53 UTC** confirmed **47 tasks: 24 completed, 23 open**. Intake was 19 completed and 28 open. Five tasks closed on verified evidence in this pass:
+
+| Completed scope | Asana task |
+| --- | --- |
+| Upstream connection-pool reuse | 1220424989463409 |
+| Realistic streaming and HTTP framing | 1220424989508502 |
+| Focused regression, runtime and archive QA | 1220425375883024 |
+| Upstream/vendor compatibility and integration contract | 1220425375725708 |
+| Repository/Asana evidence and status synchronization | 1220424906966604 |
+
+Twenty-five task descriptions were updated with task-specific results and remaining gates; all original notes were preserved and every resulting description/completion state was read back. The documentation task was then updated and independently read back as complete. MASTER and the current report now identify build 602 and active production v6.
+
+The 23 remaining tasks retain their actual criteria. They cover physical browsing/protocol/pinning/OFF and crash/extension-memory evidence, local and remote soak, representative quality and performance, interception/privacy, saved Modal caps and reintegration, the explicitly required GitHub workflow, and dependent integration/product handoff gates. In particular, the signed-release task remains open because its description explicitly requires a CI/workflow run; the successful authorized Mac upload does not prove that run occurred.
+
+The last Windows connector readback at 16:52 UTC still showed the host offline, and no physical iPad was available. Development Heartbeat has no registered Pureline project in its supported map, so no successful heartbeat run or completion signal is claimed. Project milestones were recorded in Asana. These are explicit remaining constraints, not completed work.
 
 ## Signed release evidence
 
