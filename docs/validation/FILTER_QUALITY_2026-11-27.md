@@ -118,9 +118,21 @@ The combined candidate was installed only into the isolated WireGuard laboratory
 
 The same live embedded-SVG request subsequently passed in 1.88 seconds after shared disk pressure eased. A metadata-only probe confirmed the exact 5,601-byte pre-filter input matched the source fixture. No model, deadline or rendering bound was changed.
 
-The frozen runtime was then staged under /srv with all 13 pinned runtime files and 284 vendor files (24.8 MB) byte-verified. Final readiness verified the public globe's exact approved PNG, the embedded portrait's policy-blurred PNG, and the large blocked JPEG's strong-blur PNG through real WireGuard. The separately retained curated metadata check passed.
+The v3 frozen runtime was then staged under /srv with all 13 pinned runtime files and 284 vendor files (24.8 MB) byte-verified. Final readiness verified the public globe's exact approved PNG, the embedded portrait's policy-blurred PNG, and the large blocked JPEG's strong-blur PNG through real WireGuard. The separately retained curated metadata check passed.
 
-The complete application then passed all four UI tests: eight WebKit pages with 60/60 decoded image instances and four native URLSession images with zero failures. Original timeout evidence is retained; a successful run does not guarantee immunity from later shared-host resource contention. Public-page exceptions and a bounded pending thumbnail observation are recorded in the browser report. Offline SVG checks alone are not used as proof of a live request.
+Against that v3 runtime, the complete application passed all four UI tests: eight WebKit pages with 60/60 decoded image instances and four native URLSession images with zero failures. Original timeout evidence is retained; a successful run does not guarantee immunity from later shared-host resource contention. Public-page exceptions and a bounded pending thumbnail observation are recorded in the browser report. Offline SVG checks alone are not used as proof of a live request.
+
+## Narrow legacy-metadata follow-up (v4)
+
+The v3 public Einstein page exposed a second benign SVG compatibility issue: the Wikisource logo uses the legacy Creative Commons metadata namespace http://web.resource.org/cc/. The renderer rejected that namespace before classification. The exact public file is 16,160 bytes, SHA-256 211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95. This original failure remains recorded.
+
+The v4 fix adds only that namespace to the existing metadata allowlist. Models, thresholds, deadlines, rendering bounds and the curated registry are unchanged. The exact logo passed actual model inference and HTTP serialization with an allow decision and original encoded bytes preserved; no curated exception was used. Three controls for an external resource, script and foreignObject nested in the newly recognized namespace still rejected before inference. The targeted result is **4/4 passed**.
+
+A fresh immutable v4 package was then installed only in the isolated laboratory. A fresh Chromium profile requested and displayed the actual Wikisource SVG through WireGuard: HTTP 200, policy/allow, original gzip representation, decoded body matching the source SHA, and a decoded 410x430 image. The single-asset browser check passed in 3.618 seconds. This does not retroactively change the earlier full-page or native-suite receipts.
+
+Only svg_worker.py changed among the 13 runtime files. See the [new runtime identity](../../tools/filter-quality/runtime-candidate-20261127-legacycc-6c7e4fc2.json), [targeted four-case receipt](../../tools/filter-quality/evidence/svg-legacy-metadata-validation.json), and the v4 addendum in the [browser report](BROWSER_WIREGUARD_2026-11-27.md). The untouched 240-image raster classifier result is reused; it was not rerun or retuned.
+
+The remaining public-page observations are the configured animated-GIF placeholder and an original Einstein thumbnail request still pending at the 90-second bound. That same thumbnail subsequently succeeded through the unchanged v3 WireGuard/filter route in 9.957 seconds. The retry excludes a persistent failure at retry time, but does not identify the original completion gap's cause or make that earlier page run a complete pass.
 
 ## Performance and operational state
 

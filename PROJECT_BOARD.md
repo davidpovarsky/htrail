@@ -18,6 +18,7 @@ This is a lightweight working-memory document. Detailed execution state is in [A
 - [x] Actual device Release archive and Simulator Debug builds; full app installed and launched in its own iPad simulator.
 - [x] Thirteen profile/state/statistics unit tests and post-HTTP-fix focused-host UI verification, with six WebKit pages (51 decoded image instances) and four native-client images.
 - [x] Final full-app UI suite: four tests passed, eight WebKit pages with 60/60 decoded image instances and a 4/4 native URLSession client, against the frozen /srv filtering runtime.
+- [x] Narrow v4 legacy Creative Commons SVG metadata compatibility fix: four targeted cases passed and the actual Wikisource SVG rendered in Chromium through WireGuard, without a new curated exception.
 - [x] Independent frozen portrait/biographic-photo holdout: TP121 / FN1 / TN115 / FP3 across 240 images. Additional resized/format controls are reported separately and do not inflate that denominator.
 
 Implementation starts at b66864a8f022e913b9fb099b77b7e6f34676275c; the branch history and validation documents record subsequent fixes.

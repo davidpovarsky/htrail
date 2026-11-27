@@ -60,7 +60,7 @@ Fourteen original UI screenshot attachments were exported. Representative WebKit
 
 ## Final full-application acceptance run
 
-The final runner targeted the complete Pureline Remote application, with the native guard fixes and frozen server runtime. All **4 UI tests passed**, with zero failures or skips. The xcresult wall interval was 343.095 seconds; this run overlapped the independent Chromium page checks.
+The final runner targeted the complete Pureline Remote application, with the native guard fixes and frozen v3 server runtime. All **4 UI tests passed**, with zero failures or skips. The xcresult wall interval was 343.095 seconds; this run overlapped the independent Chromium page checks.
 
 | Full-app test | Observed result |
 |---|---|
@@ -76,7 +76,7 @@ Final result bundle:
 
     /Users/m1/caches/DerivedData/pureline-wireguard-20261127/evidence/FullApp-final-20261127.xcresult
 
-The final summary, command receipt and screenshot mapping are fullapp-final-summary.json, fullapp-final-receipt.json and fullapp-final-artifacts.json in this report's asset directory. Earlier focused runs remain historical evidence and are not counted as additional unique images.
+The final summary, command receipt and screenshot mapping are fullapp-final-summary.json, fullapp-final-receipt.json and fullapp-final-artifacts.json in this report's asset directory. Earlier focused runs remain historical evidence and are not counted as additional unique images. A subsequent metadata-only SVG compatibility fix in server v4 passed its targeted four-case regression and a real Chromium asset render; it does not change the native source or the classifier holdout. See the quality and browser reports for that separately identified follow-up.
 
 After completion, the full application was relaunched normally in the dedicated simulator. A read-only device preflight at 03:16:52 UTC returned 37 devices, all explicitly marked simulated, and no physical device. No unrelated device was modified.
 

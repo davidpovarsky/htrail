@@ -124,7 +124,7 @@ WIREGUARD_BRIDGE_2026-11-27.md.
 | Check | Result |
 |---|---|
 | Native parser/preferences unit suite | 13 passed, 0 failures |
-| Full-app UI runner | Build-for-testing succeeded; execution belongs to the UI owner |
+| Full-app UI runner | Build-for-testing succeeded; the coordinating run subsequently passed 4/4 tests — see WIREGUARD_APP_2026-11-27.md |
 | Device Release archive | Succeeded; unsigned |
 | Device extension native linkage | wgTurnOn, wgTurnOff, wgGetConfig and wgSetConfig present |
 | Mach-O platforms | IOS and IOSSIMULATOR; minimum 26.5, SDK 27.0 |
