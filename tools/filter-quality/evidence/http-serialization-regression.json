@@ -1,0 +1,60 @@
+{
+  "passed": true,
+  "count": 9,
+  "uses_real_mitmproxy_response": true,
+  "model_inference": false,
+  "classification_acceptance_samples_added": 0,
+  "cases": [
+    {
+      "encoding": "identity",
+      "branch": "policy",
+      "original_serialization_valid": true,
+      "fixed_serialization_valid": true
+    },
+    {
+      "encoding": "identity",
+      "branch": "failure-placeholder",
+      "original_serialization_valid": true,
+      "fixed_serialization_valid": true
+    },
+    {
+      "encoding": "identity",
+      "branch": "allow",
+      "representation_unchanged": true
+    },
+    {
+      "encoding": "gzip",
+      "branch": "policy",
+      "original_serialization_valid": false,
+      "fixed_serialization_valid": true
+    },
+    {
+      "encoding": "gzip",
+      "branch": "failure-placeholder",
+      "original_serialization_valid": false,
+      "fixed_serialization_valid": true
+    },
+    {
+      "encoding": "gzip",
+      "branch": "allow",
+      "representation_unchanged": true
+    },
+    {
+      "encoding": "br",
+      "branch": "policy",
+      "original_serialization_valid": false,
+      "fixed_serialization_valid": true
+    },
+    {
+      "encoding": "br",
+      "branch": "failure-placeholder",
+      "original_serialization_valid": false,
+      "fixed_serialization_valid": true
+    },
+    {
+      "encoding": "br",
+      "branch": "allow",
+      "representation_unchanged": true
+    }
+  ]
+}

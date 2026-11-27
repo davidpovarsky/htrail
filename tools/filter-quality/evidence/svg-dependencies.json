@@ -1,0 +1,52 @@
+{
+  "isolated_target": ".vendor-svg",
+  "packages": [
+    {
+      "name": "cairocffi",
+      "version": "1.7.1",
+      "metadata_sha256": "fec03a0b4cbfbde59453dc583e1c18778d4fb7656a2fdcdc9c2f57e45d02cae8"
+    },
+    {
+      "name": "CairoSVG",
+      "version": "2.9.1",
+      "metadata_sha256": "c4edeae581bae97774bcce401412a14f5e56efa1e36a09b75b8830ae64eb8ee2"
+    },
+    {
+      "name": "cffi",
+      "version": "2.1.1",
+      "metadata_sha256": "558bafb9093a8e790175d9ecff9688382981d744877dad86fd6770db0f4dc918"
+    },
+    {
+      "name": "cssselect2",
+      "version": "0.10.1",
+      "metadata_sha256": "bb65ac3244a599d7bba63168f2ccea5849a4b2b1339568eab0ad933a8a44e475"
+    },
+    {
+      "name": "defusedxml",
+      "version": "0.7.1",
+      "metadata_sha256": "369d3cef64870daf849fba711cb8d05a7efe3c8d9ab0f763adc34079fe378bb1"
+    },
+    {
+      "name": "pillow",
+      "version": "12.3.0",
+      "metadata_sha256": "8fc07146cab33ef7582361dab6eac596d340b03ec648f18217da7894f73838c8"
+    },
+    {
+      "name": "pycparser",
+      "version": "3.12",
+      "metadata_sha256": "ad8db5fe2b0e0a3b0e8419fe5041b80be92470a40b06bd9c1462a0a8bb637c92"
+    },
+    {
+      "name": "tinycss2",
+      "version": "1.5.1",
+      "metadata_sha256": "97a184ce0b479d613e7bb4bbc693067ae4c04e5665fd78e8381252f855bcab59"
+    },
+    {
+      "name": "webencodings",
+      "version": "0.6.1",
+      "metadata_sha256": "3d9819d1209e5b56d4c6315efca7d5ca452ba7e55d4c3617ec63555c099bfb70"
+    }
+  ],
+  "primary_release": "https://github.com/Kozea/CairoSVG/releases/tag/2.9.1",
+  "system_cairo": "libcairo.so.2"
+}

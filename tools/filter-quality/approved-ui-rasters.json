@@ -1,0 +1,14 @@
+{
+  "entries": [
+    {
+      "id": "wikipedia-enwiki-25",
+      "publisher_url": "https://en.wikipedia.org/static/images/icons/enwiki-25.svg",
+      "normalized_png_sha256": "bb0e4b77e584215801290c003052a2aa2b0a760adcba1894a2fcddcbad9a8153",
+      "expected": "allow",
+      "reason": "Public Wikipedia 25 puzzle-globe UI logo, no person or nudity; exact inspected raster only.",
+      "review": "Visually inspected independently by quality and coordinating assistants; explicitly approved in parent task on2026-11-27. No claim of end-user image review.",
+      "raw_model_result": "false positive blur; original SVG UI raw-model acceptance remains22/23",
+      "scope": "Curated content-policy exception, not a model-accuracy improvement."
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "created_utc": "2026-11-27T01:13:35Z",
+  "holdout_inference_seen": false,
+  "method": "Manual image composition audit of all142Wikipedia fixtures before holdout inference. Publisher labels identify a biography subject; additional unlabelled people, reflections or partial people make an any-woman-in-image policy label ambiguous. This audit does not infer identity from appearance.",
+  "reviewed_wikipedia_count": 142,
+  "excluded": [
+    {
+      "id": "wikipedia-1306351",
+      "split": "calibration",
+      "sha256": "026bed996d4619c6a084f21fa9ef2a348c9ec5b469e3d4c16803f9402e67c236",
+      "reason": "Additional unlabelled people or partial people/reflections; biography category alone cannot label whole image."
+    },
+    {
+      "id": "wikipedia-60858021",
+      "split": "calibration",
+      "sha256": "4106f09884e65a6a20f44d58571b43bf55de59ebd64f0714d2ff64bbb01fe224",
+      "reason": "Additional unlabelled people or partial people/reflections; biography category alone cannot label whole image."
+    },
+    {
+      "id": "wikipedia-689839",
+      "split": "holdout",
+      "sha256": "b797474fc299924ee267bd8cf6d6ae137b0582f369b356ed433d778a8e2cbc5e",
+      "reason": "Additional unlabelled people or partial people/reflections; biography category alone cannot label whole image."
+    },
+    {
+      "id": "wikipedia-295995",
+      "split": "calibration",
+      "sha256": "0c6a42e9e6bf10cf375f58cf84d254cfa6f1f64533712c8f5579d825cd077300",
+      "reason": "Additional unlabelled people or partial people/reflections; biography category alone cannot label whole image."
+    },
+    {
+      "id": "wikipedia-80598007",
+      "split": "holdout",
+      "sha256": "f7e0bd965b27f5c2e16eba089465a997a38f5bb132959f161240b4a32df09e47",
+      "reason": "Additional unlabelled people or partial people/reflections; biography category alone cannot label whole image."
+    },
+    {
+      "id": "wikipedia-31943597",
+      "split": "holdout",
+      "sha256": "087652b994cfc2d025e8061b54d7e248825d30592532e2b3d2fdffa1aef2ae66",
+      "reason": "Additional unlabelled people or partial people/reflections; biography category alone cannot label whole image."
+    }
+  ]
+}
