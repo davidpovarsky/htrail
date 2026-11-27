@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "cases": 1,
+  "actual_models": true,
+  "mock_classification": false,
+  "raster_holdout_reclassified": false,
+  "rows": [
+    {
+      "id": "wiki-svg-00",
+      "expected": "allow",
+      "source": "Wikipedia UI icon/wordmark",
+      "action": "allow",
+      "policy_exception": "wikipedia-enwiki-25",
+      "reason": "curated-public-ui-asset",
+      "mime": "image/png",
+      "ms": 2332.64,
+      "original_representation_unchanged": false,
+      "rasterized_allow": true,
+      "exact_inspected_raster_returned": true,
+      "pass": true,
+      "reported_policy_action": "allow",
+      "outcome_action": "allow",
+      "modelActionBeforeOverride": "blur",
+      "reporting_consistent": true
+    }
+  ]
+}

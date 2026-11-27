@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-27T03:19:50.102001+00:00",
+  "public_source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Wikisource-logo.svg",
+  "http_status": 200,
+  "mime": "image/svg+xml",
+  "source_bytes": 16160,
+  "source_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95",
+  "worker_path": "/srv/pureline-poc/lab-20261127/candidate-package-v3-frozen/downstream/svg_worker.py",
+  "worker_sha256": "438029a2adecb8d3ebc8857db8220cbe2224f6a1da9dcc264d4508a084eee45e",
+  "read_only_runtime": true,
+  "lab_request_made": false,
+  "classifier_run": false,
+  "worker_exit": 2,
+  "worker_stdout_bytes": 0,
+  "diagnostic_stderr": "{\"error_type\": \"ValueError\", \"reason\": \"unsupported-svg-tag\"}",
+  "scope": "One public asset offline compatibility diagnosis; no worker/model/policy/deadline modification.",
+  "first_rejected_construct": {
+    "tag": "Work",
+    "namespace": "http://web.resource.org/cc/",
+    "children": [
+      "format",
+      "type"
+    ]
+  },
+  "unsupported_construct_counts": {
+    "Work": 1
+  },
+  "classification": "Benign SVG compatibility/usability limitation: legacy Creative Commons metadata namespace http://web.resource.org/cc/ is absent from the supported metadata namespaces. The Work element is rejected before model inference; this is not a new classifier false-positive sample."
+}
