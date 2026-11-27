@@ -14,6 +14,7 @@ final class PurelineWGController: ObservableObject {
 
     private var manager: NETunnelProviderManager?
     private var observer: NSObjectProtocol?
+    private let preferenceLoader: @MainActor () async throws -> [NETunnelProviderManager]
 
     static var supportsTunnel: Bool {
         #if targetEnvironment(simulator)
@@ -23,7 +24,10 @@ final class PurelineWGController: ObservableObject {
         #endif
     }
 
-    init() {
+    init(preferenceLoader: @escaping @MainActor () async throws -> [NETunnelProviderManager] = {
+        try await NETunnelProviderManager.loadAllFromPreferences()
+    }) {
+        self.preferenceLoader = preferenceLoader
         observer = NotificationCenter.default.addObserver(forName: .NEVPNStatusDidChange, object: nil, queue: .main) { [weak self] note in
             guard let connection = note.object as? NEVPNConnection else { return }
             Task { @MainActor in
@@ -50,17 +54,47 @@ final class PurelineWGController: ObservableObject {
         }
     }
 
+    /// UI refresh remains nonthrowing. Mutations call the throwing loader below
+    /// so a failed preference read cannot fall through to stale configuration.
     func reload() async {
         guard Self.supportsTunnel else { return }
+        do { _ = try await loadPreferences() }
+        catch { self.error = "The saved VPN configuration could not be loaded. \(error.localizedDescription)" }
+    }
+
+    @discardableResult
+    func loadPreferences() async throws -> [NETunnelProviderManager] {
         do {
-            let all = try await NETunnelProviderManager.loadAllFromPreferences()
+            let all = try await preferenceLoader()
             manager = all.first(where: Self.owns)
             status = manager?.connection.status ?? .invalid
             hasProfile = manager != nil
             let proto = manager?.protocolConfiguration as? NETunnelProviderProtocol
             endpoint = proto?.serverAddress ?? ""
             routesIPv6 = proto?.providerConfiguration?["routesIPv6"] as? Bool ?? false
-        } catch { self.error = "The saved VPN configuration could not be loaded. \(error.localizedDescription)" }
+            if status != .connected { statistics = PurelineWGStatistics() }
+            return all
+        } catch {
+            clearProfileState()
+            throw error
+        }
+    }
+
+    private func loadSavedManager(_ selected: NETunnelProviderManager) async throws {
+        do { try await selected.loadFromPreferences() }
+        catch {
+            clearProfileState()
+            throw error
+        }
+    }
+
+    private func clearProfileState() {
+        manager = nil
+        status = .invalid
+        hasProfile = false
+        endpoint = ""
+        routesIPv6 = false
+        statistics = PurelineWGStatistics()
     }
 
     func install(_ source: String) async {
@@ -73,7 +107,7 @@ final class PurelineWGController: ObservableObject {
             guard Self.supportsTunnel else {
                 throw PurelineWGProfile.ProfileError.invalid("The profile is valid. Install it on a physical iPhone or iPad to enable the VPN.")
             }
-            await reload()
+            try await loadPreferences()
             guard !isActive else { throw PurelineWGProfile.ProfileError.invalid("Disconnect the VPN before replacing its profile.") }
             let selected = manager ?? NETunnelProviderManager()
             let oldReference = (selected.protocolConfiguration as? NETunnelProviderProtocol)?.passwordReference
@@ -96,15 +130,18 @@ final class PurelineWGController: ObservableObject {
             do {
                 try await selected.saveToPreferences()
                 persisted = true
-                try await selected.loadFromPreferences()
+                try await loadSavedManager(selected)
                 manager = selected
                 if let oldReference { PurelineWGKeychain.delete(oldReference) }
-                await reload()
+                try await loadPreferences()
             } catch {
                 // If the preferences save succeeded, the new reference is live
                 // even when the subsequent reload fails.
                 if !persisted { PurelineWGKeychain.delete(reference) }
-                await reload()
+                // The in-memory object may already contain a new reference
+                // even if saving failed. Discard it before a best-effort refresh.
+                clearProfileState()
+                _ = try? await loadPreferences()
                 throw error
             }
         } catch { self.error = error.localizedDescription }
@@ -116,11 +153,10 @@ final class PurelineWGController: ObservableObject {
         error = nil
         defer { busy = false }
         do {
-            await reload()
+            let all = try await loadPreferences()
             guard let selected = manager else { throw PurelineWGProfile.ProfileError.invalid("Import a WireGuard profile first.") }
             // A local on-demand tunnel must not immediately reconnect over the
             // chosen remote one. Touch only this app's own local configuration.
-            let all = try await NETunnelProviderManager.loadAllFromPreferences()
             for local in all where !Self.owns(local) {
                 guard let proto = local.protocolConfiguration as? NETunnelProviderProtocol,
                       proto.providerBundleIdentifier == PurelineWGContract.providerID else { continue }
@@ -140,12 +176,12 @@ final class PurelineWGController: ObservableObject {
                     }
                 }
             }
-            try await selected.loadFromPreferences()
+            try await loadSavedManager(selected)
             selected.isEnabled = true
             selected.isOnDemandEnabled = false
             selected.onDemandRules = []
             try await selected.saveToPreferences()
-            try await selected.loadFromPreferences()
+            try await loadSavedManager(selected)
             try selected.connection.startVPNTunnel()
             status = selected.connection.status
         } catch { self.error = error.localizedDescription }

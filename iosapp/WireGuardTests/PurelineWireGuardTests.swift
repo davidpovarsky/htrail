@@ -1,4 +1,5 @@
 import XCTest
+import NetworkExtension
 @testable import PurelineWireGuardValidation
 
 final class PurelineWireGuardTests: XCTestCase {
@@ -47,6 +48,61 @@ final class PurelineWireGuardTests: XCTestCase {
     func testRejectsDuplicatePeersBeforeUpstreamFatalPrecondition() {
         let peer = profile.components(separatedBy: "[Peer]")[1]
         XCTAssertThrowsError(try PurelineWGProfile.parse(profile + "\n[Peer]" + peer))
+    }
+
+    func testRejectsDistinctSecondPeerWithAmbiguousDefaultRoute() {
+        let second = """
+        [Peer]
+        PublicKey = \(Data(repeating: 3, count: 32).base64EncodedString())
+        AllowedIPs = 0.0.0.0/0
+        Endpoint = 192.0.2.99:51820
+        """
+        XCTAssertThrowsError(try PurelineWGProfile.parse(profile + "\n" + second)) { error in
+            XCTAssertTrue(error.localizedDescription.contains("exactly one Peer"))
+            XCTAssertFalse(error.localizedDescription.contains("192.0.2.99"))
+        }
+    }
+
+    @MainActor
+    func testFailedPreferenceReloadThrowsAndClearsPreviousProfile() async throws {
+        enum ReadFailure: Error { case unavailable }
+        let saved = NETunnelProviderManager()
+        let proto = NETunnelProviderProtocol()
+        proto.providerBundleIdentifier = PurelineWGContract.providerID
+        proto.serverAddress = "192.0.2.1:51820"
+        proto.providerConfiguration = [
+            PurelineWGContract.modeKey: PurelineWGContract.remoteMode,
+            "routesIPv6": true
+        ]
+        saved.protocolConfiguration = proto
+        var failRead = false
+        let controller = PurelineWGController(preferenceLoader: {
+            if failRead { throw ReadFailure.unavailable }
+            return [saved]
+        })
+
+        try await controller.loadPreferences()
+        XCTAssertTrue(controller.hasProfile)
+        XCTAssertEqual(controller.endpoint, "192.0.2.1:51820")
+        XCTAssertTrue(controller.routesIPv6)
+
+        failRead = true
+        do {
+            try await controller.loadPreferences()
+            XCTFail("A mutation-time preference failure must propagate.")
+        } catch ReadFailure.unavailable {
+            // Expected: the caller must stop before any preference/key mutation.
+        } catch {
+            XCTFail("Unexpected preference error type.")
+        }
+        XCTAssertFalse(controller.hasProfile)
+        XCTAssertEqual(controller.endpoint, "")
+        XCTAssertFalse(controller.routesIPv6)
+        XCTAssertEqual(controller.status, .invalid)
+        XCTAssertEqual(controller.statistics, PurelineWGStatistics())
+        #if targetEnvironment(simulator)
+        XCTAssertFalse(PurelineWGController.supportsTunnel)
+        #endif
     }
 
     func testRejectsSplitTunnelPresentedAsWholeDeviceFiltering() {

@@ -43,8 +43,11 @@ struct PurelineWGProfile {
                 continue
             }
             if line.lowercased() == "[peer]" {
-                guard sawInterface, peerFields.count < 4 else {
-                    throw ProfileError.invalid("The profile must contain an Interface and between one and four peers.")
+                guard sawInterface else {
+                    throw ProfileError.invalid("The profile must contain an Interface before its Peer.")
+                }
+                guard peerFields.isEmpty else {
+                    throw ProfileError.invalid("Remote filtering supports exactly one Peer so the displayed server owns the default route.")
                 }
                 peerFields.append([:])
                 section = .peer
