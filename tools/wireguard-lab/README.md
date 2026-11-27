@@ -172,3 +172,24 @@ confirms an untrusted fresh browser rejects the lab CA without its SPKI pin.
 
 See `../../docs/validation/BROWSER_WIREGUARD_2026-11-27.md` for the complete
 results, known gaps, runtime hashes and evidence interpretation.
+
+## Focused v4 SVG compatibility follow-up
+
+The current isolated runtime is
+`/srv/pureline-poc/lab-20261127/candidate-package-v4-legacycc`, pinned by
+`tools/filter-quality/runtime-candidate-20261127-legacycc-6c7e4fc2.json`
+(SHA-256 `74fd5f729dbacd846e827506d6230daebfe32a3e45b36fa759e989b5c4ea4704`).
+Only the SVG worker's accepted metadata namespace list differs from v3.
+The same external/script/foreignObject restrictions remain in force.
+
+`browser_wikisource_validation.cjs` performs one actual public-asset render
+in a fresh profile. It requires the original known SVG body hash, HTTP policy
+allow, successful DOM image decode and no content-specific exception.
+Set the same runtime dependency variables used by the main browser harness,
+a fresh `PURELINE_BROWSER_RUN`, and the verified
+`PURELINE_BACKEND_REVISION`, then run this script.
+
+The completed receipt and visually inspected screenshot are in
+`evidence/chromium-wikisource-v4/`. This asset passed; it does not replace
+the v3 article captures or claim a complete article/native-suite rerun.
+The animated GIF and original bounded-wait thumbnail finding remain documented.

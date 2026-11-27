@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-11-27T03:30:38.140936+00:00",
+  "old_pid": 2952987,
+  "new_pid": 3045897,
+  "new_stage": "/srv/pureline-poc/lab-20261127/candidate-package-v4-legacycc",
+  "started_at": "2026-11-27T03:29:19Z",
+  "start_time_source": "ps lstart, UTC second resolution",
+  "entrypoint": "/srv/pureline-poc/lab-20261127/candidate-package-v4-legacycc/downstream/pureline_addon_candidate.py",
+  "manifest_sha256": "74fd5f729dbacd846e827506d6230daebfe32a3e45b36fa759e989b5c4ea4704",
+  "worker_sha256": "6c7e4fc2c6ff1d109710f090b3e4eccf4b622566ed928c20019a00b41603b393",
+  "lab_config_sha256": "6ac5a5c32a4dd50e86abc6e72737850b12b9328ffd7091cf53cea1d3bf3e6f47",
+  "isolated_udp_18521_listening": true,
+  "startup_note": "The first listener assertion after 1.2 seconds was premature; the same new process was verified listening at 03:29:54 without another restart.",
+  "lab_keys_ca_config_unchanged": true,
+  "production_untouched": true
+}

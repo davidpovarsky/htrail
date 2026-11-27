@@ -1,0 +1,73 @@
+{
+  "run_id": "chromium-wikisource-v4",
+  "started_at": "2026-11-27T03:31:40.150Z",
+  "backend_revision": "2026-11-27-legacy-cc-6c7e4fc2 / manifest74fd5f729dbacd846e827506d6230daebfe32a3e45b36fa759e989b5c4ea4704",
+  "platform": "darwin",
+  "arch": "arm64",
+  "playwright": "1.65.1",
+  "route": "Chromium image request -> explicit HTTP CONNECT -> real WireGuard -> isolated Oracle frozen filter -> public HTTPS origin",
+  "url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Wikisource-logo.svg",
+  "expected": "allow",
+  "expected_original_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95",
+  "proxy": "http://127.0.0.1:18520",
+  "fresh_profile": "/Users/m1/builds/pureline-wireguard-lab-20261127/browser-runtime/profiles/chromium-wikisource-v4",
+  "trust": {
+    "ignoreHTTPSErrors": false,
+    "mode": "Lab CA SPKI only",
+    "ca_spki_sha256_base64": "8oH7pg/cFaARtlf2hEbN/y+oMCvFIuE3zG4MXzUB5s0=",
+    "global_trust_changes": false
+  },
+  "scope": "One actual rendered public SVG asset, not a complete Einstein-page rerun or a new accuracy sample.",
+  "health_before": {
+    "bytes_down": 0,
+    "bytes_up": 0,
+    "connected": 0,
+    "errors": 0,
+    "requests": 0,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795750282",
+      "rx_bytes": "92",
+      "tx_bytes": "180"
+    }
+  },
+  "failures": [],
+  "passed": true,
+  "browser": "159.0.8154.6",
+  "response": {
+    "status": 200,
+    "content_type": "image/svg+xml",
+    "content_encoding": "gzip",
+    "declared_content_length": "5662",
+    "action": "allow",
+    "reason": "policy",
+    "presentation": null,
+    "policy_exception": null,
+    "decoded_body_bytes": 16160,
+    "decoded_body_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95"
+  },
+  "dom": {
+    "complete": true,
+    "natural_width": 410,
+    "natural_height": 430,
+    "decode_resolved": true
+  },
+  "screenshot": "wikisource.png",
+  "elapsed_ms": 3618,
+  "finished_at": "2026-11-27T03:31:43.780Z",
+  "health_after": {
+    "bytes_down": 10348,
+    "bytes_up": 2404,
+    "connected": 1,
+    "errors": 0,
+    "requests": 1,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795750282",
+      "rx_bytes": "11522",
+      "tx_bytes": "3908"
+    }
+  }
+}

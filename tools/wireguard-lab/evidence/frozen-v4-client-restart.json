@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "restarted_at": "2026-11-27T03:31:22.722177+00:00",
+  "old_pids": {
+    "proxy": 63922,
+    "relay": 63920
+  },
+  "new_pids": {
+    "relay": 73621,
+    "proxy": 73622
+  },
+  "reason": "New isolated v4 server; refresh userspace handshake and first-source UDP relay binding.",
+  "keys_ca_ports_config_unchanged": true,
+  "health": {
+    "bytes_down": 0,
+    "bytes_up": 0,
+    "connected": 0,
+    "errors": 0,
+    "requests": 0,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795750282",
+      "rx_bytes": "92",
+      "tx_bytes": "180"
+    }
+  }
+}

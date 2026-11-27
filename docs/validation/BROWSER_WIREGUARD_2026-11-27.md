@@ -8,7 +8,7 @@ tests had missed: blocked images had been served with compressed bytes but
 without the matching Content-Encoding, so they appeared broken. The corrected
 responses now decode and visibly render as strong blurs.
 
-The final frozen candidate also handles the tested static SVG logos and SVG
+The v3 frozen candidate also handles the tested static SVG logos and SVG
 embedded photographs. Its final SVG gallery decoded **5/5** images with the
 expected actions, and the high-resolution gallery decoded **4/4**, preserving
 the allowed images and strongly blurring the blocked ones. Three public
@@ -16,7 +16,7 @@ Wikipedia articles were actually navigated and scrolled. They provide useful
 coverage evidence, with the explicit remaining failures below; they are not
 a labelled accuracy benchmark.
 
-The final public pass still has three material limitations:
+The v3 public pass found three material limitations:
 
 - The Nature page's animated Pangea GIF is replaced by a failure placeholder.
 - The Einstein page's Wikisource SVG logo is unnecessarily replaced because
@@ -24,6 +24,12 @@ The final public pass still has three material limitations:
 - One Einstein thumbnail remained pending at the browser's bounded capture.
   A single later request through the same unchanged WireGuard route succeeded,
   but the original browser completion gap is not counted as a pass.
+
+A focused v4 follow-up now fixes the Wikisource metadata compatibility defect.
+One fresh Chromium image request returned the exact original SVG, passed DOM
+decoding and visibly rendered the logo, with no special policy exception. The
+animated GIF and original Einstein request-completion gap remain open. The
+v3 article captures and native suite were not silently counted as v4 reruns.
 
 This document owns the Mac Chromium evidence. Native iOS URLSession,
 WKWebView, simulator builds and physical-device VPN evidence belong to the
@@ -202,7 +208,7 @@ are written before downstream curation, so their raw blur row must not be
 misrepresented as the served decision. The one-case metadata-coherence
 regression is separate from the preserved original seven-case SVG receipt.
 
-Frozen runtime identity:
+V3 frozen runtime identity (preserved for the full browser/native evidence):
 
 | Item | Identity |
 |---|---|
@@ -247,7 +253,7 @@ fixture. Body magic, length and hashes matched the intended representations.
 The tunnel had a fresh handshake and bidirectional bytes. See
 `frozen-v3-readiness.json` and `frozen-v3-readiness-health.json`.
 
-## Final actual Chromium pass
+## Final v3 actual Chromium pass
 
 Evidence: `tools/wireguard-lab/evidence/chromium-frozen-v3/`.
 Run time: **03:08:00.810–03:11:54.659 UTC**. The pages were visited sequentially
@@ -292,6 +298,53 @@ The screenshots are representative render evidence; the per-page JSON retains
 all observed image results. The native application report owns its separate
 final WebKit and URLSession results.
 
+## Focused v4 correction and actual browser proof
+
+The quality lane added only the legacy Creative Commons metadata namespace to
+the existing SVG worker validation. It did not add a content exception, alter
+the model or relax active/external-content restrictions. The exact public SVG
+passed real model inspection as policy/allow, while legacy-namespace external
+resource, script and foreignObject cases were rejected before inference:
+**4/4 targeted cases**. See
+`tools/filter-quality/evidence/svg-legacy-metadata-validation.json`.
+
+The new immutable stage is
+`/srv/pureline-poc/lab-20261127/candidate-package-v4-legacycc`.
+All 13 manifest files and 284 unchanged vendor files were verified. Only
+`downstream/svg_worker.py` differs from v3:
+
+- Manifest: `tools/filter-quality/runtime-candidate-20261127-legacycc-6c7e4fc2.json`.
+- Manifest SHA-256: `74fd5f729dbacd846e827506d6230daebfe32a3e45b36fa759e989b5c4ea4704`.
+- Worker SHA-256: `6c7e4fc2c6ff1d109710f090b3e4eccf4b622566ed928c20019a00b41603b393`.
+- Isolated backend start: **03:29:19 UTC**; fresh client/relay: **03:31:22 UTC**.
+- The lab configuration, keys, CA, model files, bounds and policy registry
+  remain unchanged. The v3 runtime and all its receipts remain preserved.
+
+One new Chromium profile loaded the exact public Wikisource asset through the
+same real WireGuard/filter route at **03:31:40.150–03:31:43.780 UTC**:
+
+| Check | Result |
+|---|---|
+| HTTP and action | 200 / allow / policy |
+| Original representation | image/svg+xml, gzip, declared compressed length 5,662 |
+| Decoded response body | 16,160 bytes; exact original SHA-256 `211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95` |
+| Browser image decode | Complete; `img.decode()` resolved; 410 × 430 |
+| Rasterized presentation / policy exception | Neither present |
+| Request failures | 0 |
+| Harness elapsed time | 3.618 s |
+| WireGuard evidence | Fresh handshake, one successful connection, bidirectional byte growth, zero proxy errors |
+
+The screenshot `tools/wireguard-lab/evidence/chromium-wikisource-v4/wikisource.png`
+was opened and visually verified: the logo is unobscured. The paired
+`summary.json` retains the measured response, DOM result and tunnel counters.
+The focused harness is `browser_wikisource_validation.cjs`. Runtime receipts
+are `runtime-staging-v4-receipt.json`, `frozen-v4-runtime-cutover.json` and
+`frozen-v4-client-restart.json` under the lab evidence directory.
+
+This is one asset-specific correction and verification. It is not an Einstein
+article rerun, a new holdout sample or a repeat of the native application suite.
+The remaining v3 article findings below stay unchanged.
+
 ## Remaining coverage and completion gaps
 
 ### Animated GIF
@@ -302,21 +355,22 @@ still returned `replace / model-failure`. It is an unnecessary replacement
 of a natural-scene animation, not a correct allow. Animation coverage is not
 established by the still-image holdout.
 
-### Legacy metadata in an otherwise benign SVG
+### Legacy SVG metadata — historical v3 gap, corrected in v4
 
 [Wikisource-logo.svg](https://upload.wikimedia.org/wikipedia/commons/4/4c/Wikisource-logo.svg)
 returned a 1,806-byte placeholder in 2.620 seconds. The live sanitized error
 was `SVGInspectionError` at the bounded-renderer boundary, not a model
 classification or a worker timeout.
 
-An offline read of that exact public source found 16,160 bytes, SHA-256
+An offline read after the v3 run of that exact public source found 16,160 bytes, SHA-256
 `211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95`.
 The frozen worker rejected `unsupported-svg-tag` at the legacy
 `cc:Work` metadata element in namespace `http://web.resource.org/cc/`.
 Its metadata allowlist recognizes the newer namespace, not this older one.
-This is a concrete benign-metadata compatibility false block. No additional
-exception, source edit, deadline change or policy change was made during
-acceptance.
+This identified a concrete benign-metadata compatibility false block. The
+v3 runtime was preserved. The one-namespace v4 correction and actual browser
+verification are recorded above; no content exception or deadline change was
+introduced.
 
 Evidence: `tools/filter-quality/evidence/wikisource-svg-compatibility-boundary.json`
 and `tools/wireguard-lab/evidence/public-svg-error-probe.json`.
