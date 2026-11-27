@@ -1,5 +1,7 @@
 # Pureline bounded runtime and animation validation — 2026-11-27
 
+This report preserves v5 evidence. The subsequent [v6 HTTP input report](HTTP_INPUT_BOUNDS_2026-11-27.md) closes the prebuffering/decompression gap and extends the image deadline to response headers.
+
 ## Result and scope
 
 The v5 downstream candidate fixes the known animated-GIF format rejection and replaces uncancellable thread execution with a bounded pool of persistent model processes. The final animation controls passed 26/26, process controls passed 11/11, and actual mitmproxy response/hook controls passed 11/11. A real-model load delivered 100 distinct frozen-holdout images at six concurrent clients with no timeout or overload. The classifier's weights, thresholds, labels and approved UI exception remain unchanged.

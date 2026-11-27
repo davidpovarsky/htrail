@@ -116,9 +116,13 @@ class BoundedProcessPool:
             await self.close()
             raise
 
-    async def inspect(self, content, mime_type):
+    async def inspect(self, content, mime_type, *, timeout=None):
         if self.closed:
             raise InspectionFailure("worker-pool-closed")
+        deadline_seconds = self.timeout if timeout is None else min(self.timeout, timeout)
+        if deadline_seconds <= 0:
+            self.metrics["timed_out"] += 1
+            raise InspectionTimeout()
         if self.admitted >= self.capacity:
             self.metrics["capacity_rejections"] += 1
             raise QueueCapacityExceeded()
@@ -129,7 +133,7 @@ class BoundedProcessPool:
         worker = None
         started = asyncio.get_running_loop().time()
         try:
-            async with asyncio.timeout(self.timeout):
+            async with asyncio.timeout(deadline_seconds):
                 worker = await self.available.get()
                 self.metrics["active"] += 1
                 self.metrics["peak_active"] = max(self.metrics["peak_active"], self.metrics["active"])

@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-27T15:32:02.367133+00:00",
+  "passed": true,
+  "cases": 12,
+  "real_processes": true,
+  "actual_models": false,
+  "accuracy_samples_added": 0,
+  "source_sha256": "adda3f8212d45962a0e3ab504651b1c3dcde1e22bc80b8d8436991bdad63c952",
+  "rows": [
+    {
+      "id": "100-image-burst",
+      "completed": 10,
+      "bounded_rejections": 90,
+      "maximum_latency_ms": 103,
+      "metrics": {
+        "admitted": 10,
+        "peak_admitted": 10,
+        "active": 0,
+        "peak_active": 2,
+        "capacity_rejections": 90,
+        "completed": 10,
+        "last_elapsed_ms": 103
+      }
+    },
+    {
+      "id": "100-image-bounded-sustained",
+      "completed": 100,
+      "elapsed_ms": 525,
+      "peak_active": 2
+    },
+    {
+      "id": "shutdown-reaps-workers",
+      "terminated": 2
+    },
+    {
+      "id": "deadline-kills-and-recovers",
+      "elapsed_ms": 252,
+      "old_pid_terminated": true,
+      "new_pid": 1200112
+    },
+    {
+      "id": "queue-time-counts-in-deadline",
+      "timed_out": 2
+    },
+    {
+      "id": "cancel-kills-worker-and-descendants",
+      "descendants": 1,
+      "old_pid_terminated": true,
+      "recovered": true
+    },
+    {
+      "id": "cancel-queued-preserves-other-client",
+      "active_worker_preserved": true
+    },
+    {
+      "id": "crash-recovery",
+      "recovered": true
+    },
+    {
+      "id": "invalid-message-recovery",
+      "recovered": true
+    },
+    {
+      "id": "startup-timeout-reaps-every-worker",
+      "terminated": 2
+    },
+    {
+      "id": "cancel-during-spawn-retains-ownership",
+      "reaped": true
+    },
+    {
+      "id": "remaining-header-budget-enforced",
+      "expired_budget_spawns": 0,
+      "worker_killed_and_recovered": true
+    }
+  ]
+}

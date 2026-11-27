@@ -29,11 +29,14 @@ def flow(body, mime="image/png", encoding="gzip", connection="client-a"):
     headers = {"content-type": mime, "etag": '"origin"'}
     if encoding:
         headers["content-encoding"] = encoding
-    return SimpleNamespace(
+    item = SimpleNamespace(
         id=str(time.monotonic_ns()), client_conn=SimpleNamespace(id=connection),
         request=http.Request.make("GET", "https://fixture.example/image"),
         response=http.Response.make(200, body, headers),
+        metadata={}, killed=False,
     )
+    item.kill = lambda: setattr(item, "killed", True)
+    return item
 
 
 def assert_placeholder(item, reason):
@@ -49,6 +52,7 @@ def assert_placeholder(item, reason):
 
 async def ready(timeout=0.2, queued=0):
     addon = PurelineVerifiedFilter()
+    addon.bounds = SimpleNamespace(maximum_bytes=4_194_304)
     settings = load_settings(HERE/"candidate.toml")
     addon.runtime = addon.create_runtime(settings)
     addon.eligibility = ResponseEligibility(settings.section("proxy"))
@@ -79,6 +83,7 @@ async def main():
     item.response.stream = True
     unready.responseheaders(item)
     assert item.response.stream is False
+    assert item.killed
     await unready.response(item)
     assert_placeholder(item, "runtime-not-ready")
     rows.append({"id":"startup-unready-fails-closed","passed":True})
@@ -146,7 +151,7 @@ async def main():
               "actual_models":False,"accuracy_samples_added":0,"rows":rows,
               "sources":{name:hashlib.sha256((HERE/"downstream"/name).read_bytes()).hexdigest()
                          for name in ["pureline_http_addon.py","pureline_addon_v2.py","pureline_addon_candidate.py","process_pool.py"]}}
-    (HERE/"evidence/runtime-http-bounds-regression.json").write_text(json.dumps(report,indent=2)+"\n")
+    (HERE/"evidence/runtime-http-bounds-v6-regression.json").write_text(json.dumps(report,indent=2)+"\n")
     print(json.dumps(report))
 
 

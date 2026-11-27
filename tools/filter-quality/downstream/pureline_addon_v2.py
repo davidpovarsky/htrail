@@ -11,12 +11,10 @@ from pathlib import Path
 from time import monotonic
 
 from mitmproxy import http
-from downstream.pureline_http_addon import LocalImageFilterAddon
+from downstream.pureline_http_addon import LocalImageFilterAddon, apply_replacement
+from local_image_filter.image.rewrite import create_failure_placeholder
+from downstream.http_input import AMBIGUOUS, image_response, bounded_content, BoundedContentError
 
-AMBIGUOUS = frozenset({
-    "", "application/octet-stream", "binary/octet-stream",
-    "application/x-octet-stream", "application/x-binary",
-})
 STREAMING_TYPES = frozenset({
     "text/event-stream", "application/x-ndjson", "application/stream+json",
     "application/x-protobuf",
@@ -76,6 +74,11 @@ class PurelineRemoteFilter(LocalImageFilterAddon):
     def _mime_type(response: http.Response) -> str:
         return response.headers.get("content-type", "").split(";", 1)[0].lower().strip()
 
+    def requestheaders(self, flow: http.HTTPFlow) -> None:
+        # This server does not inspect or rewrite upload bodies. Use the public
+        # streaming seam instead of retaining complete uploads in the parent.
+        flow.request.stream = True
+
     def responseheaders(self, flow: http.HTTPFlow) -> None:
         response = flow.response
         if response is None:
@@ -94,15 +97,25 @@ class PurelineRemoteFilter(LocalImageFilterAddon):
         if response is None:
             return
         mime = self._mime_type(response)
+        if not image_response(flow):
+            return
+        try:
+            content = bounded_content(response, int(self.runtime.settings.section("proxy").get(
+                "max_body_bytes", 4_194_304)))
+        except BoundedContentError as error:
+            body, content_type = create_failure_placeholder(b"", text="Image decoding unavailable")
+            apply_replacement(response, body, content_type, reason=error.reason)
+            self._count("image_pipeline_failure")
+            return
         if mime in AMBIGUOUS and response.status_code in (200, 206):
-            if recognized := sniff_image_mime(response.content or b""):
+            if recognized := sniff_image_mime(content):
                 response.headers["content-type"] = recognized
                 self._count("image_mime_corrected")
         if response.status_code >= 500:
             self._count("origin_http_5xx")
         elif response.status_code >= 400:
             self._count("origin_http_4xx")
-        await super().response(flow)
+        await super().response(flow, inspected_content=content)
         action = response.headers.get("x-local-image-filter", "")
         if action in {"allow", "blur", "replace"}:
             self._count(f"image_{action}")

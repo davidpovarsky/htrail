@@ -11,6 +11,7 @@ from local_image_filter.domain.models import FilterAction
 from local_image_filter.image.rewrite import create_failure_placeholder
 from local_image_filter.proxy.filters import ResponseDisposition, ResponseEligibility
 from local_image_filter.runtime.container import RuntimeContainer, build_runtime
+from downstream.http_input import bounded_content, BoundedContentError
 
 INVALIDATED_HEADERS = (
     "content-encoding",
@@ -84,13 +85,19 @@ class LocalImageFilterAddon:
         async with self.semaphore:
             return await asyncio.to_thread(self.runtime.pipeline.filter_bytes, content, mime_type, None)
 
-    async def response(self, flow: http.HTTPFlow) -> None:
+    async def response(self, flow: http.HTTPFlow, *, inspected_content=None) -> None:
         if self.runtime is None or self.eligibility is None or self.semaphore is None:
             return
         response = flow.response
         if response is None:
             return
-        content = response.content or b""
+        try:
+            content = inspected_content if inspected_content is not None else bounded_content(
+                response, int(self.runtime.settings.section("proxy").get("max_body_bytes", 4_194_304)))
+        except BoundedContentError as error:
+            body, mime_type = create_failure_placeholder(b"", text="Image decoding unavailable")
+            apply_replacement(response, body, mime_type, reason=error.reason)
+            return
         result = self.eligibility.classify(
             host=flow.request.pretty_host,
             status_code=response.status_code,

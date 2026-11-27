@@ -174,13 +174,36 @@ async def main():
     rows.append({"id": "cancel-during-spawn-retains-ownership", "reaped": True})
     await pool.close()
 
+    pool = BoundedProcessPool(COMMAND, workers=1, queued=1, timeout=2)
+    await pool.warm_up(timeout=5)
+    old_pid = pool.workers[0].process.pid
+    began = time.monotonic()
+    try:
+        await pool.inspect(b"sleep:30", "image/png", timeout=0.1)
+        raise AssertionError("remaining header budget was ignored")
+    except InspectionTimeout:
+        pass
+    assert time.monotonic() - began < 1 and not running(old_pid)
+    before = pool.workers[0].spawn_count
+    try:
+        await pool.inspect(b"expired", "image/png", timeout=0)
+        raise AssertionError("expired header budget admitted work")
+    except InspectionTimeout:
+        pass
+    assert pool.workers[0].spawn_count == before and pool.admitted == 0
+    recovered = await pool.inspect(b"recovered", "image/png")
+    assert recovered["pid"] != old_pid
+    rows.append({"id": "remaining-header-budget-enforced", "expired_budget_spawns": 0,
+                 "worker_killed_and_recovered": True})
+    await pool.close()
+
     report = {"schema": 1, "created_utc": datetime.now(timezone.utc).isoformat(),
               "passed": True, "cases": len(rows), "real_processes": True,
               "actual_models": False, "accuracy_samples_added": 0,
               "source_sha256": hashlib.sha256((HERE/"downstream/process_pool.py").read_bytes()).hexdigest(),
               "rows": rows}
     (HERE/"evidence").mkdir(exist_ok=True)
-    (HERE/"evidence/process-bounds-regression.json").write_text(json.dumps(report,indent=2)+"\n")
+    (HERE/"evidence/process-bounds-v6-regression.json").write_text(json.dumps(report,indent=2)+"\n")
     print(json.dumps(report))
 
 
