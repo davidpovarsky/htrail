@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-27T03:26:47.117292+00:00",
+  "passed": true,
+  "cases": 4,
+  "actual_models": true,
+  "mock_classification": false,
+  "raster_holdout_reclassified": false,
+  "new_curated_exception": false,
+  "public_source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Wikisource-logo.svg",
+  "worker_sha256_before": "438029a2adecb8d3ebc8857db8220cbe2224f6a1da9dcc264d4508a084eee45e",
+  "worker_sha256_after": "6c7e4fc2c6ff1d109710f090b3e4eccf4b622566ed928c20019a00b41603b393",
+  "before": {
+    "worker_exit": 2,
+    "reason": "unsupported-svg-tag",
+    "namespace": "http://web.resource.org/cc/",
+    "source_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95",
+    "classifier_run": false
+  },
+  "rows": [
+    {
+      "id": "wikisource-logo-legacy-cc",
+      "expected": "allow",
+      "action": "allow",
+      "reason": "policy",
+      "source_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95",
+      "source_bytes": 16160,
+      "mime": "image/svg+xml",
+      "classifier_invoked": true,
+      "policy_exception": null,
+      "elapsed_ms": 1652.41,
+      "original_representation_unchanged": true,
+      "model_evidence_complete": true,
+      "pass": true
+    },
+    {
+      "id": "legacy-cc-external-resource",
+      "expected": "reject",
+      "action": "replace",
+      "reason": "model-failure",
+      "source_sha256": "5e8a31fa67a30b8926e9b000cbc7a4a1d0813ff0146eca68d8b70c632571c120",
+      "source_bytes": 203,
+      "mime": "image/png",
+      "classifier_invoked": false,
+      "policy_exception": null,
+      "elapsed_ms": 879.61,
+      "decoded_replacement": true,
+      "content_length_correct": true,
+      "pass": true
+    },
+    {
+      "id": "legacy-cc-script",
+      "expected": "reject",
+      "action": "replace",
+      "reason": "model-failure",
+      "source_sha256": "ff84e226975544405e3538c6922fa55c6cfe4e31e676fda8bb1547d8cb790119",
+      "source_bytes": 181,
+      "mime": "image/png",
+      "classifier_invoked": false,
+      "policy_exception": null,
+      "elapsed_ms": 388.31,
+      "decoded_replacement": true,
+      "content_length_correct": true,
+      "pass": true
+    },
+    {
+      "id": "legacy-cc-foreign-object",
+      "expected": "reject",
+      "action": "replace",
+      "reason": "model-failure",
+      "source_sha256": "3f5517c6b7e7f3655ea1d7f0bb6deb5c5d483f7b82f93356e78d6474df4da7c2",
+      "source_bytes": 295,
+      "mime": "image/png",
+      "classifier_invoked": false,
+      "policy_exception": null,
+      "elapsed_ms": 406.07,
+      "decoded_replacement": true,
+      "content_length_correct": true,
+      "pass": true
+    }
+  ]
+}

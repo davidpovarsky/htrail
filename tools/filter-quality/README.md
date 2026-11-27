@@ -12,7 +12,7 @@ The supplemental 81 cases passed, but contain transforms of only eight calibrati
 
 Use `downstream/pureline_addon_candidate.py` as the mitmproxy script, with `candidate.toml` as the model/policy reference. The entry point preserves the existing V2 MIME sniffing, nonimage streaming, and aggregate transport counters. It adds the corrected official decoded YOLOX model, official MobileCLIP2-S2 embedding contract, face fallback, the HTTP encoding fix, bounded static SVG inspection, and size-relative blur. The separate production `transport_diagnostics_v1.py` script remains an operator-managed companion; this package does not replace it.
 
-Existing assets remain at `/srv/pureline-poc/models`, with YuNet and the pinned OpenCV vendor under `/srv/pureline-poc/official-candidate`. `PURELINE_CLASSIFIER_SOURCE` and `PURELINE_RUNTIME_ROOT` can locate an equivalently verified installation; model paths in the deployment TOML must also be adjusted explicitly. No model download or GPU activation occurs during startup. Runtime source/configuration byte identity is pinned in `runtime-candidate-20261127-fc8c4247.json`; this manifest records artifacts, not a production deployment or live-browser acceptance.
+Existing assets remain at `/srv/pureline-poc/models`, with YuNet and the pinned OpenCV vendor under `/srv/pureline-poc/official-candidate`. `PURELINE_CLASSIFIER_SOURCE` and `PURELINE_RUNTIME_ROOT` can locate an equivalently verified installation; model paths in the deployment TOML must also be adjusted explicitly. No model download or GPU activation occurs during startup. Runtime source/configuration byte identity is pinned in `runtime-candidate-20261127-legacycc-6c7e4fc2.json`; the preceding v3 manifest remains preserved. These manifests record artifacts, not a production deployment or live-browser acceptance.
 
 Install SVG-only dependencies into the versioned package using the approved backend account:
 
@@ -48,7 +48,7 @@ The restorer validates every public asset SHA and fails on changed/unavailable o
 
 ## SVG policy and presentation
 
-Supported static SVG is rendered in a bounded subprocess, then inspected by the unchanged raster models. Normal allowed SVG and ordinary raster images preserve their original representation. The worker rejects external resources, XML entities/DTDs, scripting/event handlers, foreignObject/HTML, animation, unsupported rendering features, unsafe CSS and resource-limit violations. Only validated bounded inline PNG/JPEG/WebP resources are accepted.
+Supported static SVG is rendered in a bounded subprocess, then inspected by the unchanged raster models. Normal allowed SVG and ordinary raster images preserve their original representation. The worker rejects external resources, XML entities/DTDs, scripting/event handlers, foreignObject/HTML, animation, unsupported rendering features, unsafe CSS and resource-limit violations. Only validated bounded inline PNG/JPEG/WebP resources are accepted. The legacy Creative Commons metadata namespace is recognized under the same restrictions as current CC metadata. Its targeted real-model and rejection checks are recorded in `evidence/svg-legacy-metadata-validation.json`; no curated exception was added.
 
 For the narrow `isolation` and `mix-blend-mode:multiply` normalization path, an allowed result returns the **exact PNG submitted to classification**, with `x-local-image-filter-presentation: rasterized_allow`. It never returns the uninspected original SVG when renderer semantics differ.
 

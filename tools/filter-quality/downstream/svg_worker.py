@@ -24,7 +24,7 @@ def main():
     local=lambda name:name.rsplit("}",1)[-1]
     svg_ns="http://www.w3.org/2000/svg"
     if root.tag not in {"svg","{"+svg_ns+"}svg"}:raise ValueError("not-svg")
-    metadata_ns={"http://creativecommons.org/ns#","http://purl.org/dc/elements/1.1/","http://www.w3.org/1999/02/22-rdf-syntax-ns#","http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd","http://www.inkscape.org/namespaces/inkscape"}
+    metadata_ns={"http://creativecommons.org/ns#","http://web.resource.org/cc/","http://purl.org/dc/elements/1.1/","http://www.w3.org/1999/02/22-rdf-syntax-ns#","http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd","http://www.inkscape.org/namespaces/inkscape"}
     supported_tags=set("svg g defs title desc metadata path rect circle ellipse line polyline polygon text tspan textPath linearGradient radialGradient stop clipPath use symbol image style".split())
     props=set("fill fill-opacity fill-rule stroke stroke-width stroke-linecap stroke-linejoin stroke-miterlimit stroke-dasharray stroke-dashoffset stroke-opacity opacity color display visibility font-family font-size font-style font-weight font-variant text-anchor letter-spacing word-spacing text-decoration dominant-baseline alignment-baseline clip-path clip-rule stop-color stop-opacity shape-rendering text-rendering image-rendering".split())
     attrs=set("id class style width height x y x1 x2 y1 y2 cx cy r rx ry d points transform viewBox preserveAspectRatio href version gradientUnits gradientTransform spreadMethod offset fx fy fr clipPathUnits dx dy rotate textLength lengthAdjust space lang".split())|props

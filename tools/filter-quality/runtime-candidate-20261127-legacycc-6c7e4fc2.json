@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "revision": "2026-11-27-legacy-cc-6c7e4fc2",
+  "classifier_base_commit": "5291eedb9b46fa978e36ccec4f5504b017afe809",
+  "entrypoint": "downstream/pureline_addon_candidate.py",
+  "reference_config": "candidate.toml",
+  "created_utc": "2026-11-27T03:27:03.636161+00:00",
+  "scope": "Runtime source/configuration byte identity; not a claim of production deployment or browser acceptance.",
+  "files": {
+    "downstream/face_fallback.py": "291365c7e1745ac1cecfcf9bd8a2a74955ca9d3bc3ecb93ed4318dd8a11b1399",
+    "downstream/pureline_addon_candidate.py": "9da9685a7ed35e97f505be150bd5d046228c8c85c96c1bf245296f7c4c73f97b",
+    "downstream/pureline_addon_v2.py": "33ff62838082971c8c39cad6b5bea4e57494cfa4e61ef6a372de250ee58ad106",
+    "downstream/pureline_http_addon.py": "0b878f8f109116768c206eb8b71516e1e4f110566ebfec27263cc23b2a2b5a25",
+    "downstream/strong_blur.py": "51a34aec315cc3035dcc7d00312d229e5ea02725f43e8eb921b098eef94ccf42",
+    "downstream/svg_pipeline.py": "fc8c4247e44e0468331d21a6cdba9ff90b7e013e3081353bbf59f9037eda8f97",
+    "downstream/svg_worker.py": "6c7e4fc2c6ff1d109710f090b3e4eccf4b622566ed928c20019a00b41603b393",
+    "runtime_contract.py": "11d20dfda902910d0db24ae35b2e08a0b483919259d6c622b908779054498a2e",
+    "runtime-contract.json": "78d496d76a65a2a4c582e9fa0bf61b500e37da413bbb6e1fcdc3d8ad15fb041a",
+    "candidate.toml": "b53f002e883414ccba6011e07bde9297481f75538c85c5cefab0c6a16c4ad617",
+    "requirements-svg.lock": "929c0511abb64b41765ba78a46ddabc2d89b362e5df18e5c2bdd3aaf6036cf03",
+    "approved-ui-rasters.json": "ade4980fb508c632fff654f81fe2f5a7c10c34d35ceb70ab5d022d04730c2cff",
+    "install_svg_dependencies.py": "04be80eed54b46c29d0234467e5b92a1ff08f40422be629f608de187e8f66352"
+  },
+  "parent_manifest": "runtime-candidate-20261127-fc8c4247.json",
+  "parent_manifest_sha256": "4a6868b7afa5d575ca62f62288022ebb5cec3aaac2463aec29f9e52aba04c970",
+  "change": "Recognize legacy Creative Commons metadata namespace under the existing validation restrictions; no model, deadline, registry, or rendering expansion."
+}
