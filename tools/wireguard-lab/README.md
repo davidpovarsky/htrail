@@ -112,8 +112,9 @@ Use a new run ID/profile for each acceptance pass. Omitting
 receipt. Output is in the runtime `evidence/<run-id>` directory. The harness
 records screenshots, decoded DOM image dimensions, image-response actions,
 content hashes, network failures, cache metadata and tunnel counters. Public
-image URLs are recorded without query strings; no cookies, authorization
-headers or unrelated browsing activity are recorded.
+image URLs retain only an allowlist of nonsecret static-resource query keys;
+other query parameters, cookies, authorization headers and unrelated browsing
+activity are not recorded. Earlier run receipts omitted all query strings.
 
 Gallery pages deliberately reuse quality-test fixtures. Each page has at most
 ten images, and the manifest retains expected labels and original public URLs.
@@ -128,12 +129,46 @@ setter uses the existing Content-Encoding. Removing that header afterward
 produced compressed image bytes labelled as an uncompressed JPEG, with an
 incorrect declared Content-Length.
 
-The local lab V2 wrapper imports this corrected module instead of the upstream
-base addon. The production source and service remain unchanged. The quality
-lane has ported the same correction to its package and verifies actual
-mitmproxy identity/gzip/Brotli serialization for policy blur, failure
-replacement and allowed passthrough.
+The first corrected V2 lab wrapper imported this local module. It is retained
+as historical source evidence. The final active runtime uses the equivalent
+module in the quality package, together with its bounded SVG and strong-blur
+adapters. The production source and service remain unchanged. The quality
+lane verifies actual mitmproxy identity/gzip/Brotli serialization for policy
+blur, failure replacement and allowed passthrough.
+
+## Frozen runtime and controlled fixtures
+
+The v3 frozen runtime is
+`/srv/pureline-poc/lab-20261127/candidate-package-v3-frozen`, with entrypoint
+`downstream/pureline_addon_candidate.py`. Its versioned source/config manifest
+is `tools/filter-quality/runtime-candidate-20261127-fc8c4247.json`, SHA-256
+`4a6868b7afa5d575ca62f62288022ebb5cec3aaac2463aec29f9e52aba04c970`.
+The exact copy verified all 13 manifest files and 284 SVG vendor files. Runtime
+keys and CA material remain outside the repository. A later isolated revision
+must receive a new directory, manifest and receipt; preserve prior evidence.
+
+`fixture_origin.py` is a separate lab-only mitmproxy script. It answers only
+six fixed, hash-verified GET fixtures at the reserved HTTP host `192.0.2.1`
+and prefix `/pureline-lab-20261127/fixtures/`. The ordinary response hook still
+runs the real filter. The fixture hook does not return policy decisions and
+does not need an external listener, host route or public firewall change.
+It supports `svg.html` and `highres.html`; their embedded photographs and
+large derivatives reuse calibration sources, so they are integration checks,
+not additional independent accuracy observations.
+
+The script also retains narrowly scoped input metadata and sanitized error
+classes for diagnosing worker failures. It must not log arbitrary URLs,
+headers, payloads or exception text. Public fixtures and lab evidence are the
+only supported content for this diagnostic route.
+
+## Acceptance evidence
 
 Before/after receipts and browser screenshots are retained under `evidence`.
-See `../../docs/validation/BROWSER_WIREGUARD_2026-11-27.md` from this directory's
-repository root-relative context (`docs/validation` in the app repository).
+The final v3 pass is `evidence/chromium-frozen-v3/`. SVG5/5 and highres4/4
+rendered with the expected actions. Public pages retain explicit coverage
+failures and an unresolved original browser completion, with a later
+successful single-request retry recorded separately. The negative TLS control
+confirms an untrusted fresh browser rejects the lab CA without its SPKI pin.
+
+See `../../docs/validation/BROWSER_WIREGUARD_2026-11-27.md` for the complete
+results, known gaps, runtime hashes and evidence interpretation.

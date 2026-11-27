@@ -1,0 +1,11 @@
+{
+  "staged_at": "2026-11-27T02:59:50.481298+00:00",
+  "source_package": "/mnt/development/projects/pureline-wireguard-app-20261127/tools/filter-quality",
+  "staged_package": "/srv/pureline-poc/lab-20261127/candidate-package-v3-frozen",
+  "runtime_manifest_sha256": "4a6868b7afa5d575ca62f62288022ebb5cec3aaac2463aec29f9e52aba04c970",
+  "runtime_files_verified": 13,
+  "vendor_files_verified": 284,
+  "vendor_bytes": 24807234,
+  "derived_bytecode_cache_excluded": true,
+  "inventory_sha256": "9ae9b562e434df934e3d9528c76c8ca178dbe51b9c8a7f574ab1a62ff8c98b5d"
+}

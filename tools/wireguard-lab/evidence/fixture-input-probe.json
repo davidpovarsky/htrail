@@ -1,0 +1,10 @@
+{
+  "stage": "responseheaders-before-response-filter",
+  "timestamp": 1795748881.98942,
+  "fixture": "randomuser-women-77.svg",
+  "mime_type": "image/svg+xml",
+  "decoded_body_bytes": 5601,
+  "decoded_body_sha256": "f3e33f152876775df5174e2e1a3c494a60c8ea822df06c5993cc530d928bb227",
+  "expected_sha256": "f3e33f152876775df5174e2e1a3c494a60c8ea822df06c5993cc530d928bb227",
+  "matches_fixture": true
+}

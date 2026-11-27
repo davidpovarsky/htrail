@@ -1,0 +1,14 @@
+{
+  "bytes_down": 89145,
+  "bytes_up": 678,
+  "connected": 3,
+  "errors": 0,
+  "requests": 3,
+  "run_id": "pureline-wg-lab-20261127",
+  "transport": "wireguard-go-netstack",
+  "wireguard": {
+    "last_handshake_time_sec": "1795748671",
+    "rx_bytes": "96108",
+    "tx_bytes": "5316"
+  }
+}

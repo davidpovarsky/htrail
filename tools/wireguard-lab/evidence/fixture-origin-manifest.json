@@ -1,0 +1,60 @@
+{
+  "purpose": "Controlled Oracle fixture origin through real WG and ordinary response filtering; not independent accuracy data",
+  "origin": "http://192.0.2.1/pureline-lab-20261127/fixtures/",
+  "fixtures": [
+    {
+      "filename": "randomuser-women-77.svg",
+      "content_type": "image/svg+xml",
+      "sha256": "f3e33f152876775df5174e2e1a3c494a60c8ea822df06c5993cc530d928bb227",
+      "expected": "block",
+      "source_group": "randomuser-women-77",
+      "source_path": "tools/filter-quality/results/svg/fixtures/randomuser-women-77.svg",
+      "bytes": 5601
+    },
+    {
+      "filename": "randomuser-men-54.svg",
+      "content_type": "image/svg+xml",
+      "sha256": "c020161c24527213b385fa4f62148ab98be700db69b518ef6499801f118769a4",
+      "expected": "allow",
+      "source_group": "randomuser-men-54",
+      "source_path": "tools/filter-quality/results/svg/fixtures/randomuser-men-54.svg",
+      "bytes": 7193
+    },
+    {
+      "filename": "wikipedia-1111265-1024.jpg",
+      "content_type": "image/jpeg",
+      "sha256": "6966a8377e2ab86b4b3f5b1d3007022010cb398a09605bdc6f5ed39334c5ff61",
+      "expected": "block",
+      "source_group": "wikipedia-1111265",
+      "source_path": "tools/filter-quality/results/presentation/fixtures/wikipedia-1111265-1024.jpg",
+      "bytes": 268271
+    },
+    {
+      "filename": "wikipedia-1111265-1536.jpg",
+      "content_type": "image/jpeg",
+      "sha256": "6dd02622b699326b37253010c55e43125b4f01e11c0c6555495c0c706b5e0a4c",
+      "expected": "block",
+      "source_group": "wikipedia-1111265",
+      "source_path": "tools/filter-quality/results/presentation/fixtures/wikipedia-1111265-1536.jpg",
+      "bytes": 472689
+    },
+    {
+      "filename": "wikipedia-105969-1024.jpg",
+      "content_type": "image/jpeg",
+      "sha256": "d7e131a9098e031242a73a99749368c32017aeee0820b702d37b05d8da821436",
+      "expected": "allow",
+      "source_group": "wikipedia-105969",
+      "source_path": "tools/filter-quality/results/presentation/fixtures/wikipedia-105969-1024.jpg",
+      "bytes": 275790
+    },
+    {
+      "filename": "wikipedia-105969-1536.jpg",
+      "content_type": "image/jpeg",
+      "sha256": "fc03288e8b32cb1abcce363487a3918b4274606e5907c9c3b8a87531532702c9",
+      "expected": "allow",
+      "source_group": "wikipedia-105969",
+      "source_path": "tools/filter-quality/results/presentation/fixtures/wikipedia-105969-1536.jpg",
+      "bytes": 480100
+    }
+  ]
+}

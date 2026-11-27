@@ -418,6 +418,73 @@
         "source_url": "https://randomuser.me/api/portraits/thumb/men/28.jpg",
         "source_group": "randomuser-men-28"
       }
+    ],
+    "svg": [
+      {
+        "id": "wikipedia-globe",
+        "expected": "allow",
+        "source_url": "https://en.wikipedia.org/static/images/icons/enwiki-25.svg",
+        "source_group": "wikipedia-globe",
+        "note": "Original public SVG logo"
+      },
+      {
+        "id": "wikipedia-wordmark",
+        "expected": "allow",
+        "source_url": "https://en.wikipedia.org/static/images/mobile/copyright/wikipedia-wordmark-en-25.svg",
+        "source_group": "wikipedia-wordmark",
+        "note": "Original public SVG logo"
+      },
+      {
+        "id": "wikipedia-tagline",
+        "expected": "allow",
+        "source_url": "https://en.wikipedia.org/static/images/mobile/copyright/wikipedia-tagline-en-25.svg",
+        "source_group": "wikipedia-tagline",
+        "note": "Original public SVG logo"
+      },
+      {
+        "id": "randomuser-women-77-embedded-svg",
+        "expected": "block",
+        "source_url": "http://192.0.2.1/pureline-lab-20261127/fixtures/randomuser-women-77.svg",
+        "source_group": "randomuser-women-77",
+        "note": "Controlled SVG with an embedded calibration image; still filtered on Oracle"
+      },
+      {
+        "id": "randomuser-men-54-embedded-svg",
+        "expected": "allow",
+        "source_url": "http://192.0.2.1/pureline-lab-20261127/fixtures/randomuser-men-54.svg",
+        "source_group": "randomuser-men-54",
+        "note": "Controlled SVG with an embedded calibration image; still filtered on Oracle"
+      }
+    ],
+    "highres": [
+      {
+        "id": "wikipedia-1111265-1024",
+        "expected": "block",
+        "source_url": "http://192.0.2.1/pureline-lab-20261127/fixtures/wikipedia-1111265-1024.jpg",
+        "source_group": "wikipedia-1111265",
+        "note": "1024/1536-pixel derivative for blur presentation; not an independent scene"
+      },
+      {
+        "id": "wikipedia-1111265-1536",
+        "expected": "block",
+        "source_url": "http://192.0.2.1/pureline-lab-20261127/fixtures/wikipedia-1111265-1536.jpg",
+        "source_group": "wikipedia-1111265",
+        "note": "1024/1536-pixel derivative for blur presentation; not an independent scene"
+      },
+      {
+        "id": "wikipedia-105969-1024",
+        "expected": "allow",
+        "source_url": "http://192.0.2.1/pureline-lab-20261127/fixtures/wikipedia-105969-1024.jpg",
+        "source_group": "wikipedia-105969",
+        "note": "1024/1536-pixel derivative for blur presentation; not an independent scene"
+      },
+      {
+        "id": "wikipedia-105969-1536",
+        "expected": "allow",
+        "source_url": "http://192.0.2.1/pureline-lab-20261127/fixtures/wikipedia-105969-1536.jpg",
+        "source_group": "wikipedia-105969",
+        "note": "1024/1536-pixel derivative for blur presentation; not an independent scene"
+      }
     ]
   },
   "transport_note": "Only local HTML bypasses the proxy. All primary public HTTPS image sources must use the lab WireGuard proxy.",

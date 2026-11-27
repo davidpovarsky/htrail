@@ -1,0 +1,10 @@
+{
+  "cutover_start_utc": "2026-11-27T03:03:32.767829+00:00",
+  "started_at": "2026-11-27T03:03:33.169735+00:00",
+  "old_pid": 2859992,
+  "new_pid": 2952987,
+  "entrypoint": "/srv/pureline-poc/lab-20261127/candidate-package-v3-frozen/downstream/pureline_addon_candidate.py",
+  "manifest_sha256": "4a6868b7afa5d575ca62f62288022ebb5cec3aaac2463aec29f9e52aba04c970",
+  "code_or_model_or_bounds_changed": false,
+  "production_touched": false
+}
