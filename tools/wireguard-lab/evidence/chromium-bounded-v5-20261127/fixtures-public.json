@@ -1,0 +1,32 @@
+{
+  "fixtures": [
+    {
+      "filename": "pangea.gif",
+      "content_type": "image/gif",
+      "sha256": "21de2a3e19a60fd4d933919f6aa491a775fa1a42d0709aa3e677fac51d712bdd",
+      "expected": "allow",
+      "animated": true
+    },
+    {
+      "filename": "late-blocked-frame.gif",
+      "content_type": "image/gif",
+      "sha256": "d977849a99b8773aeeb7aeba69711b47badd1559de8d40baf88e3f6d8d86540f",
+      "expected": "blur",
+      "animated": true
+    },
+    {
+      "filename": "static-allow.jpg",
+      "content_type": "image/jpeg",
+      "sha256": "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9",
+      "expected": "allow",
+      "animated": false
+    },
+    {
+      "filename": "static-block.jpg",
+      "content_type": "image/jpeg",
+      "sha256": "2b60a52f98219bd878af04c6c7a7cbbd291bae76598bbdf3c1148ce294256869",
+      "expected": "blur",
+      "animated": false
+    }
+  ]
+}

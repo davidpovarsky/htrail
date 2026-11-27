@@ -193,3 +193,7 @@ The completed receipt and visually inspected screenshot are in
 `evidence/chromium-wikisource-v4/`. This asset passed; it does not replace
 the v3 article captures or claim a complete article/native-suite rerun.
 The animated GIF and original bounded-wait thumbnail finding remain documented.
+
+## Bounded v5 follow-up
+
+The completion pass used a separate peer, CA, package and loopback ports18530/18531/18532, preserving the old lab. `browser_bounded_v5_validation.cjs` reads a hash-verified fixture manifest and performs five rendered checks, including animation pixel changes and late-frame static blocking. See `../../docs/validation/BROWSER_BOUNDED_V5_2026-11-27.md` for exact setup, manifest, screenshots and limits. The dedicated processes/carrier were stopped after acceptance.

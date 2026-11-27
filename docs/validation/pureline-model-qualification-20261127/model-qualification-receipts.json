@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "scope": "Pureline full-product CoreML conversion qualification",
+  "generated_utc": "2026-11-27T15:19:33.188105+00:00",
+  "status": "qualified for existing iOS27 CPU_ONLY runtime policy",
+  "vendor_commit": "5291eedb9b46fa978e36ccec4f5504b017afe809",
+  "adapter_commit": "0655d1d7e2e2998188adf2068da7743cfc449341",
+  "source_pins": {
+    "apple_ml_mobileclip": "aecfb5453d022e9deff12f81a150ea8f35194baa",
+    "open_clip": "54c9754a94baacac5b2d9b1c76318078d48912af",
+    "apple_mobileclip2_s2_checkpoint_revision": "72424e7025436db18f15c3eff6ee8c7c15ad4481"
+  },
+  "source_tool_sha256": {
+    "download_model.sh": "6f594d9eacaa4d7407ce45c187a1907ad53ed9589e76c4d5ce724e597ac68265",
+    "inspect_mil_program.py": "7b5116dc386c77f18245de5b04f7d8c748e9d722cd23a72e7f98a1870b315166",
+    "requirements.txt": "42e921aef6e5a084fe3bd66bcc5f63fdd65b555da928a90925b8f8a57d45708e",
+    "README.md": "d7d83a511b212f39f415484c00c735513fc3763ca7e1e1b2e0326f62bb48b07c",
+    "MODEL_LICENSE.md": "b939e6c51a3e6c4fd7ceb2d74e8a6e7dc4cb0a9cd995c08493031251914b0bef",
+    "convert_mobileclip2_s2.py": "8ca2cf1416655a5d1698fb5a9138f5850242a9b813120fa7d6c1a79f2b52e03d",
+    "verify_conversion.py": "e55600060d8aa63b8944b46fba24aa7f90064c582c90b6574bcb95c6a6703b09",
+    "write_manifest.py": "294f127b4a6b60e427dbb79529c9b18111984edf1665e003158fdbbedc4ad4a5",
+    "export_partial_image_encoder.py": "9ad489cbab8b068aa64b20cc572dd45ffd432e2292cee4a62b61c966a31e3817",
+    "model_manifest.json": "db04b8ae0dfc1dcf0a88154c8a38a6a4a1f6c970ea5f63ae4ea42a574dc1bf72"
+  },
+  "runtime_policy_source_sha256": "11a5aff0a8e4f0fd31610688c151d4dd9675e9356f42941a691a8c90a997c9ca",
+  "qualification": {
+    "scope": "qualified-full-product-mobileclip-assets",
+    "utc": "2026-11-27T14:55:59.257137+00:00",
+    "verification_adapter_commit": "0655d1d7e2e2998188adf2068da7743cfc449341",
+    "compute_units": "CPU_ONLY",
+    "runtime_policy": "existing iOS27AndLaterCPUOnly",
+    "verification_metrics": {
+      "model": "MobileCLIP2-S2",
+      "samples": 10,
+      "minimumImageEmbeddingCosine": 0.9998859455775914,
+      "sameTopCategorySamples": 10,
+      "maximumAbsoluteEmbeddingDifference": 0.004448354244232178,
+      "meanAbsoluteEmbeddingDifference": 0.00040635697077959774,
+      "maximumScoreDifference": 0.0008430468728841678,
+      "finite": true,
+      "normalizationVerified": true,
+      "softmaxVerified": true,
+      "passed": true,
+      "verificationContext": {
+        "computeUnits": "CPU_ONLY",
+        "defaultProductPolicy": "iOS27AndLaterCPUOnly",
+        "upstreamVerifierSHA256": "e55600060d8aa63b8944b46fba24aa7f90064c582c90b6574bcb95c6a6703b09",
+        "upstreamConverterSHA256": "8ca2cf1416655a5d1698fb5a9138f5850242a9b813120fa7d6c1a79f2b52e03d",
+        "upstreamExitCode": 0,
+        "fixtureCountRequired": 10,
+        "thresholdsUnchanged": true,
+        "hostPlatform": "macOS-27.0-arm64-arm-64bit"
+      }
+    },
+    "manifest": {
+      "model": "MobileCLIP2-S2",
+      "source": "apple/MobileCLIP2-S2",
+      "revision": "72424e7025436db18f15c3eff6ee8c7c15ad4481",
+      "checkpoint": "mobileclip2_s2.pt",
+      "checkpointSHA256": "37c2d839a856491f2fcc82c40dc28672dbd0907235b4cd4c38dfff6457f0c09f",
+      "imageEncoder": "MobileCLIP2S2ImageEncoder.mlpackage",
+      "imageEncoderSHA256": "d051afb7eeb6619fb1f510cd7bccf34e812f7e4f3d430c1e86d48591448bf78f",
+      "promptEmbeddingsSHA256": "8f411353a134d8c32fd9d6e309bc228481fce5b8dd46e867a864c0f4d139aedf",
+      "textEncoderBundled": false,
+      "precision": "float16",
+      "deploymentTarget": "iOS17",
+      "exportMethod": "torch.jit.trace",
+      "preprocessing": {
+        "inputSize": [
+          1,
+          3,
+          256,
+          256
+        ],
+        "colorLayout": "RGB",
+        "imageScale": 0.00392156862745098,
+        "bias": [
+          0,
+          0,
+          0
+        ],
+        "resizeMode": "aspect-fill",
+        "cropMode": "center",
+        "normalization": "none; model internal preprocessing"
+      }
+    },
+    "assets": [
+      {
+        "path": "/Users/m1/builds/pureline-wireguard-app-20261127/Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ImageEncoder.mlpackage",
+        "sha256": "d051afb7eeb6619fb1f510cd7bccf34e812f7e4f3d430c1e86d48591448bf78f",
+        "bytes": 71735075
+      },
+      {
+        "path": "/Users/m1/builds/pureline-wireguard-app-20261127/Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2PromptEmbeddings.json",
+        "sha256": "8f411353a134d8c32fd9d6e309bc228481fce5b8dd46e867a864c0f4d139aedf",
+        "bytes": 59054
+      },
+      {
+        "path": "/Users/m1/builds/pureline-wireguard-app-20261127/Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ModelManifest.json",
+        "sha256": "ccdfeb440160c94a7c9e694011f1e4b3a4dd6d42f7141a1cb6b4ad6359c2a8ac",
+        "bytes": 943
+      },
+      {
+        "path": "/Users/m1/builds/pureline-wireguard-app-20261127/Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2ConversionReport.json",
+        "sha256": "38db92db33e34a50b688e5b41369baf12e18e11ee9ab2f2edbae3ce55a0f90ce",
+        "bytes": 277
+      },
+      {
+        "path": "/Users/m1/builds/pureline-wireguard-app-20261127/Vendor/AI-Image-Classifier/AI-Image-Classifier/Models/MobileCLIP2S2-MODEL-LICENSE.md",
+        "sha256": "b939e6c51a3e6c4fd7ceb2d74e8a6e7dc4cb0a9cd995c08493031251914b0bef",
+        "bytes": 6141
+      }
+    ],
+    "free_before_bytes": 6292746240,
+    "interpretation": "Numerical conversion parity on all10 original fixtures; not physical-device inference or image-filter accuracy acceptance.",
+    "preserved_nudenet_sha256": "573ea21255941b761dda7d0c61d213a46c7712027724d6dffb37d7cedca37292",
+    "free_after_bytes": 6220480512,
+    "status": "passed"
+  },
+  "adapter_contract": {
+    "stage": "downstream-verifier-adapter-contract",
+    "started_utc": "2026-11-27T14:49:46.880456+00:00",
+    "adapter_sha256": "4c0198b820079746359e0299fcd43dedbace1c31e5e0a85ef43405152e8983f6",
+    "results": [
+      {
+        "case": "default-cpu-only",
+        "exit": 0,
+        "expected_exit": 0,
+        "contract_passed": true,
+        "metrics": {
+          "model": "MobileCLIP2-S2",
+          "samples": 10,
+          "minimumImageEmbeddingCosine": 0.9998859455775914,
+          "sameTopCategorySamples": 10,
+          "maximumAbsoluteEmbeddingDifference": 0.004448354244232178,
+          "meanAbsoluteEmbeddingDifference": 0.00040635697077959774,
+          "maximumScoreDifference": 0.0008430468728841678,
+          "finite": true,
+          "normalizationVerified": true,
+          "softmaxVerified": true,
+          "passed": true,
+          "verificationContext": {
+            "computeUnits": "CPU_ONLY",
+            "defaultProductPolicy": "iOS27AndLaterCPUOnly",
+            "upstreamVerifierSHA256": "e55600060d8aa63b8944b46fba24aa7f90064c582c90b6574bcb95c6a6703b09",
+            "upstreamConverterSHA256": "8ca2cf1416655a5d1698fb5a9138f5850242a9b813120fa7d6c1a79f2b52e03d",
+            "upstreamExitCode": 0,
+            "fixtureCountRequired": 10,
+            "thresholdsUnchanged": true,
+            "hostPlatform": "macOS-27.0-arm64-arm-64bit"
+          }
+        }
+      },
+      {
+        "case": "explicit-all-negative-control",
+        "exit": 1,
+        "expected_exit": 1,
+        "contract_passed": true,
+        "metrics": {
+          "model": "MobileCLIP2-S2",
+          "samples": 10,
+          "minimumImageEmbeddingCosine": 0.9662132062064158,
+          "sameTopCategorySamples": 10,
+          "maximumAbsoluteEmbeddingDifference": 0.05499543994665146,
+          "meanAbsoluteEmbeddingDifference": 0.006691218772903085,
+          "maximumScoreDifference": 0.02391627318066153,
+          "finite": true,
+          "normalizationVerified": true,
+          "softmaxVerified": true,
+          "passed": false,
+          "verificationContext": {
+            "computeUnits": "ALL",
+            "defaultProductPolicy": "iOS27AndLaterCPUOnly",
+            "upstreamVerifierSHA256": "e55600060d8aa63b8944b46fba24aa7f90064c582c90b6574bcb95c6a6703b09",
+            "upstreamConverterSHA256": "8ca2cf1416655a5d1698fb5a9138f5850242a9b813120fa7d6c1a79f2b52e03d",
+            "upstreamExitCode": 1,
+            "fixtureCountRequired": 10,
+            "thresholdsUnchanged": true,
+            "hostPlatform": "macOS-27.0-arm64-arm-64bit"
+          }
+        }
+      }
+    ],
+    "status": "passed",
+    "finished_utc": "2026-11-27T14:50:50.886087+00:00",
+    "free_after_bytes": 6330564608
+  },
+  "cpu_and_gpu_diagnostic": {
+    "model": "MobileCLIP2-S2",
+    "samples": 10,
+    "minimumImageEmbeddingCosine": 0.9999508182614345,
+    "sameTopCategorySamples": 10,
+    "maximumAbsoluteEmbeddingDifference": 0.0043541789054870605,
+    "meanAbsoluteEmbeddingDifference": 0.0002441458171233535,
+    "maximumScoreDifference": 0.0006793133953771346,
+    "finite": true,
+    "normalizationVerified": true,
+    "softmaxVerified": true,
+    "passed": true
+  },
+  "original_evidence": [
+    {
+      "path": "/Users/m1/caches/pureline-mobileclip2s2-72424e7/input-receipt.json",
+      "sha256": "9bf0bc3770633be6ca6dfd9a3f272539d772d76bb7e17514818278607fbca627"
+    },
+    {
+      "path": "/Users/m1/caches/pureline-mobileclip2s2-72424e7/environment-receipt.json",
+      "sha256": "be3490406070aa5862aedde0337f76f987ae9d0550e102e2a6c9e9bdfaeb6ea2"
+    },
+    {
+      "path": "/Users/m1/caches/pureline-mobileclip2s2-72424e7/conversion-receipt.json",
+      "sha256": "f1f6f84a5f35e98cdae98b700b3b31b1dfbbe735ca6c73268e5b6cf0acecdc08"
+    },
+    {
+      "path": "/Users/m1/caches/pureline-mobileclip2s2-72424e7/conversion-verification.json",
+      "sha256": "84123fac00c29549117280916baff00301f979fbf4f66d0de64ac2ed4ba8e65d"
+    },
+    {
+      "path": "/Users/m1/caches/pureline-mobileclip2s2-72424e7/compute-unit-diagnostic-receipt.json",
+      "sha256": "ba3be48f60517d681055754cc1ca5957260f5134c67604aaa02b102109522706"
+    },
+    {
+      "path": "/Users/m1/caches/pureline-mobileclip2s2-72424e7/conversion-verification-cpu_only.json",
+      "sha256": "c7158a5df2b56aa5f3b8ab59c8f41ad1b638ae994be1897dd0a2a27d297c14e7"
+    },
+    {
+      "path": "/Users/m1/caches/pureline-mobileclip2s2-72424e7/conversion-verification-cpu_and_gpu.json",
+      "sha256": "ccf21e8c505dd17f9d59487aac75394966e8cf585635cf24d3721529d0a84c6b"
+    },
+    {
+      "path": "/Users/m1/caches/pureline-mobileclip2s2-72424e7/adapter-verification-receipt.json",
+      "sha256": "927f99faf7e83b9dc2f22b6a48f8c2271f51172cea7d87cab70470125adf52a6"
+    },
+    {
+      "path": "/Users/m1/caches/pureline-mobileclip2s2-72424e7/adapter-default-cpu-only.json",
+      "sha256": "72c6199fc07ac756f1e50b9108957ecf4eca744d6d6a7ba26c0e729cb7b4d9cf"
+    },
+    {
+      "path": "/Users/m1/caches/pureline-mobileclip2s2-72424e7/adapter-explicit-all-negative-control.json",
+      "sha256": "b4988ee9a8707185f5728ab08b41bf2613754f2fee48291321b2e6a31306def2"
+    },
+    {
+      "path": "/Users/m1/caches/pureline-mobileclip2s2-72424e7/qualification-receipt.json",
+      "sha256": "6be592e735fecefb8eb31cc121e84c314573cdd2e083efd0d612dc4638be6864"
+    }
+  ],
+  "limitations": [
+    "All10 original verifier fixtures are numerical conversion parity; no filtering-quality corpus claim.",
+    "No physical iPad inference or PacketTunnel memory acceptance is established.",
+    "ALL compute-unit verification failed and remains preserved; no threshold relaxation or model substitution."
+  ]
+}

@@ -1,5 +1,19 @@
 # Project Board
 
+## Completion pass — 27 November 2026
+
+Intake: Asana project 1220424906877685 contains 47 tasks (19 complete, 28 open). Local CoreML and remote WireGuard/server acceptance remain separate.
+
+- Published base: f53ff65711af1b5f2552f44c5c24c8e5244a2cb0, on local product base 09dfa21d5b27557e77d181d7aa31888d749aa91c.
+- Native lane: final26 socket cases pass, including bodyless pooling and POST-to-next-GET progress. Bounded decode, strict fallback and lifecycle changes passed their downstream assertions; runtime26 is25/26 because the original real-model smoke failed in Vision human detection. Root cause is under investigation; signed release remains gated.
+- Runtime lane:26 format controls,11 process controls,11 HTTP hook controls,100 distinct-image delivery/parity and12 enabled-cache checks pass. Chromium v5 passed5/5. Independent review found pre-worker HTTP buffer/decompression and startup-readiness gaps: v5 is held, and a separately pinned v6 plus real-socket acceptance is in progress. No production activation.
+- Apple lane: existing signing identity and both profiles verified. Restored exact MobileCLIP resources passed all10 numerical fixtures with existing CPU_ONLY policy; the failed ALL control is preserved. Full simulator target builds; distribution602 awaits native acceptance and a source pin.
+- Integration owner alone accepts evidence, updates this board, merges, publishes and reconciles Asana.
+
+### Gates still requiring evidence
+
+Physical iPad access is absent; simulator and Mac tests do not close the historical iPad browsing, extension memory, VPN and cross-app gates. SentinelX service management still rejects pureline-poc because it is unregistered; preserve the prepared operator-reviewed rollout. Workflow-only commit 676d317039815f7b97131a35d96c3ab2c30701d7 is preserved separately but cannot be pushed through the existing OAuth grant without workflow scope. Modal billing/resource status was read, while saved usage/spend caps remain unverified. Development Heartbeat rejects Pureline as an unsupported project; report milestones in Asana without relabeling the run.
+
 This is a lightweight working-memory document. Detailed execution state is in [Asana](https://app.asana.com/1/1219597879016953/project/1220424906877685/task/1220941302170999) and the reports in docs/validation.
 
 ## Discoveries

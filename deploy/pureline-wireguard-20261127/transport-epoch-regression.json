@@ -1,0 +1,34 @@
+{
+  "created_utc": "2026-11-27T15:23:25.218984+00:00",
+  "passed": true,
+  "cases": 6,
+  "source_sha256": "a0ee233586eae1628631b28e771dcaa081e5fcef1cf975f795dc4ddc858a69ad",
+  "rows": [
+    {
+      "case": "startup replaces stale receipt without traffic",
+      "passed": true
+    },
+    {
+      "case": "receipt file permissions are private",
+      "passed": true
+    },
+    {
+      "case": "aggregate counts and bounded sanitized error ring",
+      "passed": true
+    },
+    {
+      "case": "retired instance skips newer observed epoch",
+      "passed": true
+    },
+    {
+      "case": "terminal lifecycle is explicit",
+      "passed": true
+    },
+    {
+      "case": "diagnostic filesystem failure does not alter hook control flow",
+      "passed": true
+    }
+  ],
+  "production_files_modified": false,
+  "scope": "Offline event-hook/receipt checks; not physical traffic acceptance."
+}

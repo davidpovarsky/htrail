@@ -1,0 +1,212 @@
+{
+  "run_id": "chromium-bounded-v5-20261127",
+  "started_at": "2026-11-27T15:05:26.585Z",
+  "backend_revision": "e9b4424cce6a376c9ac2620cf5b5ad0ac0680264e5653042dc29eb812b13711b",
+  "route": "Chromium -> explicit CONNECT/HTTP -> wireguard-go netstack -> framed UDP/SSH carrier -> isolated Oracle WireGuard -> real candidate filter",
+  "scope": "Rendered controlled fixtures plus one public HTTPS SVG. Not a physical iOS, public UDP, independent accuracy or whole-article test.",
+  "proxy": "http://127.0.0.1:18530",
+  "platform": "darwin",
+  "arch": "arm64",
+  "playwright": "1.65.1",
+  "trust": {
+    "ignoreHTTPSErrors": false,
+    "ca_spki_sha256_base64": "3IlHG01JWzRJ7pUFX2YtnTJT0UdLEP+dF47sObPkOPU=",
+    "global_trust_changes": false
+  },
+  "health_before": {
+    "bytes_down": 0,
+    "bytes_up": 0,
+    "connected": 0,
+    "errors": 0,
+    "requests": 0,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795791908",
+      "rx_bytes": "92",
+      "tx_bytes": "180"
+    }
+  },
+  "assets": [
+    {
+      "fixture": "pangea.gif",
+      "url": "http://192.0.2.1/pureline-lab-20261127/fixtures/pangea.gif",
+      "expected": "allow",
+      "expected_source_sha256": "21de2a3e19a60fd4d933919f6aa491a775fa1a42d0709aa3e677fac51d712bdd",
+      "passed": true,
+      "response": {
+        "status": 200,
+        "content_type": "image/gif",
+        "content_encoding": null,
+        "declared_content_length": "316480",
+        "action": "allow",
+        "reason": "policy",
+        "presentation": null,
+        "policy_exception": null,
+        "decoded_body_bytes": 316480,
+        "decoded_body_sha256": "21de2a3e19a60fd4d933919f6aa491a775fa1a42d0709aa3e677fac51d712bdd"
+      },
+      "dom": {
+        "complete": true,
+        "natural_width": 200,
+        "natural_height": 160,
+        "decode_resolved": true
+      },
+      "rendered_samples": [
+        {
+          "screenshot": "pangea.gif-frame-0.png",
+          "sha256": "16d5f6d722f88604d5e179e65a04a798c6ba4caf0f65fb5e77160b08e14d63d7"
+        },
+        {
+          "screenshot": "pangea.gif-frame-1.png",
+          "sha256": "e1805e10dc701e498fdb87ceb178e2502d1323996968efc1c913e5542b8b3421"
+        },
+        {
+          "screenshot": "pangea.gif-frame-2.png",
+          "sha256": "fd88163cf00a751086a428f213cec36692cb573cb2e2c8712b6c29c65cce364c"
+        }
+      ],
+      "animation_visible": true,
+      "elapsed_ms": 12145
+    },
+    {
+      "fixture": "late-blocked-frame.gif",
+      "url": "http://192.0.2.1/pureline-lab-20261127/fixtures/late-blocked-frame.gif",
+      "expected": "blur",
+      "expected_source_sha256": "d977849a99b8773aeeb7aeba69711b47badd1559de8d40baf88e3f6d8d86540f",
+      "passed": true,
+      "response": {
+        "status": 200,
+        "content_type": "image/png",
+        "content_encoding": null,
+        "declared_content_length": "7591",
+        "action": "blur",
+        "reason": "policy",
+        "presentation": null,
+        "policy_exception": null,
+        "decoded_body_bytes": 7591,
+        "decoded_body_sha256": "39e1705511f678467e7def1446b0ce163d000c39e7956f4f4dd1a5fa9ead7ecf"
+      },
+      "dom": {
+        "complete": true,
+        "natural_width": 128,
+        "natural_height": 128,
+        "decode_resolved": true
+      },
+      "rendered_samples": [
+        {
+          "screenshot": "late-blocked-frame.gif-frame-0.png",
+          "sha256": "0bf32cef739d3182d215ff24b688aed1ccfcf7f6b1296c50bcd581b40d2f3444"
+        },
+        {
+          "screenshot": "late-blocked-frame.gif-frame-1.png",
+          "sha256": "0bf32cef739d3182d215ff24b688aed1ccfcf7f6b1296c50bcd581b40d2f3444"
+        },
+        {
+          "screenshot": "late-blocked-frame.gif-frame-2.png",
+          "sha256": "0bf32cef739d3182d215ff24b688aed1ccfcf7f6b1296c50bcd581b40d2f3444"
+        }
+      ],
+      "animation_visible": false,
+      "elapsed_ms": 3995
+    },
+    {
+      "fixture": "static-allow.jpg",
+      "url": "http://192.0.2.1/pureline-lab-20261127/fixtures/static-allow.jpg",
+      "expected": "allow",
+      "expected_source_sha256": "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9",
+      "passed": true,
+      "response": {
+        "status": 200,
+        "content_type": "image/jpeg",
+        "content_encoding": null,
+        "declared_content_length": "5276",
+        "action": "allow",
+        "reason": "policy",
+        "presentation": null,
+        "policy_exception": null,
+        "decoded_body_bytes": 5276,
+        "decoded_body_sha256": "d1a3e08d4e37d6ee2b7de1db8df87c1dc7acd8ffb004caaf980917de518a60c9"
+      },
+      "dom": {
+        "complete": true,
+        "natural_width": 128,
+        "natural_height": 128,
+        "decode_resolved": true
+      },
+      "elapsed_ms": 1465
+    },
+    {
+      "fixture": "static-block.jpg",
+      "url": "http://192.0.2.1/pureline-lab-20261127/fixtures/static-block.jpg",
+      "expected": "blur",
+      "expected_source_sha256": "2b60a52f98219bd878af04c6c7a7cbbd291bae76598bbdf3c1148ce294256869",
+      "passed": true,
+      "response": {
+        "status": 200,
+        "content_type": "image/jpeg",
+        "content_encoding": null,
+        "declared_content_length": "979",
+        "action": "blur",
+        "reason": "policy",
+        "presentation": null,
+        "policy_exception": null,
+        "decoded_body_bytes": 979,
+        "decoded_body_sha256": "e207d17fcebf558e97358e0bae26474770e9c0c96b45fccb10b83e2790e73aec"
+      },
+      "dom": {
+        "complete": true,
+        "natural_width": 128,
+        "natural_height": 128,
+        "decode_resolved": true
+      },
+      "elapsed_ms": 1486
+    },
+    {
+      "fixture": "public-wikisource.svg",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Wikisource-logo.svg",
+      "expected": "allow",
+      "expected_source_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95",
+      "passed": true,
+      "response": {
+        "status": 200,
+        "content_type": "image/svg+xml",
+        "content_encoding": "gzip",
+        "declared_content_length": "5662",
+        "action": "allow",
+        "reason": "policy",
+        "presentation": null,
+        "policy_exception": null,
+        "decoded_body_bytes": 16160,
+        "decoded_body_sha256": "211b332af6138a7c2d5fce0b58586c63e03ea418060539dd315e61c0c0e49e95"
+      },
+      "dom": {
+        "complete": true,
+        "natural_width": 410,
+        "natural_height": 430,
+        "decode_resolved": true
+      },
+      "elapsed_ms": 1787
+    }
+  ],
+  "failures": [],
+  "passed": true,
+  "browser": "159.0.8154.6",
+  "screenshot": "gallery.png",
+  "health_after": {
+    "bytes_down": 340665,
+    "bytes_up": 2500,
+    "connected": 5,
+    "errors": 0,
+    "requests": 5,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795791908",
+      "rx_bytes": "363072",
+      "tx_bytes": "16420"
+    }
+  },
+  "finished_at": "2026-11-27T15:05:48.428Z",
+  "transport_verified": true
+}

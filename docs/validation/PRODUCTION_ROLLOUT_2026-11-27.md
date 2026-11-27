@@ -1,5 +1,7 @@
 # Pureline filtering service rollout — prepared, not applied
 
+> HOLD: independent review found pre-worker HTTP buffering/decompression and startup-readiness gaps in v5. The immutable v5 staging directory is retained for evidence and must not be activated. A separately hashed v6 candidate and actual HTTP boundary acceptance are required before promotion.
+
 ## Observed state and management boundary
 
 The production system service `pureline-poc.service` remains active on Oracle with the V2 configuration. At the preflight, its PID was 3542726, service user was `chatgpt-agent`, and its memory ceiling was 2 GiB. Its existing WireGuard listener is UDP 51820. No production service configuration, CA, peer configuration, firewall, global route, or live process was changed by this run.
@@ -23,17 +25,21 @@ Place that entry under the existing `services:` map without replacing its other 
 
 ## Prepared release layout
 
+The final candidate is pinned by `tools/filter-quality/runtime-candidate-20261127-bounded-v5.json`, SHA-256 `e9b4424cce6a376c9ac2620cf5b5ad0ac0680264e5653042dc29eb812b13711b` (18 package files and the unchanged 284-file SVG vendor tree). Its focused Chromium v5 acceptance passed all five rendered fixtures/assets over a newly isolated WireGuard route.
+
 The intended immutable release directory is:
 
-    /srv/pureline-poc/releases/20261127-wireguard-verified
+    /srv/pureline-poc/releases/20261127-wireguard-bounded-v5
 
-Before creating that directory, require it and the proposed versioned cache filename to be absent. If the release directory already exists, verify every recorded identity/hash and reuse it only if it is the exact same candidate. Otherwise choose a new release ID and cache filename and update both prepared files together. Never overwrite an existing release or reuse a cache across different code/model/policy identities.
+This exact directory was staged during the completion pass, with root-owned read-only files and a successful service-user runtime-contract check. The source/config identities and non-activation status are in `deploy/pureline-wireguard-20261127/v5-staging-receipt.json`. No systemd drop-in was installed.
+
+For another staging attempt, require the chosen directory and the proposed versioned cache filename to be absent. If the release directory already exists, verify every recorded identity/hash and reuse it only if it is the exact same candidate. Otherwise choose a new release ID and cache filename and update both prepared files together. Never overwrite an existing release or reuse a cache across different code/model/policy identities.
 
 Copy the final committed package from `tools/filter-quality/` into that directory: downstream Python sources, runtime_contract.py, runtime-contract.json, approved-ui-rasters.json, requirements-svg.lock, and the packaged runtime checker. Also copy the exact isolated `.vendor-svg` dependency directory used by the passing lab, verifying its recorded package versions/hashes. Do not copy the corpus, result images, Git metadata, lab WireGuard profiles, or the lab-only fixture-origin hook.
 
 Install the prepared `production.toml` at the release root. Keep release code and dependencies root-owned and read-only to the service user. The existing models, pinned classifier source, YuNet model, OpenCV vendor directory, and Python environment remain at their validated paths under `/srv/pureline-poc`; do not create a second multi-gigabyte model copy.
 
-The proposed production configuration uses the measured official model paths, existing concurrency/body/time limits, CPU inference, a new versioned cache database, and the previous bounded diagnostic settings. Old V2 cache entries must not be reused. Cache miss/hit behavior under this enabled production cache is a rollout gate; the offline quality benchmark deliberately disabled its cache.
+The proposed production configuration uses the measured official model paths, existing concurrency/body/time limits, CPU inference, a new versioned cache database, and the previous bounded diagnostic settings. The measured configuration uses two killable worker processes and eight queued image requests. The 18-second budget covers queueing and complete-body processing, not upstream network acquisition. The 100-image test peaked at 830 MiB combined parent/worker RSS; this observation does not replace the unit's 2 GiB hard limit. Old V2 cache entries must not be reused. Workers append .worker-0/.worker-1 before the SQLite suffix and write diagnostics in worker-0/worker-1 subdirectories. Keep those cache/diagnostic parents writable outside the immutable release. Cache miss/hit behavior under the enabled production configuration is a rollout gate; the offline quality benchmark deliberately disabled its cache.
 
 ## Preflight gates after service management is enabled
 

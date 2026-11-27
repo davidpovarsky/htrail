@@ -1,0 +1,17 @@
+{
+  "finished_at": "2026-11-27T15:07:50.037667+00:00",
+  "stopped": [
+    {
+      "role": "backend",
+      "pid": 1055191
+    },
+    {
+      "role": "oracle-relay",
+      "pid": 1053736
+    }
+  ],
+  "new_lab_ssh_exit": 0,
+  "remaining_owned_processes": [],
+  "production_changed": false,
+  "old_lab_changed": false
+}

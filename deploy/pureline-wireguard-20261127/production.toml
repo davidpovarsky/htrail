@@ -5,12 +5,14 @@
 [proxy]
 mode = "regular"
 max_parallel_images = 2
+max_queued_images = 8
 max_body_bytes = 4194304
 request_timeout_seconds = 18
 fail_action = "replace"
 ignore_hosts = ["localhost","127.0.0.1","::1"]
 
 [runtime]
+process_workers = 2
 mock_models = false
 intra_op_threads = 1
 inter_op_threads = 1
@@ -36,7 +38,7 @@ path = "/srv/pureline-poc/models/runtime-manifest-fully-official.json"
 [cache]
 enabled = true
 memory_entries = 256
-sqlite_path = "/srv/pureline-poc/cache/decisions-20261127-verified.sqlite3"
+sqlite_path = "/srv/pureline-poc/cache/decisions-20261127-bounded-v5.sqlite3"
 ttl_seconds = 86400
 
 [diagnostics]

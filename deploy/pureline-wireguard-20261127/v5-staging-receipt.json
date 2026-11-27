@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-11-27T15:09:25.758675+00:00",
+  "release": "/srv/pureline-poc/releases/20261127-wireguard-bounded-v5",
+  "manifest_sha256": "e9b4424cce6a376c9ac2620cf5b5ad0ac0680264e5653042dc29eb812b13711b",
+  "production_config_sha256": "78cc703d504bbfb8bce8fcdabbde729e47d88fda8739e1699bd53bd7af401191",
+  "root_owned_read_only": true,
+  "service_user_contract_check_exit": 0,
+  "service_activated": false,
+  "management_gate": "SentinelX service_not_allowed for pureline-poc; no policy/restart bypass"
+}
