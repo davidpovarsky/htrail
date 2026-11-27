@@ -84,6 +84,7 @@ targets:
       - path: ImageFilterIntegration/Core/ExtensionSafeDiagnosticLogService.swift
       - path: ImageFilterIntegration/Core/PurelineFilterConfiguration.swift
       - path: ImageFilterIntegration/Core/DirectImageSafetyAnalyzer.swift
+      - path: ImageFilterIntegration/Core/PurelineHumanDetectionService.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.ImageFilterCore

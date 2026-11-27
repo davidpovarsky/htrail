@@ -1,0 +1,378 @@
+{
+  "schema_version": 1,
+  "scope": "Pureline iOS runtime validation attempts",
+  "status": "25 passed;1 integrated Vision inference smoke failed; model diagnosis pending",
+  "physical_device_tested": false,
+  "attempts": [
+    {
+      "interpretation": "No test methods executed; unsigned simulator packaging and launch failure",
+      "receipt": {
+        "scope": "P-NATIVE-IMAGE-LIFECYCLE-runtime26",
+        "started_utc": "2026-11-27T15:10:04.287966+00:00",
+        "status": "failed",
+        "command": [
+          "xcodebuild",
+          "-xctestrun",
+          "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Full/Build/Products/HTTrailRuntimeTests_iphonesimulator27.0-arm64.xctestrun",
+          "-destination",
+          "platform=iOS Simulator,id=6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+          "-destination-timeout",
+          "90",
+          "-parallel-testing-enabled",
+          "NO",
+          "-collect-test-diagnostics",
+          "never",
+          "-test-timeouts-enabled",
+          "YES",
+          "-default-test-execution-time-allowance",
+          "180",
+          "-maximum-test-execution-time-allowance",
+          "300",
+          "-resultBundlePath",
+          "/Users/m1/builds/_preflight/pureline-native-runtime-20261127/Runtime.xcresult",
+          "-only-testing:HTTrailRuntimeTests/IntegratedRuntimeTests",
+          "test-without-building"
+        ],
+        "source_sha256": {
+          "Sources/HTTrailCore/Proxy/DecryptedProxyHandler.swift": "258b5de5d80608b216ff93f3673845b3a2db9f6bf546c6e4835296ff2d88618f",
+          "Sources/HTTrailCore/Proxy/ProxyHandlers.swift": "169d3fb9840f0de8c03d2b788ae9f29885529b3be51d813b3b268cb6233425d6",
+          "Sources/HTTrailCore/Proxy/ProxyServer.swift": "b90ed826fea960eff220613e52b4ab1282008252d11b63877f084e5e85c1a6e5",
+          "Sources/HTTrailCore/Proxy/StreamingProxyHandler.swift": "9f2194eaa6640b1d2ab5230dfa6e001dc697b3b7c3afc5a931a38ef3a633bb8b",
+          "Tests/HTTrailCoreTests/StreamingProxyTests.swift": "b68d4b1fd0b55cf57d852a695b120ef33998a3cbc20704ad936b10dffd7d9e00",
+          "iosapp/ImageFilterIntegration/Core/DirectImageSafetyAnalyzer.swift": "e70dfe2635c0ddf324122728d17fe9698056101f50fe87851ebce821a496a0db",
+          "iosapp/ImageFilterIntegration/Core/PurelineFilterConfiguration.swift": "9ecf839fa57484ce8c435bcfe91189b62321da53639abe6c27c647e3a7a97120",
+          "iosapp/PacketTunnel/ImageFilterProxyBridge.swift": "5079c0757bfc8c2801d1b71518f5e689d8bd75d8e1896df1673dcc2e1da91409",
+          "iosapp/PacketTunnel/PacketTunnelProvider.swift": "2ddc7017a7c55669efa58b77584d334cfd8496255b3021a34050f268c8eb308f",
+          "iosapp/PurelineIntegration/Capture/PurelineBoundedFlowSink.swift": "12476ba5a4543d346d8d23e34389cfc1c32becafa094d102955527deb1a30c31",
+          "iosapp/PurelineIntegration/Configuration/PurelineDefaultFilterConfiguration.json": "35d68e332028532de683d5d3bff2a5d3e00a907bb9c07e0ad5ce3eddeef2aec8",
+          "iosapp/PurelineIntegration/ImageFiltering/PurelineImageResponsePolicy.swift": "2aa47f76985f9a7825db837db5082653d22fef478d44a1812dfe2ee4c00b43e4",
+          "iosapp/PurelineIntegration/ImageFiltering/PurelineInspectionAdmissionController.swift": "a49578ecab87bedc1057d9f106a4ee4431bbaca7c413adbc42274efba0007242",
+          "iosapp/RuntimeTests/IntegratedRuntimeTests.swift": "e4b32eee8b070d0b2a3922a750a14918271e35b341b3b7309b62fba32b8033d3",
+          "Package.swift": "904986ec446a0e3f2ac9ea77f8b2212057dccd1820a59b85ea46a637a1ede2bd",
+          "Package.resolved": "fa869fcaf1ce81c2850bb0b303ca12ab9ea409b8304f32b153623f411ec2195c",
+          "Tests/HTTrailCoreTests/WebSocketCaptureTests.swift": "4a02c5db78bea936c18340b815063925e6d20de5ff0131dd73044ed97508d680",
+          "iosapp/project.yml": "b66945df9725b147d6477070369b85066315b8a3892ac1f4751d394f926fdfce",
+          "iosapp/HTTrailiOS.xcodeproj/project.pbxproj": "db09b6cde7549b63a1b109bf6fae3459af4c59edb89bc45720bac3e5481cdc54",
+          "iosapp/HTTrailiOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "68b3c03c349dd9c6c35ddd307fe1e673b52dec5c777c7fb40397006624df4039"
+        },
+        "build_receipt_sha256": "939321348066d9af865ab626c311845292cc63778a4ceaa90797f89ec3acbb1c",
+        "xctestrun_sha256": "037d22790dd75477da286910971823e67b675870ed1956b3073259e8e68a83bf",
+        "model_qualification_receipt_sha256": "6be592e735fecefb8eb31cc121e84c314573cdd2e083efd0d612dc4638be6864",
+        "expected_tests": 26,
+        "physical_device_tested": false,
+        "exit_code": 65,
+        "source_unchanged": true,
+        "finished_utc": "2026-11-27T15:10:19.263453+00:00",
+        "xcresult_summary": {
+          "devicesAndConfigurations": [
+            {
+              "device": {
+                "architecture": "arm64",
+                "deviceId": "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+                "deviceName": "Pureline-WireGuard-QA-20261127",
+                "modelName": "iPad Pro 13-inch (M5)",
+                "osBuildNumber": "24A434",
+                "osVersion": "27.0",
+                "platform": "iOS Simulator"
+              },
+              "expectedFailures": 0,
+              "failedTests": 1,
+              "passedTests": 0,
+              "skippedTests": 0,
+              "testPlanConfiguration": {
+                "configurationId": "1",
+                "configurationName": "Test Scheme Action"
+              }
+            }
+          ],
+          "environmentDescription": "HTTrailRuntimeTests \u00b7 Built with macOS 27.0",
+          "expectedFailures": 0,
+          "failedTests": 1,
+          "finishTime": 1795792218.371,
+          "passedTests": 0,
+          "result": "Failed",
+          "runtimeWarnings": [],
+          "skippedTests": 0,
+          "startTime": 1795792205.282,
+          "statistics": [],
+          "testFailures": [
+            {
+              "failureText": "Failed to install or launch the test runner. (Underlying Error: Simulator device failed to launch com.davidpovarsky.pureline.ImageFilterRuntimeHost. No such process. (Underlying Error: Application launch for 'com.davidpovarsky.pureline.ImageFilterRuntimeHost' did not return a process handle nor launch error. No such process))",
+              "targetName": "HTTrailRuntimeTests",
+              "testIdentifier": 1,
+              "testIdentifierString": "ImageFilterRuntimeHost encountered an error",
+              "testName": "ImageFilterRuntimeHost encountered an error"
+            }
+          ],
+          "title": "Test - HTTrailRuntimeTests",
+          "topInsights": [],
+          "totalTestCount": 1
+        },
+        "destination": {
+          "device_id": "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+          "name": "Pureline-WireGuard-QA-20261127",
+          "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-27-0"
+        }
+      },
+      "original_receipt_path": "/Users/m1/builds/_preflight/pureline-native-runtime-20261127/runtime-receipt.json",
+      "original_receipt_sha256": "ef03966aa1ae36b9d24c89f448610c29526891c5ef31b070fe819cec10630275",
+      "original_log_path": "/Users/m1/builds/_preflight/pureline-native-runtime-20261127/runtime.log",
+      "original_log_sha256": "abfb3dc7a52e93f0c3ead32a12461af84808da5e7848d49a2687232e201443d1"
+    },
+    {
+      "interpretation": "No test methods executed; corrected ad-hoc signature passes but XCTest launch still failed",
+      "receipt": {
+        "scope": "P-NATIVE-IMAGE-LIFECYCLE-runtime26",
+        "started_utc": "2026-11-27T15:14:45.659292+00:00",
+        "status": "failed",
+        "command": [
+          "xcodebuild",
+          "-xctestrun",
+          "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Full/Build/Products/HTTrailRuntimeTests_iphonesimulator27.0-arm64.xctestrun",
+          "-destination",
+          "platform=iOS Simulator,id=6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+          "-destination-timeout",
+          "90",
+          "-parallel-testing-enabled",
+          "NO",
+          "-collect-test-diagnostics",
+          "never",
+          "-test-timeouts-enabled",
+          "YES",
+          "-default-test-execution-time-allowance",
+          "180",
+          "-maximum-test-execution-time-allowance",
+          "300",
+          "-resultBundlePath",
+          "/Users/m1/builds/_preflight/pureline-native-runtime-20261127/RuntimeAdhoc.xcresult",
+          "-only-testing:HTTrailRuntimeTests/IntegratedRuntimeTests",
+          "test-without-building"
+        ],
+        "source_sha256": {
+          "Sources/HTTrailCore/Proxy/DecryptedProxyHandler.swift": "258b5de5d80608b216ff93f3673845b3a2db9f6bf546c6e4835296ff2d88618f",
+          "Sources/HTTrailCore/Proxy/ProxyHandlers.swift": "169d3fb9840f0de8c03d2b788ae9f29885529b3be51d813b3b268cb6233425d6",
+          "Sources/HTTrailCore/Proxy/ProxyServer.swift": "b90ed826fea960eff220613e52b4ab1282008252d11b63877f084e5e85c1a6e5",
+          "Sources/HTTrailCore/Proxy/StreamingProxyHandler.swift": "9f2194eaa6640b1d2ab5230dfa6e001dc697b3b7c3afc5a931a38ef3a633bb8b",
+          "Tests/HTTrailCoreTests/StreamingProxyTests.swift": "b68d4b1fd0b55cf57d852a695b120ef33998a3cbc20704ad936b10dffd7d9e00",
+          "iosapp/ImageFilterIntegration/Core/DirectImageSafetyAnalyzer.swift": "e70dfe2635c0ddf324122728d17fe9698056101f50fe87851ebce821a496a0db",
+          "iosapp/ImageFilterIntegration/Core/PurelineFilterConfiguration.swift": "9ecf839fa57484ce8c435bcfe91189b62321da53639abe6c27c647e3a7a97120",
+          "iosapp/PacketTunnel/ImageFilterProxyBridge.swift": "5079c0757bfc8c2801d1b71518f5e689d8bd75d8e1896df1673dcc2e1da91409",
+          "iosapp/PacketTunnel/PacketTunnelProvider.swift": "2ddc7017a7c55669efa58b77584d334cfd8496255b3021a34050f268c8eb308f",
+          "iosapp/PurelineIntegration/Capture/PurelineBoundedFlowSink.swift": "12476ba5a4543d346d8d23e34389cfc1c32becafa094d102955527deb1a30c31",
+          "iosapp/PurelineIntegration/Configuration/PurelineDefaultFilterConfiguration.json": "35d68e332028532de683d5d3bff2a5d3e00a907bb9c07e0ad5ce3eddeef2aec8",
+          "iosapp/PurelineIntegration/ImageFiltering/PurelineImageResponsePolicy.swift": "2aa47f76985f9a7825db837db5082653d22fef478d44a1812dfe2ee4c00b43e4",
+          "iosapp/PurelineIntegration/ImageFiltering/PurelineInspectionAdmissionController.swift": "a49578ecab87bedc1057d9f106a4ee4431bbaca7c413adbc42274efba0007242",
+          "iosapp/RuntimeTests/IntegratedRuntimeTests.swift": "e4b32eee8b070d0b2a3922a750a14918271e35b341b3b7309b62fba32b8033d3",
+          "Package.swift": "904986ec446a0e3f2ac9ea77f8b2212057dccd1820a59b85ea46a637a1ede2bd",
+          "Package.resolved": "fa869fcaf1ce81c2850bb0b303ca12ab9ea409b8304f32b153623f411ec2195c",
+          "Tests/HTTrailCoreTests/WebSocketCaptureTests.swift": "4a02c5db78bea936c18340b815063925e6d20de5ff0131dd73044ed97508d680",
+          "iosapp/project.yml": "b66945df9725b147d6477070369b85066315b8a3892ac1f4751d394f926fdfce",
+          "iosapp/HTTrailiOS.xcodeproj/project.pbxproj": "db09b6cde7549b63a1b109bf6fae3459af4c59edb89bc45720bac3e5481cdc54",
+          "iosapp/HTTrailiOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "68b3c03c349dd9c6c35ddd307fe1e673b52dec5c777c7fb40397006624df4039"
+        },
+        "build_receipt_sha256": "bf11946b17de19e64ba293dbd35346aff81003a1ffa308487672db8374d5b9e2",
+        "xctestrun_sha256": "037d22790dd75477da286910971823e67b675870ed1956b3073259e8e68a83bf",
+        "model_qualification_receipt_sha256": "6be592e735fecefb8eb31cc121e84c314573cdd2e083efd0d612dc4638be6864",
+        "expected_tests": 26,
+        "physical_device_tested": false,
+        "prior_attempt": "Runtime.xcresult: host launch failure before tests; packaging corrected with Xcode ad-hoc signing",
+        "exit_code": 65,
+        "source_unchanged": true,
+        "finished_utc": "2026-11-27T15:14:48.800266+00:00",
+        "xcresult_summary": {
+          "devicesAndConfigurations": [
+            {
+              "device": {
+                "architecture": "arm64",
+                "deviceId": "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+                "deviceName": "Pureline-WireGuard-QA-20261127",
+                "modelName": "iPad Pro 13-inch (M5)",
+                "osBuildNumber": "24A434",
+                "osVersion": "27.0",
+                "platform": "iOS Simulator"
+              },
+              "expectedFailures": 0,
+              "failedTests": 1,
+              "passedTests": 0,
+              "skippedTests": 0,
+              "testPlanConfiguration": {
+                "configurationId": "1",
+                "configurationName": "Test Scheme Action"
+              }
+            }
+          ],
+          "environmentDescription": "HTTrailRuntimeTests \u00b7 Built with macOS 27.0",
+          "expectedFailures": 0,
+          "failedTests": 1,
+          "finishTime": 1795792488.627,
+          "passedTests": 0,
+          "result": "Failed",
+          "runtimeWarnings": [],
+          "skippedTests": 0,
+          "startTime": 1795792486.488,
+          "statistics": [],
+          "testFailures": [
+            {
+              "failureText": "Failed to install or launch the test runner. (Underlying Error: Simulator device failed to launch com.davidpovarsky.pureline.ImageFilterRuntimeHost. No such process. (Underlying Error: Application launch for 'com.davidpovarsky.pureline.ImageFilterRuntimeHost' did not return a process handle nor launch error. No such process))",
+              "targetName": "HTTrailRuntimeTests",
+              "testIdentifier": 1,
+              "testIdentifierString": "ImageFilterRuntimeHost encountered an error",
+              "testName": "ImageFilterRuntimeHost encountered an error"
+            }
+          ],
+          "title": "Test - HTTrailRuntimeTests",
+          "topInsights": [],
+          "totalTestCount": 1
+        },
+        "expected_count_passed": false,
+        "destination": {
+          "device_id": "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+          "name": "Pureline-WireGuard-QA-20261127",
+          "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-27-0"
+        }
+      },
+      "original_receipt_path": "/Users/m1/builds/_preflight/pureline-native-runtime-20261127/runtime-adhoc-receipt.json",
+      "original_receipt_sha256": "e5fbe482cd16ae837a47c74b6f922249c80f682f27c7f2a0106332ceb0c69356",
+      "original_log_path": "/Users/m1/builds/_preflight/pureline-native-runtime-20261127/runtime-adhoc.log",
+      "original_log_sha256": "d36ecb63939ed6bc591fecc1682737e07be0df81de84c3c1721e0eb16f5e121a"
+    },
+    {
+      "interpretation": "All26 test methods executed with explicit en/US;25 pass,1 visionFailed",
+      "receipt": {
+        "scope": "P-NATIVE-IMAGE-LIFECYCLE-runtime26",
+        "started_utc": "2026-11-27T15:21:48.697196+00:00",
+        "status": "failed",
+        "command": [
+          "xcodebuild",
+          "-xctestrun",
+          "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Full/Build/Products/HTTrailRuntimeTests_iphonesimulator27.0-arm64.xctestrun",
+          "-destination",
+          "platform=iOS Simulator,id=6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+          "-destination-timeout",
+          "90",
+          "-parallel-testing-enabled",
+          "NO",
+          "-collect-test-diagnostics",
+          "never",
+          "-test-timeouts-enabled",
+          "YES",
+          "-default-test-execution-time-allowance",
+          "180",
+          "-maximum-test-execution-time-allowance",
+          "300",
+          "-resultBundlePath",
+          "/Users/m1/builds/_preflight/pureline-native-runtime-20261127/RuntimeLocale.xcresult",
+          "-only-testing:HTTrailRuntimeTests/IntegratedRuntimeTests",
+          "-testLanguage",
+          "en",
+          "-testRegion",
+          "US",
+          "test-without-building"
+        ],
+        "source_sha256": {
+          "Sources/HTTrailCore/Proxy/DecryptedProxyHandler.swift": "258b5de5d80608b216ff93f3673845b3a2db9f6bf546c6e4835296ff2d88618f",
+          "Sources/HTTrailCore/Proxy/ProxyHandlers.swift": "169d3fb9840f0de8c03d2b788ae9f29885529b3be51d813b3b268cb6233425d6",
+          "Sources/HTTrailCore/Proxy/ProxyServer.swift": "b90ed826fea960eff220613e52b4ab1282008252d11b63877f084e5e85c1a6e5",
+          "Sources/HTTrailCore/Proxy/StreamingProxyHandler.swift": "9f2194eaa6640b1d2ab5230dfa6e001dc697b3b7c3afc5a931a38ef3a633bb8b",
+          "Tests/HTTrailCoreTests/StreamingProxyTests.swift": "b68d4b1fd0b55cf57d852a695b120ef33998a3cbc20704ad936b10dffd7d9e00",
+          "iosapp/ImageFilterIntegration/Core/DirectImageSafetyAnalyzer.swift": "e70dfe2635c0ddf324122728d17fe9698056101f50fe87851ebce821a496a0db",
+          "iosapp/ImageFilterIntegration/Core/PurelineFilterConfiguration.swift": "9ecf839fa57484ce8c435bcfe91189b62321da53639abe6c27c647e3a7a97120",
+          "iosapp/PacketTunnel/ImageFilterProxyBridge.swift": "5079c0757bfc8c2801d1b71518f5e689d8bd75d8e1896df1673dcc2e1da91409",
+          "iosapp/PacketTunnel/PacketTunnelProvider.swift": "2ddc7017a7c55669efa58b77584d334cfd8496255b3021a34050f268c8eb308f",
+          "iosapp/PurelineIntegration/Capture/PurelineBoundedFlowSink.swift": "12476ba5a4543d346d8d23e34389cfc1c32becafa094d102955527deb1a30c31",
+          "iosapp/PurelineIntegration/Configuration/PurelineDefaultFilterConfiguration.json": "35d68e332028532de683d5d3bff2a5d3e00a907bb9c07e0ad5ce3eddeef2aec8",
+          "iosapp/PurelineIntegration/ImageFiltering/PurelineImageResponsePolicy.swift": "2aa47f76985f9a7825db837db5082653d22fef478d44a1812dfe2ee4c00b43e4",
+          "iosapp/PurelineIntegration/ImageFiltering/PurelineInspectionAdmissionController.swift": "a49578ecab87bedc1057d9f106a4ee4431bbaca7c413adbc42274efba0007242",
+          "iosapp/RuntimeTests/IntegratedRuntimeTests.swift": "e4b32eee8b070d0b2a3922a750a14918271e35b341b3b7309b62fba32b8033d3",
+          "Package.swift": "904986ec446a0e3f2ac9ea77f8b2212057dccd1820a59b85ea46a637a1ede2bd",
+          "Package.resolved": "fa869fcaf1ce81c2850bb0b303ca12ab9ea409b8304f32b153623f411ec2195c",
+          "Tests/HTTrailCoreTests/WebSocketCaptureTests.swift": "4a02c5db78bea936c18340b815063925e6d20de5ff0131dd73044ed97508d680",
+          "iosapp/project.yml": "b66945df9725b147d6477070369b85066315b8a3892ac1f4751d394f926fdfce",
+          "iosapp/HTTrailiOS.xcodeproj/project.pbxproj": "db09b6cde7549b63a1b109bf6fae3459af4c59edb89bc45720bac3e5481cdc54",
+          "iosapp/HTTrailiOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "68b3c03c349dd9c6c35ddd307fe1e673b52dec5c777c7fb40397006624df4039"
+        },
+        "build_receipt_sha256": "bf11946b17de19e64ba293dbd35346aff81003a1ffa308487672db8374d5b9e2",
+        "xctestrun_sha256": "037d22790dd75477da286910971823e67b675870ed1956b3073259e8e68a83bf",
+        "model_qualification_receipt_sha256": "6be592e735fecefb8eb31cc121e84c314573cdd2e083efd0d612dc4638be6864",
+        "expected_tests": 26,
+        "physical_device_tested": false,
+        "launch_diagnostic": "Generated xctestrun TestLanguage and TestRegion were empty; explicit en/US CLI override. Host ad-hoc signature verifies and direct simctl launch proved normal startup. No source/binary/injection/scheme changes.",
+        "exit_code": 65,
+        "source_unchanged": true,
+        "finished_utc": "2026-11-27T15:21:54.900496+00:00",
+        "xcresult_summary": {
+          "devicesAndConfigurations": [
+            {
+              "device": {
+                "architecture": "arm64",
+                "deviceId": "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+                "deviceName": "Pureline-WireGuard-QA-20261127",
+                "modelName": "iPad Pro 13-inch (M5)",
+                "osBuildNumber": "24A434",
+                "osVersion": "27.0",
+                "platform": "iOS Simulator"
+              },
+              "expectedFailures": 0,
+              "failedTests": 1,
+              "passedTests": 25,
+              "skippedTests": 0,
+              "testPlanConfiguration": {
+                "configurationId": "1",
+                "configurationName": "Test Scheme Action"
+              }
+            }
+          ],
+          "environmentDescription": "HTTrailRuntimeTests \u00b7 Built with macOS 27.0",
+          "expectedFailures": 0,
+          "failedTests": 1,
+          "finishTime": 1795792914.81,
+          "passedTests": 25,
+          "result": "Failed",
+          "runtimeWarnings": [],
+          "skippedTests": 0,
+          "startTime": 1795792909.585,
+          "statistics": [],
+          "testFailures": [
+            {
+              "failureText": "failed: caught error: \"visionFailed\"",
+              "targetName": "HTTrailRuntimeTests",
+              "testIdentifier": 8,
+              "testIdentifierString": "IntegratedRuntimeTests/testDirectImageSafetyPipelineLoadsModelsAndRunsRepeatedInference()",
+              "testIdentifierURL": "test://com.apple.xcode/HTTrailiOS/HTTrailRuntimeTests/IntegratedRuntimeTests/testDirectImageSafetyPipelineLoadsModelsAndRunsRepeatedInference",
+              "testName": "testDirectImageSafetyPipelineLoadsModelsAndRunsRepeatedInference()"
+            }
+          ],
+          "title": "Test - HTTrailRuntimeTests",
+          "topInsights": [
+            {
+              "category": "Longest Test Runs",
+              "impact": "90% of duration",
+              "text": "1 longest test run with outlier durations exceeding 1.46s (three standard deviations)"
+            }
+          ],
+          "totalTestCount": 26
+        },
+        "expected_count_passed": false,
+        "destination": {
+          "device_id": "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+          "name": "Pureline-WireGuard-QA-20261127",
+          "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-27-0"
+        }
+      },
+      "original_receipt_path": "/Users/m1/builds/_preflight/pureline-native-runtime-20261127/runtime-locale-receipt.json",
+      "original_receipt_sha256": "f040b0272591a4430865e58456af7e8e45c0cdb40c9600fe5ff1b621d59f5a2d",
+      "original_log_path": "/Users/m1/builds/_preflight/pureline-native-runtime-20261127/runtime-locale.log",
+      "original_log_sha256": "803118f017d743f04ef424c3bd01e2713cf0499f3ec9712366713eec7f099ceb"
+    }
+  ],
+  "diagnostic_logs": [
+    {
+      "path": "/Users/m1/builds/_preflight/pureline-native-runtime-20261127/vision-system-diagnostic.log",
+      "sha256": "f61456189796b26dc27153a429500baf3a64f9d79f9654fc762ddb6b014193cf"
+    },
+    {
+      "path": "/Users/m1/builds/_preflight/pureline-native-runtime-20261127/simulator-launch-diagnostic.log",
+      "sha256": "e79fefb6731b8346f2be5f2c84b7ae05c396710460e0e52204adc10f4b3f8f5d"
+    }
+  ]
+}

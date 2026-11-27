@@ -79,7 +79,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 "truncatedResponses": String(snapshot.truncatedResponseCount)
             ])
         }
-        let sink: FlowSink = boundedSink ?? NullFlowSink()
+        let sink = PurelineCompletionFlowSink(downstream: boundedSink ?? NullFlowSink()) {
+            ImageFilterProxyBridge.responseCompleted($0)
+        }
         let server = ProxyServer(port: port, certificateAuthority: ca, sink: sink, engine: engine)
         server.bindHost = "127.0.0.1"
         server.verifyUpstreamCertificates = true
@@ -92,7 +94,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         )
         ImageFilterProxyBridge.configure(server: server, diagnostics: diagnostics)
         server.streamingResponseObserver = { [weak self, diagnostics] request, response in
-            ImageFilterProxyBridge.responseCompleted(request)
             guard PurelineAntiBotChallengeDetector.isStrongChallenge(response) else { return }
             guard let self else { return }
             let info = self.antiBotStore.add(host: request.host)

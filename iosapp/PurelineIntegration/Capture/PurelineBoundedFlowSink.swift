@@ -1,6 +1,23 @@
 import Foundation
 import HTTrailCore
 
+/// Completes request-scoped resources even when an upstream fails before a
+/// response can be emitted. Response observers alone cannot see that case.
+public struct PurelineCompletionFlowSink: FlowSink {
+    private let downstream: FlowSink
+    private let completion: @Sendable (CapturedRequest) -> Void
+
+    public init(downstream: FlowSink, completion: @escaping @Sendable (CapturedRequest) -> Void) {
+        self.downstream = downstream
+        self.completion = completion
+    }
+
+    public func record(_ flow: Flow) {
+        if flow.state == .completed || flow.state == .failed { completion(flow.request) }
+        downstream.record(flow)
+    }
+}
+
 public struct PurelineCaptureLimits: Sendable, Equatable {
     public var requestPreviewBytes: Int
     public var responsePreviewBytes: Int

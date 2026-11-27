@@ -1,5 +1,4 @@
 import CoreGraphics
-import CoreImage
 import ImageIO
 import Foundation
 import UIKit
@@ -77,6 +76,12 @@ public actor PurelineModelLifecycle {
     public func snapshot() -> (state: State, attempts: Int, completions: Int) { (state, attempts, completions) }
 }
 
+public nonisolated enum DirectImageSafetyError: Error {
+    case invalidImage
+    case unsupportedImage
+    case modelUnavailable(String)
+}
+
 public nonisolated struct DirectImageSafetyDecision: Sendable {
     public let allowed: Bool
     public let risk: String
@@ -95,6 +100,44 @@ public nonisolated struct DirectImageSafetyDecision: Sendable {
     }
 }
 
+/// Decode directly into the configured raster budget. Resizing a UIImage after
+/// decoding it can already have allocated the entire original inside the tunnel.
+nonisolated enum PurelineImageDecoder {
+    static func frameCount(_ data: Data) -> Int {
+        guard let source = CGImageSourceCreateWithData(data as CFData,
+            [kCGImageSourceShouldCache: false] as CFDictionary) else { return 0 }
+        return CGImageSourceGetCount(source)
+    }
+
+    static func decode(_ data: Data, pipeline: PurelineFilterConfiguration.Pipeline) -> CGImage? {
+        guard !data.isEmpty, data.count <= pipeline.maximumImageBytes,
+              pipeline.maximumPixelDimension > 0, pipeline.maximumTotalPixels > 0,
+              let source = CGImageSourceCreateWithData(data as CFData,
+                  [kCGImageSourceShouldCache: false] as CFDictionary),
+              CGImageSourceGetCount(source) == 1,
+              let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
+              let widthValue = properties[kCGImagePropertyPixelWidth] as? NSNumber,
+              let heightValue = properties[kCGImagePropertyPixelHeight] as? NSNumber else { return nil }
+        let width = widthValue.doubleValue, height = heightValue.doubleValue
+        guard width.isFinite, height.isFinite, width > 0, height > 0 else { return nil }
+        let longestSide = max(width, height)
+        let dimensionScale = min(1, Double(pipeline.maximumPixelDimension) / longestSide)
+        let pixelScale = min(1, sqrt(Double(pipeline.maximumTotalPixels) / (width * height)))
+        let thumbnailSize = max(1, Int((longestSide * min(dimensionScale, pixelScale)).rounded(.down)))
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: thumbnailSize,
+            kCGImageSourceShouldCacheImmediately: true,
+            kCGImageSourceShouldAllowFloat: false
+        ]
+        guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary),
+              max(image.width, image.height) <= pipeline.maximumPixelDimension,
+              image.width <= pipeline.maximumTotalPixels / max(1, image.height) else { return nil }
+        return image
+    }
+}
+
 /// Pureline-owned bounded facade over vendor detector/model services. The vendor
 /// evidence pipeline and UI remain unchanged; PacketTunnel opts into this policy.
 public actor DirectImageSafetyAnalyzer {
@@ -102,12 +145,11 @@ public actor DirectImageSafetyAnalyzer {
     public nonisolated static let packetTunnelUsesMobileCLIP = true
     public nonisolated static let packetTunnelUsesNudeNet = true
 
-    private let humanDetector = HumanDetectionService()
+    private let humanDetector = PurelineHumanDetectionService()
     private let mobileCLIP: MobileCLIPService
     private let nudeNet: NudeNetService
     private let mobileLifecycle: PurelineModelLifecycle
     private let nudeLifecycle: PurelineModelLifecycle
-    private let ciContext = CIContext(options: [.cacheIntermediates: false])
     private var configuration = PurelineFilterConfiguration.builtIn
     private var revisionHash = "built-in"
 
@@ -158,9 +200,12 @@ public actor DirectImageSafetyAnalyzer {
             return DirectImageSafetyDecision(allowed: true, risk: "disabled", confidence: 0,
                                              triggeredClass: nil, personCount: 0, highestWomanScore: nil)
         }
-        guard imageData.count <= config.pipeline.maximumImageBytes,
-              let decoded = decodeAndScale(imageData, config: config) else {
-            throw NSError(domain: "PurelineImageSafety", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid or oversized image"])
+        guard imageData.count <= config.pipeline.maximumImageBytes else { throw DirectImageSafetyError.invalidImage }
+        // The local runtime has no all-frame classifier. Approving frame zero
+        // would expose uninspected animation frames to the browser.
+        guard PurelineImageDecoder.frameCount(imageData) <= 1 else { throw DirectImageSafetyError.unsupportedImage }
+        guard let decoded = PurelineImageDecoder.decode(imageData, pipeline: config.pipeline) else {
+            throw DirectImageSafetyError.invalidImage
         }
 
         var detections: [HumanDetection] = []
@@ -186,7 +231,9 @@ public actor DirectImageSafetyAnalyzer {
         var modelsRun: [String] = [], modelsPrepared: [String] = []
         var mobileEvidence: [PurelineMobileCLIPEvidence] = []
         if config.models.mobileCLIP2 {
-            if try await mobileLifecycle.prepareIfNeeded() { modelsPrepared.append("MobileCLIP2-S2") }
+            do {
+                if try await mobileLifecycle.prepareIfNeeded() { modelsPrepared.append("MobileCLIP2-S2") }
+            } catch { throw DirectImageSafetyError.modelUnavailable("MobileCLIP2-S2") }
             modelsRun.append("MobileCLIP2-S2")
             for crop in crops {
                 let result = try await mobileCLIP.classify(crop)
@@ -205,7 +252,9 @@ public actor DirectImageSafetyAnalyzer {
 
         var nudeEvidence: [PurelineNudeNetEvidence] = []
         if config.models.nudeNet {
-            if try await nudeLifecycle.prepareIfNeeded() { modelsPrepared.append("NudeNet320n") }
+            do {
+                if try await nudeLifecycle.prepareIfNeeded() { modelsPrepared.append("NudeNet320n") }
+            } catch { throw DirectImageSafetyError.modelUnavailable("NudeNet320n") }
             modelsRun.append("NudeNet320n")
             if config.nudeNet.runFullImage {
                 let batch = try await nudeNet.detect(image: UIImage(cgImage: decoded))
@@ -243,17 +292,4 @@ public actor DirectImageSafetyAnalyzer {
         )
     }
 
-    private func decodeAndScale(_ data: Data, config: PurelineFilterConfiguration) -> CGImage? {
-        guard let image = UIImage(data: data), let source = image.cgImage else { return nil }
-        let oriented = CIImage(cgImage: source).oriented(forExifOrientation: Int32(image.imageOrientation.cgImagePropertyOrientation.rawValue))
-        guard let normalized = ciContext.createCGImage(oriented, from: oriented.extent) else { return nil }
-        let width = Double(normalized.width), height = Double(normalized.height)
-        let dimensionScale = min(1, Double(config.pipeline.maximumPixelDimension) / max(width, height))
-        let pixelScale = min(1, sqrt(Double(config.pipeline.maximumTotalPixels) / max(width * height, 1)))
-        let scale = min(dimensionScale, pixelScale)
-        guard scale < 1 else { return normalized }
-        let target = CGRect(x: 0, y: 0, width: CGFloat(max(1, (width * scale).rounded())), height: CGFloat(max(1, (height * scale).rounded())))
-        let scaled = CIImage(cgImage: normalized).transformed(by: CGAffineTransform(scaleX: CGFloat(scale), y: CGFloat(scale)))
-        return ciContext.createCGImage(scaled, from: target)
-    }
 }

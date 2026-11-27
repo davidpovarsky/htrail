@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "scope": "Bounded Vision input and compute-device diagnosis",
+  "observations_collected": true,
+  "original_model_smoke_accepted": false,
+  "interpretation": "Both current bounded and prior CI default requests fail with Vision code9; advertised CPU on current bounded input succeeds. Supports a compute-backend issue in this simulator, not a decoder regression. Does not itself close original model smoke or physical-device gates.",
+  "diagnostic_receipt": {
+    "scope": "Observational Vision input/backend diagnosis only",
+    "started_utc": "2026-11-27T15:34:15.112710+00:00",
+    "status": "observations_collected",
+    "acceptance_substitute": false,
+    "diagnostic_source_sha256": "8395e621009b6e1e286b25de73186997cf8b5150661a88901110a34b824407a3",
+    "production_source_sha256": {
+      "Sources/HTTrailCore/Proxy/DecryptedProxyHandler.swift": "258b5de5d80608b216ff93f3673845b3a2db9f6bf546c6e4835296ff2d88618f",
+      "Sources/HTTrailCore/Proxy/ProxyHandlers.swift": "169d3fb9840f0de8c03d2b788ae9f29885529b3be51d813b3b268cb6233425d6",
+      "Sources/HTTrailCore/Proxy/ProxyServer.swift": "b90ed826fea960eff220613e52b4ab1282008252d11b63877f084e5e85c1a6e5",
+      "Sources/HTTrailCore/Proxy/StreamingProxyHandler.swift": "9f2194eaa6640b1d2ab5230dfa6e001dc697b3b7c3afc5a931a38ef3a633bb8b",
+      "Tests/HTTrailCoreTests/StreamingProxyTests.swift": "719baba6cf1cfdbd2e5fd10e247e5aa6c95d4c130282d1c3a2698fea79293855",
+      "iosapp/ImageFilterIntegration/Core/DirectImageSafetyAnalyzer.swift": "e70dfe2635c0ddf324122728d17fe9698056101f50fe87851ebce821a496a0db",
+      "iosapp/ImageFilterIntegration/Core/PurelineFilterConfiguration.swift": "9ecf839fa57484ce8c435bcfe91189b62321da53639abe6c27c647e3a7a97120",
+      "iosapp/PacketTunnel/ImageFilterProxyBridge.swift": "5079c0757bfc8c2801d1b71518f5e689d8bd75d8e1896df1673dcc2e1da91409",
+      "iosapp/PacketTunnel/PacketTunnelProvider.swift": "2ddc7017a7c55669efa58b77584d334cfd8496255b3021a34050f268c8eb308f",
+      "iosapp/PurelineIntegration/Capture/PurelineBoundedFlowSink.swift": "12476ba5a4543d346d8d23e34389cfc1c32becafa094d102955527deb1a30c31",
+      "iosapp/PurelineIntegration/Configuration/PurelineDefaultFilterConfiguration.json": "35d68e332028532de683d5d3bff2a5d3e00a907bb9c07e0ad5ce3eddeef2aec8",
+      "iosapp/PurelineIntegration/ImageFiltering/PurelineImageResponsePolicy.swift": "2aa47f76985f9a7825db837db5082653d22fef478d44a1812dfe2ee4c00b43e4",
+      "iosapp/PurelineIntegration/ImageFiltering/PurelineInspectionAdmissionController.swift": "a49578ecab87bedc1057d9f106a4ee4431bbaca7c413adbc42274efba0007242",
+      "iosapp/RuntimeTests/IntegratedRuntimeTests.swift": "e4b32eee8b070d0b2a3922a750a14918271e35b341b3b7309b62fba32b8033d3",
+      "Package.swift": "904986ec446a0e3f2ac9ea77f8b2212057dccd1820a59b85ea46a637a1ede2bd",
+      "Package.resolved": "fa869fcaf1ce81c2850bb0b303ca12ab9ea409b8304f32b153623f411ec2195c",
+      "Tests/HTTrailCoreTests/WebSocketCaptureTests.swift": "4a02c5db78bea936c18340b815063925e6d20de5ff0131dd73044ed97508d680",
+      "iosapp/project.yml": "b66945df9725b147d6477070369b85066315b8a3892ac1f4751d394f926fdfce",
+      "iosapp/HTTrailiOS.xcodeproj/project.pbxproj": "db09b6cde7549b63a1b109bf6fae3459af4c59edb89bc45720bac3e5481cdc54",
+      "iosapp/HTTrailiOS.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "68b3c03c349dd9c6c35ddd307fe1e673b52dec5c777c7fb40397006624df4039"
+    },
+    "validated_core_component_commit": "91f38f6",
+    "free_before_bytes": 5852495872,
+    "commands": [
+      {
+        "phase": "build",
+        "command": [
+          "xcodebuild",
+          "-project",
+          "/Users/m1/builds/pureline-wireguard-app-20261127/iosapp/HTTrailiOS.xcodeproj",
+          "-scheme",
+          "HTTrailRuntimeTests",
+          "-configuration",
+          "Debug",
+          "-destination",
+          "generic/platform=iOS Simulator",
+          "-derivedDataPath",
+          "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Full",
+          "-clonedSourcePackagesDirPath",
+          "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Full/SourcePackages",
+          "-onlyUsePackageVersionsFromResolvedFile",
+          "-disableAutomaticPackageResolution",
+          "-skipPackageUpdates",
+          "-jobs",
+          "2",
+          "-resultBundlePath",
+          "/Users/m1/builds/_preflight/pureline-vision-input-diagnostic-20261127/Build.xcresult",
+          "ARCHS=arm64",
+          "ONLY_ACTIVE_ARCH=YES",
+          "CODE_SIGNING_ALLOWED=YES",
+          "COMPILER_INDEX_STORE_ENABLE=NO",
+          "CODE_SIGN_IDENTITY=-",
+          "build-for-testing"
+        ]
+      },
+      {
+        "phase": "diagnostic-observation",
+        "command": [
+          "xcodebuild",
+          "-xctestrun",
+          "/Users/m1/caches/DerivedData/pureline-wireguard-20261127/Full/Build/Products/HTTrailRuntimeTests_iphonesimulator27.0-arm64.xctestrun",
+          "-destination",
+          "platform=iOS Simulator,id=6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+          "-destination-timeout",
+          "90",
+          "-parallel-testing-enabled",
+          "NO",
+          "-collect-test-diagnostics",
+          "never",
+          "-test-timeouts-enabled",
+          "YES",
+          "-default-test-execution-time-allowance",
+          "180",
+          "-maximum-test-execution-time-allowance",
+          "300",
+          "-resultBundlePath",
+          "/Users/m1/builds/_preflight/pureline-vision-input-diagnostic-20261127/Run.xcresult",
+          "-only-testing:HTTrailRuntimeTests/VisionInputDiagnosticTests/testCompareBoundedAndPriorVisionInputs",
+          "-testLanguage",
+          "en",
+          "-testRegion",
+          "US",
+          "test-without-building"
+        ]
+      }
+    ],
+    "diagnostic_project_sha256": "bcd71bb92c14a8c1b6a8a20417a2fd4b595100d80619a5303d00d3e93d5ce456",
+    "build_exit_code": 0,
+    "run_exit_code": 0,
+    "observations": {
+      "analyzerPrepareCompletedBeforeVision": true,
+      "observations": [
+        {
+          "alphaInfo": 6,
+          "bitsPerComponent": 8,
+          "bitsPerPixel": 32,
+          "bytesPerRow": 3776,
+          "code": 9,
+          "colorModel": 1,
+          "colorSpace": "kCGColorSpaceSRGB",
+          "cpuOnly": false,
+          "description": "Could not create inference context",
+          "domain": "com.apple.Vision",
+          "height": 2048,
+          "input": "bounded",
+          "success": false,
+          "width": 942
+        },
+        {
+          "alphaInfo": 1,
+          "bitsPerComponent": 8,
+          "bitsPerPixel": 32,
+          "bytesPerRow": 3776,
+          "code": 9,
+          "colorModel": 1,
+          "colorSpace": "kCGColorSpaceDeviceRGB",
+          "cpuOnly": false,
+          "description": "Could not create inference context",
+          "domain": "com.apple.Vision",
+          "height": 2048,
+          "input": "prior-ci",
+          "success": false,
+          "width": 942
+        },
+        {
+          "alphaInfo": 6,
+          "bitsPerComponent": 8,
+          "bitsPerPixel": 32,
+          "bytesPerRow": 3776,
+          "colorModel": 1,
+          "colorSpace": "kCGColorSpaceSRGB",
+          "computeStages": [
+            {
+              "selected": "cpu",
+              "stage": "VNComputeStage(_rawValue: VNComputeStageMain)",
+              "supported": [
+                "gpu",
+                "cpu"
+              ]
+            }
+          ],
+          "cpuOnly": true,
+          "detections": 0,
+          "height": 2048,
+          "input": "bounded",
+          "success": true,
+          "width": 942
+        }
+      ]
+    },
+    "xcresult_summary": {
+      "devicesAndConfigurations": [
+        {
+          "device": {
+            "architecture": "arm64",
+            "deviceId": "6A58D1EB-9CA4-4714-9151-2FE8B54214D7",
+            "deviceName": "Pureline-WireGuard-QA-20261127",
+            "modelName": "iPad Pro 13-inch (M5)",
+            "osBuildNumber": "24A434",
+            "osVersion": "27.0",
+            "platform": "iOS Simulator"
+          },
+          "expectedFailures": 0,
+          "failedTests": 0,
+          "passedTests": 1,
+          "skippedTests": 0,
+          "testPlanConfiguration": {
+            "configurationId": "1",
+            "configurationName": "Test Scheme Action"
+          }
+        }
+      ],
+      "environmentDescription": "HTTrailRuntimeTests \u00b7 Built with macOS 27.0",
+      "expectedFailures": 0,
+      "failedTests": 0,
+      "finishTime": 1795793671.648,
+      "passedTests": 1,
+      "result": "Passed",
+      "runtimeWarnings": [],
+      "skippedTests": 0,
+      "startTime": 1795793667.553,
+      "statistics": [],
+      "testFailures": [],
+      "title": "Test - HTTrailRuntimeTests",
+      "topInsights": [],
+      "totalTestCount": 1
+    },
+    "temporary_file_removed": true,
+    "production_source_restored": true,
+    "restore_generation_exit": 0,
+    "finished_utc": "2026-11-27T15:34:31.884372+00:00",
+    "free_after_bytes": 5671190528
+  },
+  "original_evidence": [
+    {
+      "path": "/Users/m1/builds/_preflight/pureline-vision-input-diagnostic-20261127/receipt.json",
+      "sha256": "dcd6f3ecd628f87d4b2e343ccf5d782eb0c7050a6f9128ffda800fc4b4e55067"
+    },
+    {
+      "path": "/Users/m1/builds/_preflight/pureline-vision-input-diagnostic-20261127/build.log",
+      "sha256": "540f885f56deda097d5221b4b8ea65d21db013a9e0a1ce5ede0821796ddb71f5"
+    },
+    {
+      "path": "/Users/m1/builds/_preflight/pureline-vision-input-diagnostic-20261127/run.log",
+      "sha256": "cc4a5c1d991b2a0d4ceeebf3c5bb5b900e499d179ed9e582f6a1c0b76b02bd32"
+    },
+    {
+      "path": "/Users/m1/builds/_preflight/pureline-vision-input-diagnostic-20261127/observations.json",
+      "sha256": "3eef297e7de8ba23f27b1070874f7180d34577942e17f1a166425ff2d50ed70e"
+    },
+    {
+      "path": "/Users/m1/builds/_preflight/pureline-vision-input-diagnostic-20261127/summary.json",
+      "sha256": "40a33bf1e83829eaf4825cc8e11a598f9a030c5cb1ff29da6036d93684ad00f8"
+    },
+    {
+      "path": "/Users/m1/builds/_preflight/pureline-vision-input-diagnostic-20261127/VisionComputeDeviceSDK27.txt",
+      "sha256": "3def3cd15c2dfa3fd223eee02463bdcd42d0497058bc31d7690139ebd2d2c85e"
+    }
+  ],
+  "original_failed_smoke_receipt_path": "/Users/m1/builds/_preflight/pureline-native-runtime-20261127/runtime-locale-receipt.json",
+  "original_failed_smoke_receipt_sha256": "f040b0272591a4430865e58456af7e8e45c0cdb40c9600fe5ff1b621d59f5a2d"
+}
