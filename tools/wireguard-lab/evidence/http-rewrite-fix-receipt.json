@@ -1,0 +1,6 @@
+{
+  "upstream_path": "/srv/pureline-poc/source/CrossPlatformImageFilter/src/local_image_filter/proxy/addon.py",
+  "upstream_sha256": "99623a0a768dcac250dc319732a91c4ea2ab4e6a5acf9afedf98548fff36c4e0",
+  "fixed_sha256": "0a359e1a28e26e1ca30e9f63d07c00ae60f8212509a70f76e7fb76821068a55e",
+  "change": "Remove original Content-Encoding and other invalidated representation metadata before mitmproxy response.content setter, for policy and failure replacement. Model and policy unchanged."
+}

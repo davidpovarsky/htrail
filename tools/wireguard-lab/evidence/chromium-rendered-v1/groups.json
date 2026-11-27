@@ -1,0 +1,148 @@
+{
+  "id": "groups",
+  "kind": "fixture-gallery",
+  "requested_url": "http://127.0.0.1:18524/groups.html",
+  "navigation_status": 200,
+  "navigation_error": null,
+  "elapsed_ms": 4439,
+  "all_dom_images_settled": true,
+  "screenshot": "groups.png",
+  "screenshot_error": null,
+  "dom": {
+    "title": "Pureline QA — groups",
+    "url": "http://127.0.0.1:18524/groups.html",
+    "image_count": 2,
+    "images": [
+      {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Viola_Alberti_She_1911.jpg/500px-Viola_Alberti_She_1911.jpg",
+        "alt": "wikipedia-63005541",
+        "complete": true,
+        "naturalWidth": 500,
+        "naturalHeight": 382,
+        "renderedWidth": 225,
+        "renderedHeight": 210,
+        "loading": "eager",
+        "cssBackground": "rgb(233, 237, 243)",
+        "expected": "block",
+        "observed_action": "allow",
+        "http_status": 200,
+        "decoded": true,
+        "policy_match": false
+      },
+      {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Abbott_and_Costello_circa_1940s.JPG/500px-Abbott_and_Costello_circa_1940s.JPG",
+        "alt": "wikipedia-105969",
+        "complete": true,
+        "naturalWidth": 500,
+        "naturalHeight": 618,
+        "renderedWidth": 225,
+        "renderedHeight": 210,
+        "loading": "eager",
+        "cssBackground": "rgb(233, 237, 243)",
+        "expected": "allow",
+        "observed_action": "allow",
+        "http_status": 200,
+        "decoded": true,
+        "policy_match": true
+      }
+    ],
+    "load_status_text": "2 / 2 loaded; 0 errors",
+    "body_height": 517
+  },
+  "responses": [
+    {
+      "url": "http://127.0.0.1:18524/groups.html",
+      "resourceType": "document",
+      "status": 200,
+      "contentType": "text/html",
+      "action": null,
+      "reason": null,
+      "cache": null,
+      "elapsed_ms": 21
+    },
+    {
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Viola_Alberti_She_1911.jpg/500px-Viola_Alberti_She_1911.jpg",
+      "resourceType": "image",
+      "status": 200,
+      "contentType": "image/jpeg",
+      "action": "allow",
+      "reason": "policy",
+      "cache": "miss",
+      "elapsed_ms": 2505,
+      "body_bytes": 25201,
+      "body_sha256": "7724b7f9c53b5795161e58f4d149e1e7f118bcf84db4fa4fa333b366d2476670"
+    },
+    {
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Abbott_and_Costello_circa_1940s.JPG/500px-Abbott_and_Costello_circa_1940s.JPG",
+      "resourceType": "image",
+      "status": 200,
+      "contentType": "image/jpeg",
+      "action": "allow",
+      "reason": "policy",
+      "cache": "miss",
+      "elapsed_ms": 3024,
+      "body_bytes": 84471,
+      "body_sha256": "27ed74a143e4ccbb6b65db89371fcc9b878b81e112f7790c089a2f688c24935f"
+    }
+  ],
+  "failed_requests": [],
+  "javascript_errors": [],
+  "network": [
+    {
+      "url": "http://127.0.0.1:18524/groups.html",
+      "resourceType": "Document",
+      "status": 200,
+      "mimeType": "text/html",
+      "fromDiskCache": false,
+      "fromServiceWorker": false,
+      "protocol": "http/1.0",
+      "encodedDataLength": 2991
+    },
+    {
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Viola_Alberti_She_1911.jpg/500px-Viola_Alberti_She_1911.jpg",
+      "resourceType": "Image",
+      "status": 200,
+      "mimeType": "image/jpeg",
+      "fromDiskCache": false,
+      "fromServiceWorker": false,
+      "protocol": "h2",
+      "encodedDataLength": 25501
+    },
+    {
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Abbott_and_Costello_circa_1940s.JPG/500px-Abbott_and_Costello_circa_1940s.JPG",
+      "resourceType": "Image",
+      "status": 200,
+      "mimeType": "image/jpeg",
+      "fromDiskCache": false,
+      "fromServiceWorker": false,
+      "protocol": "h2",
+      "encodedDataLength": 84826
+    }
+  ],
+  "health_after": {
+    "bytes_down": 35130,
+    "bytes_up": 25008,
+    "connected": 19,
+    "errors": 0,
+    "requests": 19,
+    "run_id": "pureline-wg-lab-20261127",
+    "transport": "wireguard-go-netstack",
+    "wireguard": {
+      "last_handshake_time_sec": "1795743197",
+      "rx_bytes": "2721291",
+      "tx_bytes": "144172"
+    }
+  },
+  "counts": {
+    "dom_images": 2,
+    "decoded_images": 2,
+    "image_network_responses": 2,
+    "actions": {
+      "allow": 2
+    },
+    "labelled_matches": 1,
+    "labelled_mismatches": 1,
+    "labelled_unresolved": 0,
+    "failed_requests": 0
+  }
+}
