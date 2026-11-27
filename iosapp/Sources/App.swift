@@ -11,7 +11,17 @@ struct HTTrailiOSApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootTabView()
+            Group {
+                #if DEBUG
+                if UserDefaults.standard.bool(forKey: "purelineLab") {
+                    NavigationStack { PurelineFilteringLabView() }
+                } else {
+                    RootTabView()
+                }
+                #else
+                RootTabView()
+                #endif
+            }
                 .environmentObject(model)
                 .environmentObject(vpn)
                 .preferredColorScheme(.dark)

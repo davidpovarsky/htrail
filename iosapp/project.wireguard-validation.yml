@@ -1,0 +1,136 @@
+name: PurelineWireGuardValidation
+options:
+  deploymentTarget:
+    iOS: "26.5"
+packages:
+  WireGuardKit:
+    path: "../Packages/PurelineWireGuard"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "26.5"
+    DEVELOPMENT_TEAM: NA6HPWARQ2
+    CODE_SIGN_STYLE: Automatic
+    LIBRARY_SEARCH_PATHS: "$(inherited) $(PURELINE_WIREGUARD_BUILD_ROOT)/$(PLATFORM_NAME)"
+    PURELINE_WIREGUARD_BUILD_ROOT: "$(HOME)/caches/DerivedData/pureline-wireguard-20261127/WireGuard"
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+    TARGETED_DEVICE_FAMILY: "1,2"
+aggregateTargets:
+  WireGuardGoBridge:
+    targets: []
+    buildScripts:
+      - name: Build official WireGuard Go bridge
+        script: |
+          python3 "$PROJECT_DIR/../scripts/build_wireguard_bridge.py" --source-root "$PROJECT_DIR/.." --platform "$PLATFORM_NAME" --go "$HOME/toolchains/go1.26.5/bin/go" --minimum-ios "$IPHONEOS_DEPLOYMENT_TARGET" --output-root "$PURELINE_WIREGUARD_BUILD_ROOT"
+        basedOnDependencyAnalysis: false
+targets:
+  PurelineWireGuardValidation:
+    type: application
+    platform: iOS
+    sources:
+      - path: WireGuardValidation/ValidationApp.swift
+      - path: WireGuardIntegration/App
+      - path: WireGuardIntegration/Shared
+    dependencies:
+      - package: WireGuardKit
+        product: WireGuardKit
+      - target: WireGuardGoBridge
+      - target: PurelineWireGuardValidationTunnel
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: "Pureline WG Validation"
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_NSLocalNetworkUsageDescription: "Connect to the isolated filtering test route."
+        INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads: YES
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "701"
+    entitlements:
+      path: WireGuardValidation/Validation.entitlements
+      properties:
+        com.apple.developer.networking.networkextension:
+          - packet-tunnel-provider
+        com.apple.security.application-groups:
+          - group.com.davidpovarsky.pureline
+  PurelineWireGuardValidationTunnel:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: WireGuardValidation/ValidationProvider.swift
+      - path: WireGuardIntegration/Shared
+      - path: WireGuardIntegration/Extension
+    dependencies:
+      - package: WireGuardKit
+        product: WireGuardKit
+      - target: WireGuardGoBridge
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.PacketTunnel
+        APPLICATION_EXTENSION_API_ONLY: YES
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../../Frameworks"
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "701"
+    info:
+      path: WireGuardValidation/TunnelInfo.plist
+      properties:
+        CFBundleDisplayName: Pureline WireGuard Validation
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.networkextension.packet-tunnel
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PurelineWGValidationProvider
+    entitlements:
+      path: WireGuardValidation/Tunnel.entitlements
+      properties:
+        com.apple.developer.networking.networkextension:
+          - packet-tunnel-provider
+        com.apple.security.application-groups:
+          - group.com.davidpovarsky.pureline
+  PurelineWireGuardTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: WireGuardTests
+    dependencies:
+      - target: PurelineWireGuardValidation
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.WireGuardTests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/PurelineWireGuardValidation.app/PurelineWireGuardValidation"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+  PurelineWireGuardUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: WireGuardUITests
+    dependencies:
+      - target: PurelineWireGuardValidation
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidpovarsky.pureline.WireGuardUITests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: PurelineWireGuardValidation
+schemes:
+  PurelineWireGuardValidation:
+    build:
+      targets:
+        PurelineWireGuardValidation: all
+        PurelineWireGuardTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - PurelineWireGuardTests
+  PurelineWireGuardUI:
+    build:
+      targets:
+        PurelineWireGuardValidation: all
+        PurelineWireGuardUITests: [test]
+        PurelineWireGuardTests: [test]
+    test:
+      config: Debug
+      targets:
+        - PurelineWireGuardUITests
+        - PurelineWireGuardTests
