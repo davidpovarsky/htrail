@@ -66,7 +66,10 @@ fi
 VERIFY_JSON="$CACHE_ROOT/conversion-verification.json"
 (
   cd "$VENDOR_DIR"
-  python tools/MobileCLIPConversion/verify_conversion.py \
+  # Match the existing iOS 27+ CPU-only runtime policy without changing parity gates.
+  python "$ROOT_DIR/scripts/verify_image_filter_conversion.py" \
+    --vendor-root "$VENDOR_DIR" \
+    --compute-units CPU_ONLY \
     --checkpoint "$CHECKPOINT_DIR/mobileclip2_s2.pt" \
     --models "$CONVERTED_DIR" \
     --output "$VERIFY_JSON"
