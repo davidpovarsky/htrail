@@ -1,0 +1,59 @@
+# Prepared production configuration: not applied. Classifier thresholds unchanged.
+# Pureline research POC (single iPad). Values override the pinned packaged defaults.
+# IMPORTANT: The proxy actually runs in mitmproxy wireguard mode; this field retains
+# the package's valid "regular" CLI mode. The service invokes mitmdump directly.
+[proxy]
+mode = "regular"
+max_parallel_images = 2
+max_body_bytes = 4194304
+request_timeout_seconds = 18
+fail_action = "replace"
+ignore_hosts = ["localhost","127.0.0.1","::1"]
+
+[runtime]
+mock_models = false
+intra_op_threads = 1
+inter_op_threads = 1
+max_concurrent_inference = 2
+provider_priority = ["CPUExecutionProvider"]
+
+[models.mobileclip]
+path = "/srv/pureline-poc/models/official_mobileclip2_s2_image_encoder.onnx"
+prompt_embeddings_path = "/srv/pureline-poc/models/official_mobileclip2_s2_prompt_embeddings.npz"
+input_name = "image"
+output_name = "embedding"
+
+[models.person]
+path = "/srv/pureline-poc/models/person_detector_official_decoded.onnx"
+
+[models.nudenet]
+path = "/srv/pureline-poc/models/nudenet320n.onnx"
+labels_path = "/srv/pureline-poc/models/nudenet_labels.json"
+
+[models.manifest]
+path = "/srv/pureline-poc/models/runtime-manifest-fully-official.json"
+
+[cache]
+enabled = true
+memory_entries = 256
+sqlite_path = "/srv/pureline-poc/cache/decisions-20261127-verified.sqlite3"
+ttl_seconds = 86400
+
+[diagnostics]
+enabled = true
+directory = "/srv/pureline-poc/diagnostics"
+store_urls = false
+store_image_bytes = false
+store_crops = false
+max_jsonl_bytes = 5000000
+
+[processing]
+maximum_person_crops = 12
+maximum_dimension = 1536
+maximum_total_pixels = 4194304
+animated_image_mode = "replace"
+
+# Research-only recalibration, all other shipped policy defaults are preserved.
+[policy]
+woman_min_score = 0.20
+face_fallback_woman_min_score = 0.20

@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-27",
+  "target": "pureline-poc",
+  "purpose_built_operation": "sentinel_service_status",
+  "result": "service_not_allowed",
+  "registered_services": [
+    "docker",
+    "nginx",
+    "sentinelx-cloud-core"
+  ],
+  "production_change_performed": false,
+  "policy_change_performed": false,
+  "proposed_files": [
+    "90-verified-candidate.conf",
+    "production.toml"
+  ],
+  "baseline_observed": {
+    "active": true,
+    "pid": 3542726,
+    "user": "chatgpt-agent",
+    "memory_max_bytes": 2147483648,
+    "udp_port": 51820,
+    "config": "/srv/pureline-poc/config/pureline-v2.toml"
+  }
+}
