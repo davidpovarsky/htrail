@@ -82,20 +82,12 @@ class PurelineRemoteFilter(LocalImageFilterAddon):
             return
         mime = self._mime_type(response)
         if mime.startswith("image/") or mime in AMBIGUOUS:
+            response.stream = False
             return  # image responses must be buffered so the AI can analyze
-        try:
-            length = int(response.headers.get("content-length", "0"))
-        except (ValueError, TypeError):
-            length = 0
-        # Preserve ordinary HTML, CSS, JavaScript and JSON response handling.
-        # Stream only continuous streams, media or very large non-image assets.
-        if (
-            mime.startswith(("audio/", "video/"))
-            or mime in STREAMING_TYPES
-            or length > 2_000_000
-        ):
-            response.stream = True
-            self._count("streamed_nonimage")
+        # No downstream inspection mutates non-image bodies. Let HTML, CSS,
+        # JavaScript and streams render while independent images are inspected.
+        response.stream = True
+        self._count("streamed_nonimage")
 
     async def response(self, flow: http.HTTPFlow) -> None:
         response = flow.response
@@ -116,6 +108,7 @@ class PurelineRemoteFilter(LocalImageFilterAddon):
             self._count(f"image_{action}")
         if response.headers.get("x-local-image-filter-reason") in {
             "model-failure", "missing-rewrite", "policy-error",
+            "inspection-timeout", "inspection-queue-full", "worker-failure",
         }:
             self._count("image_pipeline_failure")
 

@@ -58,10 +58,13 @@ class LocalImageFilterAddon:
             help="Path to Local AI Image Filter TOML configuration",
         )
 
+    def create_runtime(self, settings):
+        return build_runtime(settings)
+
     def running(self) -> None:
         configured = str(ctx.options.local_image_filter_config).strip() or None
         settings = load_settings(configured)
-        self.runtime = build_runtime(settings)
+        self.runtime = self.create_runtime(settings)
         proxy_config = settings.section("proxy")
         self.eligibility = ResponseEligibility(proxy_config)
         concurrency = min(
@@ -76,6 +79,10 @@ class LocalImageFilterAddon:
             f"Local image filter ready; config={settings.source_description}; "
             f"providers={self.runtime.selected_providers}"
         )
+
+    async def inspect(self, content, mime_type, flow):
+        async with self.semaphore:
+            return await asyncio.to_thread(self.runtime.pipeline.filter_bytes, content, mime_type, None)
 
     async def response(self, flow: http.HTTPFlow) -> None:
         if self.runtime is None or self.eligibility is None or self.semaphore is None:
@@ -94,30 +101,26 @@ class LocalImageFilterAddon:
         if result.disposition == ResponseDisposition.IGNORE:
             return
         if result.disposition == ResponseDisposition.FAIL_CLOSED_IMAGE:
-            body, mime_type = create_failure_placeholder(content, text="Image not inspected")
+            body, mime_type = create_failure_placeholder(b"", text="Image not inspected")
             apply_replacement(response, body, mime_type, reason=result.reason)
             return
 
-        async with self.semaphore:
-            try:
-                outcome = await asyncio.to_thread(
-                    self.runtime.pipeline.filter_bytes,
-                    content,
-                    result.mime_type,
-                    None,
-                )
-            except Exception as error:
-                ctx.log.error(f"Image filter pipeline error: {error.__class__.__name__}: {error}")
-                fail_action = str(
-                    self.runtime.settings.section("proxy").get("fail_action", "replace")
-                )
-                if fail_action == "allow":
-                    response.headers["x-local-image-filter"] = "allow"
-                    response.headers["x-local-image-filter-reason"] = "model-failure-fail-open"
-                    return
-                body, mime_type = create_failure_placeholder(content, text="Image analysis failed")
-                apply_replacement(response, body, mime_type, reason="model-failure")
+        try:
+            outcome = await self.inspect(content, result.mime_type, flow)
+        except Exception as error:
+            # Do not include a raw exception message: libraries may embed URLs.
+            ctx.log.error(f"Image filter pipeline error: {error.__class__.__name__}")
+            fail_action = str(self.runtime.settings.section("proxy").get("fail_action", "replace"))
+            if fail_action == "allow":
+                response.headers["x-local-image-filter"] = "allow"
+                response.headers["x-local-image-filter-reason"] = "model-failure-fail-open"
                 return
+            reason = getattr(error, "reason", "model-failure")
+            if reason not in {"inspection-timeout", "inspection-queue-full", "worker-failure"}:
+                reason = "model-failure"
+            body, mime_type = create_failure_placeholder(b"", text="Image analysis unavailable")
+            apply_replacement(response, body, mime_type, reason=reason)
+            return
 
         response.headers["x-local-image-filter"] = outcome.decision.action.value
         response.headers["x-local-image-filter-cache"] = "hit" if outcome.cache_hit else "miss"
@@ -125,7 +128,7 @@ class LocalImageFilterAddon:
 
         if outcome.decision.action in {FilterAction.BLUR, FilterAction.REPLACE}:
             if outcome.replacement_bytes is None:
-                body, mime_type = create_failure_placeholder(content, text="Image unavailable")
+                body, mime_type = create_failure_placeholder(b"", text="Image unavailable")
                 apply_replacement(response, body, mime_type, reason="missing-rewrite")
                 return
             # Invalidate the original encoding before assigning decoded pixels.
@@ -150,7 +153,7 @@ class LocalImageFilterAddon:
                 response.headers["x-local-image-filter-policy-exception"] = curated["id"]
                 response.headers["x-local-image-filter-reason"] = "curated-public-ui-asset"
         elif outcome.decision.action == FilterAction.ERROR:
-            body, mime_type = create_failure_placeholder(content, text="Image analysis failed")
+            body, mime_type = create_failure_placeholder(b"", text="Image analysis failed")
             apply_replacement(response, body, mime_type, reason="policy-error")
 
 

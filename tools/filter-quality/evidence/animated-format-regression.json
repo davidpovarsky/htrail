@@ -1,0 +1,350 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-27T15:01:22.248634+00:00",
+  "passed": true,
+  "cases": 26,
+  "actual_image_decoding": true,
+  "actual_model_inference": false,
+  "accuracy_samples_added": 0,
+  "rows": [
+    {
+      "id": "all-safe-gif-preserves-original",
+      "action": "allow",
+      "expected": "allow",
+      "classifier_calls": 3,
+      "animation": {
+        "mode": "every-composited-frame",
+        "sourceFormat": "GIF",
+        "framesInspected": 3,
+        "uniqueFramesInspected": 3,
+        "complete": true,
+        "durationMs": 16,
+        "presentation": "original-animation"
+      },
+      "reason": null,
+      "passed": true
+    },
+    {
+      "id": "last-frame-blocked-no-first-frame-bypass",
+      "action": "blur",
+      "expected": "blur",
+      "classifier_calls": 3,
+      "animation": {
+        "mode": "every-composited-frame",
+        "sourceFormat": "GIF",
+        "framesInspected": 3,
+        "uniqueFramesInspected": 3,
+        "complete": false,
+        "durationMs": 4,
+        "presentation": "static-replacement"
+      },
+      "reason": null,
+      "passed": true
+    },
+    {
+      "id": "first-frame-blocked",
+      "action": "blur",
+      "expected": "blur",
+      "classifier_calls": 1,
+      "animation": {
+        "mode": "every-composited-frame",
+        "sourceFormat": "GIF",
+        "framesInspected": 1,
+        "uniqueFramesInspected": 1,
+        "complete": false,
+        "durationMs": 3,
+        "presentation": "static-replacement"
+      },
+      "reason": null,
+      "passed": true
+    },
+    {
+      "id": "middle-single-flash-blocked",
+      "action": "blur",
+      "expected": "blur",
+      "classifier_calls": 2,
+      "animation": {
+        "mode": "every-composited-frame",
+        "sourceFormat": "GIF",
+        "framesInspected": 2,
+        "uniqueFramesInspected": 2,
+        "complete": false,
+        "durationMs": 3,
+        "presentation": "static-replacement"
+      },
+      "reason": null,
+      "passed": true
+    },
+    {
+      "id": "all-safe-apng",
+      "action": "allow",
+      "expected": "allow",
+      "classifier_calls": 2,
+      "animation": {
+        "mode": "every-composited-frame",
+        "sourceFormat": "PNG",
+        "framesInspected": 2,
+        "uniqueFramesInspected": 2,
+        "complete": true,
+        "durationMs": 2,
+        "presentation": "original-animation"
+      },
+      "reason": null,
+      "passed": true
+    },
+    {
+      "id": "last-frame-blocked-apng",
+      "action": "blur",
+      "expected": "blur",
+      "classifier_calls": 2,
+      "animation": {
+        "mode": "every-composited-frame",
+        "sourceFormat": "PNG",
+        "framesInspected": 2,
+        "uniqueFramesInspected": 2,
+        "complete": false,
+        "durationMs": 1,
+        "presentation": "static-replacement"
+      },
+      "reason": null,
+      "passed": true
+    },
+    {
+      "id": "apng-false-frame-count-1",
+      "action": "reject",
+      "expected": "reject",
+      "classifier_calls": 0,
+      "animation": null,
+      "reason": "animation-apng-frame-count-mismatch",
+      "passed": true
+    },
+    {
+      "id": "apng-false-frame-count-3",
+      "action": "reject",
+      "expected": "reject",
+      "classifier_calls": 0,
+      "animation": null,
+      "reason": "animation-apng-frame-count-mismatch",
+      "passed": true
+    },
+    {
+      "id": "apng-missing-iend",
+      "action": "reject",
+      "expected": "reject",
+      "classifier_calls": 0,
+      "animation": null,
+      "reason": "animation-truncated-png",
+      "passed": true
+    },
+    {
+      "id": "apng-invalid-control-crc",
+      "action": "reject",
+      "expected": "reject",
+      "classifier_calls": 0,
+      "animation": null,
+      "reason": "animation-invalid-png-control-crc",
+      "passed": true
+    },
+    {
+      "id": "apng-separate-default-navy",
+      "action": "allow",
+      "expected": "allow",
+      "classifier_calls": 3,
+      "animation": {
+        "mode": "every-composited-frame",
+        "sourceFormat": "PNG",
+        "framesInspected": 3,
+        "uniqueFramesInspected": 3,
+        "complete": true,
+        "durationMs": 1,
+        "presentation": "original-animation"
+      },
+      "reason": null,
+      "passed": true
+    },
+    {
+      "id": "apng-separate-default-red",
+      "action": "blur",
+      "expected": "blur",
+      "classifier_calls": 1,
+      "animation": {
+        "mode": "every-composited-frame",
+        "sourceFormat": "PNG",
+        "framesInspected": 1,
+        "uniqueFramesInspected": 1,
+        "complete": false,
+        "durationMs": 1,
+        "presentation": "static-replacement"
+      },
+      "reason": null,
+      "passed": true
+    },
+    {
+      "id": "all-safe-webp",
+      "action": "allow",
+      "expected": "allow",
+      "classifier_calls": 2,
+      "animation": {
+        "mode": "every-composited-frame",
+        "sourceFormat": "WEBP",
+        "framesInspected": 2,
+        "uniqueFramesInspected": 2,
+        "complete": true,
+        "durationMs": 3,
+        "presentation": "original-animation"
+      },
+      "reason": null,
+      "passed": true
+    },
+    {
+      "id": "last-frame-blocked-webp",
+      "action": "blur",
+      "expected": "blur",
+      "classifier_calls": 2,
+      "animation": {
+        "mode": "every-composited-frame",
+        "sourceFormat": "WEBP",
+        "framesInspected": 2,
+        "uniqueFramesInspected": 2,
+        "complete": false,
+        "durationMs": 3,
+        "presentation": "static-replacement"
+      },
+      "reason": null,
+      "passed": true
+    },
+    {
+      "id": "frame-count-exhaustion",
+      "action": "reject",
+      "expected": "reject",
+      "classifier_calls": 0,
+      "animation": null,
+      "reason": "animation-frame-limit",
+      "passed": true
+    },
+    {
+      "id": "frame-pixels-exhaustion",
+      "action": "reject",
+      "expected": "reject",
+      "classifier_calls": 0,
+      "animation": null,
+      "reason": "animation-frame-pixel-limit",
+      "passed": true
+    },
+    {
+      "id": "total-pixels-exhaustion",
+      "action": "reject",
+      "expected": "reject",
+      "classifier_calls": 1,
+      "animation": null,
+      "reason": "animation-decoded-pixel-limit",
+      "passed": true
+    },
+    {
+      "id": "input-bytes-exhaustion",
+      "action": "reject",
+      "expected": "reject",
+      "classifier_calls": 0,
+      "animation": null,
+      "reason": "animation-byte-limit",
+      "passed": true
+    },
+    {
+      "id": "deadline-exhaustion",
+      "action": "reject",
+      "expected": "reject",
+      "classifier_calls": 0,
+      "animation": null,
+      "reason": "animation-deadline",
+      "passed": true
+    },
+    {
+      "id": "corrupt-gif",
+      "action": "reject",
+      "expected": "reject",
+      "classifier_calls": 0,
+      "animation": null,
+      "reason": "animation-truncated-gif",
+      "passed": true
+    },
+    {
+      "id": "truncated-gif",
+      "action": "reject",
+      "expected": "reject",
+      "classifier_calls": 0,
+      "animation": null,
+      "reason": "animation-truncated-gif",
+      "passed": true
+    },
+    {
+      "id": "missing-gif-trailer",
+      "action": "reject",
+      "expected": "reject",
+      "classifier_calls": 0,
+      "animation": null,
+      "reason": "animation-truncated-gif",
+      "passed": true
+    },
+    {
+      "id": "single-static-gif-unchanged",
+      "action": "allow",
+      "expected": "allow",
+      "classifier_calls": 1,
+      "animation": null,
+      "reason": null,
+      "passed": true
+    },
+    {
+      "id": "delta-pixels-disposal-1",
+      "action": "blur",
+      "expected": "blur",
+      "classifier_calls": 2,
+      "animation": {
+        "mode": "every-composited-frame",
+        "sourceFormat": "GIF",
+        "framesInspected": 2,
+        "uniqueFramesInspected": 2,
+        "complete": false,
+        "durationMs": 3,
+        "presentation": "static-replacement"
+      },
+      "reason": null,
+      "passed": true
+    },
+    {
+      "id": "delta-pixels-disposal-2",
+      "action": "blur",
+      "expected": "blur",
+      "classifier_calls": 2,
+      "animation": {
+        "mode": "every-composited-frame",
+        "sourceFormat": "GIF",
+        "framesInspected": 2,
+        "uniqueFramesInspected": 2,
+        "complete": false,
+        "durationMs": 3,
+        "presentation": "static-replacement"
+      },
+      "reason": null,
+      "passed": true
+    },
+    {
+      "id": "delta-pixels-disposal-3",
+      "action": "blur",
+      "expected": "blur",
+      "classifier_calls": 2,
+      "animation": {
+        "mode": "every-composited-frame",
+        "sourceFormat": "GIF",
+        "framesInspected": 2,
+        "uniqueFramesInspected": 2,
+        "complete": false,
+        "durationMs": 2,
+        "presentation": "static-replacement"
+      },
+      "reason": null,
+      "passed": true
+    }
+  ],
+  "source_sha256": "13eb1d0fb5cfc478c6701c4abfeb1454228e87609c5832e794d722a61e317866"
+}
