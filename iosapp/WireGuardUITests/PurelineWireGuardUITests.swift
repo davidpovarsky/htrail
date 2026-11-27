@@ -32,10 +32,19 @@ final class PurelineWireGuardUITests: XCTestCase {
 
     @MainActor
     func test02ActualWebKitBrowsesImageGalleries() {
-        let pages = [
+        browse([
             ("allow", 10), ("block", 10), ("mixed", 10),
             ("objects", 9), ("groups", 2), ("thumbnails", 10)
-        ]
+        ])
+    }
+
+    @MainActor
+    func test04SVGAndHighResolutionImagesRenderThroughFiltering() {
+        browse([("svg", 5), ("highres", 4)])
+    }
+
+    @MainActor
+    private func browse(_ pages: [(String, Int)]) {
         for (name, count) in pages {
             let app = XCUIApplication()
             app.launchArguments = ["-purelineLab", "YES", "-purelineLabURL", "http://127.0.0.1:18524/\(name).html"]

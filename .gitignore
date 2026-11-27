@@ -49,3 +49,5 @@ Icon?
 .wireguard-lab/
 
 iosapp/PurelineWireGuardValidation.xcodeproj/
+
+iosapp/PurelineRemote.xcodeproj/

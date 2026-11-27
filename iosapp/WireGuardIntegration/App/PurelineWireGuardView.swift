@@ -27,7 +27,11 @@ struct PurelineWireGuardView: View {
                 }
                 if controller.busy { ProgressView("Updating VPN…") }
             } header: { Text("Remote filtering") } footer: {
+                #if PURELINE_REMOTE_BUILD
+                Text("Images are inspected on your configured filtering server. A connected VPN does not by itself confirm image filtering.")
+                #else
                 Text("This mode sends traffic through your selected server for filtering. The local Pureline models are used only by local capture. A connected VPN does not by itself confirm image filtering.")
+                #endif
             }
 
             if controller.hasProfile {
