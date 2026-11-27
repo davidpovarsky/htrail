@@ -10,15 +10,27 @@ import NIOWebSocket
 final class WebSocketCaptureTests: XCTestCase {
 
     func testWebSocketFramesCapturedThroughProxy() async throws {
+        try await assertWebSocketFramesCaptured(streamRequestBodies: false)
+    }
+
+    func testWebSocketFramesWithStreamingRequestsAndPool() async throws {
+        try await assertWebSocketFramesCaptured(streamRequestBodies: true)
+    }
+
+    private func assertWebSocketFramesCaptured(streamRequestBodies: Bool) async throws {
         let server = RealtimeTestServer()
         let ports = try server.start()
         defer { server.stop() }
 
         let ca = try CertificateAuthority.create()
         let sink = CollectingSink()
-        let proxyPort = 19_096
-        let proxy = ProxyServer(port: proxyPort, certificateAuthority: ca, sink: sink)
+        let proxy = ProxyServer(port: 0, certificateAuthority: ca, sink: sink)
+        proxy.streamRequestBodies = streamRequestBodies
+        proxy.upstreamConnectionPoolConfiguration = .init(
+            maximumConnectionsPerOrigin: 1, maximumConnectionsTotal: 2, idleTimeout: 5
+        )
         try await proxy.start()
+        let proxyPort = proxy.boundPort
         defer { Task { try? await proxy.stop() } }
 
         let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
@@ -32,6 +44,12 @@ final class WebSocketCaptureTests: XCTestCase {
                     collector: collector, upgraded: upgraded))
             }
         let channel = try await bootstrap.connect(host: "127.0.0.1", port: proxyPort).get()
+
+        let upgradeTimeout = channel.eventLoop.scheduleTask(in: .seconds(5)) {
+            upgraded.fail(WSTestError.notUpgraded("upgrade timed out"))
+            channel.close(promise: nil)
+        }
+        upgraded.futureResult.whenComplete { _ in upgradeTimeout.cancel() }
 
         let ws = try await upgraded.futureResult.get()
         try await sendFrame(ws, opcode: .text, bytes: Array("hello-ws".utf8))

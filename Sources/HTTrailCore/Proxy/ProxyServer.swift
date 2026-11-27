@@ -42,6 +42,15 @@ public struct StreamingResponseMetadata: Sendable {
 }
 
 public typealias StreamingResponseInspectionPolicy = @Sendable (CapturedRequest, StreamingResponseMetadata) -> Int?
+/// Optional downstream policy applied before any origin response bytes reach
+/// the client. An inspection fallback is used for a size overflow, incomplete
+/// origin response, or inspector error; nil retains transparent fail-open.
+public enum StreamingResponseDisposition: Sendable {
+    case stream
+    case inspect(maximumBytes: Int, failureResponse: CapturedResponse? = nil)
+    case respond(CapturedResponse)
+}
+public typealias StreamingResponseDispositionPolicy = @Sendable (CapturedRequest, StreamingResponseMetadata) -> StreamingResponseDisposition
 public typealias StreamingResponseInspector = @Sendable (CapturedRequest, CapturedResponse) async throws -> CapturedResponse?
 public typealias StreamingResponseObserver = @Sendable (CapturedRequest, CapturedResponse) -> Void
 
@@ -88,6 +97,9 @@ public final class ProxyServer: @unchecked Sendable {
     /// Optional bounded response-inspection seam. A positive policy result is
     /// the maximum body bytes that may be held; nil streams immediately.
     public var streamingResponseInspectionPolicy: StreamingResponseInspectionPolicy?
+    /// Takes precedence over the legacy inspection policy when present. The
+    /// default is nil, preserving HTTrail's existing transparent behavior.
+    public var streamingResponseDispositionPolicy: StreamingResponseDispositionPolicy?
     public var streamingResponseInspector: StreamingResponseInspector?
     public var streamingResponseObserver: StreamingResponseObserver?
     public var runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)?
@@ -144,6 +156,7 @@ public final class ProxyServer: @unchecked Sendable {
         let requestInspectionBodyCap = self.requestInspectionBodyCap
         let requestCaptureBodyCap = self.requestCaptureBodyCap
         let responseInspectionPolicy = self.streamingResponseInspectionPolicy
+        let responseDispositionPolicy = self.streamingResponseDispositionPolicy
         let responseInspector = self.streamingResponseInspector
         let responseObserver = self.streamingResponseObserver
         let runtimeEventHandler = self.runtimeEventHandler
@@ -167,6 +180,7 @@ public final class ProxyServer: @unchecked Sendable {
                                                   requestInspectionBodyCap: requestInspectionBodyCap,
                                                   requestCaptureBodyCap: requestCaptureBodyCap,
                                                   responseInspectionPolicy: responseInspectionPolicy,
+                                                  responseDispositionPolicy: responseDispositionPolicy,
                                                    responseInspector: responseInspector,
                                                    responseObserver: responseObserver,
                                                    runtimeEventHandler: runtimeEventHandler,

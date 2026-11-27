@@ -2,6 +2,7 @@ import XCTest
 import NIOCore
 import NIOPosix
 import NIOHTTP1
+import NIOSSL
 @testable import HTTrailCore
 
 /// Exercises the streaming response path, the capture-body cap, upstream
@@ -158,6 +159,9 @@ final class StreamingProxyTests: XCTestCase {
             $0.streamRequestBodies = true
             $0.requestCaptureBodyCap = previewCap
             $0.requestInspectionBodyCap = 128 * 1024
+            $0.upstreamConnectionPoolConfiguration = .init(
+                maximumConnectionsPerOrigin: 1, maximumConnectionsTotal: 2, idleTimeout: 5
+            )
         }
         defer { Task { try? await proxy.stop() } }
 
@@ -205,12 +209,127 @@ final class StreamingProxyTests: XCTestCase {
         XCTAssertEqual(result.body, "ORIGINAL")
     }
 
+    func testStrictInspectionBlocksOversizedChunkedBodyAndDiscardsOrigin() async throws {
+        let origin = TestOrigin()
+        let port = try origin.start(bodyByteCount: 5_000, chunked: true)
+        defer { origin.stop() }
+        let calls = LockedCounter(), events = LockedEvents()
+        let replacement = inspectionPlaceholder()
+        let (proxy, sink) = try await makeProxy {
+            $0.streamRequestBodies = true
+            $0.upstreamConnectionPoolConfiguration = .init(maximumConnectionsPerOrigin: 1, maximumConnectionsTotal: 2, idleTimeout: 5)
+            $0.runtimeEventHandler = { events.append($0) }
+            $0.streamingResponseDispositionPolicy = { _, _ in .inspect(maximumBytes: 1_000, failureResponse: replacement) }
+            $0.streamingResponseInspector = { _, response in calls.increment(); return response }
+        }
+        defer { Task { try? await proxy.stop() } }
+        for _ in 0..<2 {
+            guard let result = curlThroughProxy(proxyPort: proxy.boundPort, url: "http://127.0.0.1:\(port)/image")
+            else { throw XCTSkip("curl unavailable") }
+            XCTAssertEqual(result.code, "200")
+            XCTAssertEqual(result.body, "SAFE-PLACEHOLDER")
+        }
+        XCTAssertEqual(calls.value, 0)
+        XCTAssertEqual(sink.flows.count, 2)
+        XCTAssertTrue(sink.flows.allSatisfy { $0.response?.body == replacement.body })
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolHit }.count, 0)
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 2)
+    }
+
+    func testStrictInspectionReplacesTruncatedOriginBeforeAnyBytesEscape() async throws {
+        try await verifyInterruptedInspection(termination: .truncate)
+    }
+
+    func testStrictInspectionReplacesStalledOriginBeforeAnyBytesEscape() async throws {
+        try await verifyInterruptedInspection(termination: .stall)
+    }
+
+    func testStrictInspectionReplacesClassifierFailure() async throws {
+        let origin = TestOrigin()
+        let port = try origin.start(bodyString: "SENSITIVE-ORIGINAL")
+        defer { origin.stop() }
+        let replacement = inspectionPlaceholder()
+        let (proxy, sink) = try await makeProxy {
+            $0.streamingResponseDispositionPolicy = { _, _ in .inspect(maximumBytes: 1_024, failureResponse: replacement) }
+            $0.streamingResponseInspector = { _, _ in throw CocoaError(.fileReadCorruptFile) }
+        }
+        defer { Task { try? await proxy.stop() } }
+        guard let result = curlThroughProxy(proxyPort: proxy.boundPort, url: "http://127.0.0.1:\(port)/image")
+        else { throw XCTSkip("curl unavailable") }
+        XCTAssertEqual(result.body, "SAFE-PLACEHOLDER")
+        let flow = try await waitForFlow(sink)
+        XCTAssertEqual(flow.response?.body, replacement.body)
+    }
+
+    func testResponseDispositionCanReplaceAtHeadersAndPreserveHEADFraming() async throws {
+        let origin = TestOrigin()
+        let port = try origin.start(bodyString: "SENSITIVE-ORIGINAL")
+        defer { origin.stop() }
+        let calls = LockedCounter()
+        let replacement = inspectionPlaceholder()
+        let (proxy, _) = try await makeProxy {
+            $0.streamRequestBodies = true
+            $0.streamingResponseDispositionPolicy = { _, _ in .respond(replacement) }
+            $0.streamingResponseInspector = { _, response in calls.increment(); return response }
+        }
+        defer { Task { try? await proxy.stop() } }
+        let url = "http://127.0.0.1:\(port)/image"
+        guard let head = curlThroughProxy(proxyPort: proxy.boundPort, url: url, arguments: ["--head"]),
+              let get = curlThroughProxy(proxyPort: proxy.boundPort, url: url)
+        else { throw XCTSkip("curl unavailable") }
+        XCTAssertEqual(head.code, "200")
+        XCTAssertFalse(head.body.contains("SAFE-PLACEHOLDER"))
+        XCTAssertEqual(get.body, "SAFE-PLACEHOLDER")
+        XCTAssertEqual(calls.value, 0)
+    }
+
+    func testStreamingDispositionSkipsInspectionAndOverridesLegacyPolicy() async throws {
+        let origin = TestOrigin()
+        let port = try origin.start(bodyString: "ORIGINAL")
+        defer { origin.stop() }
+        let calls = LockedCounter()
+        let (proxy, _) = try await makeProxy {
+            $0.streamingResponseInspectionPolicy = { _, _ in 1_024 }
+            $0.streamingResponseDispositionPolicy = { _, _ in .stream }
+            $0.streamingResponseInspector = { _, response in calls.increment(); return response }
+        }
+        defer { Task { try? await proxy.stop() } }
+        guard let result = curlThroughProxy(proxyPort: proxy.boundPort, url: "http://127.0.0.1:\(port)/image")
+        else { throw XCTSkip("curl unavailable") }
+        XCTAssertEqual(result.body, "ORIGINAL")
+        XCTAssertEqual(calls.value, 0)
+    }
+
+    func testStrictInspectionAllowsCompleteBodyAndReusesOrigin() async throws {
+        let origin = TestOrigin()
+        let port = try origin.start(bodyString: "CLASSIFIED-ALLOWED")
+        defer { origin.stop() }
+        let calls = LockedCounter(), events = LockedEvents()
+        let replacement = inspectionPlaceholder()
+        let (proxy, _) = try await makeProxy {
+            $0.upstreamConnectionPoolConfiguration = .init(maximumConnectionsPerOrigin: 1, maximumConnectionsTotal: 2, idleTimeout: 5)
+            $0.runtimeEventHandler = { events.append($0) }
+            $0.streamingResponseDispositionPolicy = { _, _ in .inspect(maximumBytes: 1_024, failureResponse: replacement) }
+            $0.streamingResponseInspector = { _, _ in calls.increment(); return nil }
+        }
+        defer { Task { try? await proxy.stop() } }
+        for _ in 0..<2 {
+            guard let result = curlThroughProxy(proxyPort: proxy.boundPort, url: "http://127.0.0.1:\(port)/image")
+            else { throw XCTSkip("curl unavailable") }
+            XCTAssertEqual(result.body, "CLASSIFIED-ALLOWED")
+        }
+        XCTAssertEqual(calls.value, 2)
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 1)
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolHit }.count, 1)
+    }
+
     func testBoundedPoolReusesSequentialSameOriginConnections() async throws {
         let origin = TestOrigin()
         let originPort = try origin.start(bodyString: "REUSED")
         defer { origin.stop() }
         let events = LockedEvents()
         let (proxy, sink) = try await makeProxy {
+            $0.streamRequestBodies = true // PacketTunnel's actual configuration
             $0.upstreamConnectionPoolConfiguration = UpstreamConnectionPoolConfiguration(
                 maximumConnectionsPerOrigin: 1, maximumConnectionsTotal: 2, idleTimeout: 5
             )
@@ -227,6 +346,99 @@ final class StreamingProxyTests: XCTestCase {
         XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 1, eventSummary)
         XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolHit }.count, 1, eventSummary)
         XCTAssertTrue(events.values.contains { $0.kind == .upstreamTiming && $0.detail.contains("reused=true") }, eventSummary)
+    }
+
+    func testStreamingRequestModePoolsGETHEADAndEmptyPOST() async throws {
+        let origin = TestOrigin()
+        let originPort = try origin.start(bodyString: "METHOD-BODY")
+        defer { origin.stop() }
+        let events = LockedEvents()
+        let (proxy, sink) = try await makeProxy {
+            $0.streamRequestBodies = true
+            $0.upstreamConnectionPoolConfiguration = .init(
+                maximumConnectionsPerOrigin: 1, maximumConnectionsTotal: 2, idleTimeout: 5
+            )
+            $0.runtimeEventHandler = { events.append($0) }
+        }
+        defer { Task { try? await proxy.stop() } }
+        let url = "http://127.0.0.1:\(originPort)/"
+        for arguments in [[], ["--head"], ["-X", "POST", "-H", "Content-Length: 0"]] {
+            guard let response = curlThroughProxy(proxyPort: proxy.boundPort, url: url, arguments: arguments)
+            else { throw XCTSkip("curl unavailable") }
+            XCTAssertEqual(response.code, "200")
+        }
+        XCTAssertEqual(sink.flows.map(\.request.method), ["GET", "HEAD", "POST"])
+        XCTAssertEqual(sink.flows.first { $0.request.method == "HEAD" }?.response?.body.count, 0)
+        XCTAssertEqual(sink.flows.last?.response?.body, Data("METHOD-BODY".utf8))
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 1)
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolHit }.count, 2)
+    }
+
+    func testStreamingRequestModeReusesTLSOriginAndPreservesHEADFraming() async throws {
+        let originCA = try CertificateAuthority.create()
+        let origin = TestOrigin()
+        let port = try origin.start(bodyString: "TLS-BODY", tlsLeaf: originCA.leaf(for: "127.0.0.1"))
+        defer { origin.stop() }
+        let proxyCA = try CertificateAuthority.create()
+        let caFile = FileManager.default.temporaryDirectory.appendingPathComponent("pureline-proxy-ca-\(UUID().uuidString).pem")
+        try proxyCA.caCertificatePEM.write(to: caFile, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: caFile) }
+        let events = LockedEvents()
+        let sink = CollectingSink()
+        let proxy = ProxyServer(port: 0, certificateAuthority: proxyCA, sink: sink)
+        proxy.bindHost = "127.0.0.1"
+        proxy.streamRequestBodies = true
+        proxy.verifyUpstreamCertificates = false // Only this ephemeral, self-signed local origin.
+        proxy.upstreamConnectionPoolConfiguration = .init(
+            maximumConnectionsPerOrigin: 1, maximumConnectionsTotal: 2, idleTimeout: 5
+        )
+        proxy.runtimeEventHandler = { events.append($0) }
+        try await proxy.start()
+        defer { Task { try? await proxy.stop() } }
+
+        let url = "https://127.0.0.1:\(port)/"
+        for methodArguments in [[], ["--head"], []] {
+            let arguments = ["--cacert", caFile.path] + methodArguments
+            guard let response = curlThroughProxy(proxyPort: proxy.boundPort, url: url, arguments: arguments)
+            else { throw XCTSkip("curl unavailable") }
+            XCTAssertEqual(response.code, "200")
+            if methodArguments.isEmpty { XCTAssertEqual(response.body, "TLS-BODY") }
+        }
+        XCTAssertEqual(sink.flows.count, 3)
+        XCTAssertEqual(sink.flows.first { $0.request.method == "HEAD" }?.response?.body.count, 0)
+        XCTAssertTrue(sink.flows.allSatisfy(\.secure))
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 1)
+        XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolHit }.count, 2)
+    }
+
+    func testStreamingUploadResumesReadsForNextRequestOnSameClientConnection() async throws {
+        let origin = UploadOrigin()
+        let port = try origin.start()
+        defer { origin.stop() }
+        let (proxy, sink) = try await makeProxy {
+            $0.streamRequestBodies = true
+            $0.upstreamConnectionPoolConfiguration = .init(
+                maximumConnectionsPerOrigin: 1, maximumConnectionsTotal: 2, idleTimeout: 5
+            )
+        }
+        defer { Task { try? await proxy.stop() } }
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/curl")
+        let common = ["-sS", "--noproxy", "", "-x", "http://127.0.0.1:\(proxy.boundPort)",
+                      "--max-time", "8", "-w", "\ncode:%{http_code};connections:%{num_connects}\n"]
+        let url = "http://127.0.0.1:\(port)/upload"
+        process.arguments = common + ["--data-binary", "upload-body", url, "--next"] + common + [url]
+        let output = Pipe()
+        process.standardOutput = output
+        process.standardError = Pipe()
+        do { try process.run() } catch { throw XCTSkip("curl unavailable") }
+        let bytes = output.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+        let response = String(decoding: bytes, as: UTF8.self)
+        XCTAssertEqual(process.terminationStatus, 0, response)
+        XCTAssertTrue(response.contains("11\ncode:200;connections:1"), response)
+        XCTAssertTrue(response.contains("0\ncode:200;connections:0"), "client connection should be reused: \(response)")
+        XCTAssertEqual(sink.flows.map(\.request.method), ["POST", "GET"])
     }
 
     func testPoolExpiresIdleConnections() async throws {
@@ -294,6 +506,37 @@ final class StreamingProxyTests: XCTestCase {
         XCTAssertTrue(events.values.contains { $0.kind == .upstreamPoolEviction && $0.detail == "origin-connection-close" })
     }
 
+    func testCloseDelimitedOriginCompletesStreamingAndInspectedResponses() async throws {
+        let origin = TestOrigin()
+        let port = try origin.start(bodyString: "CLOSE-DELIMITED", closeDelimited: true)
+        defer { origin.stop() }
+        for inspect in [false, true] {
+            let calls = LockedCounter(), events = LockedEvents()
+            let replacement = inspectionPlaceholder()
+            let (proxy, sink) = try await makeProxy {
+                $0.streamRequestBodies = true
+                $0.upstreamConnectionPoolConfiguration = .init(maximumConnectionsPerOrigin: 1, maximumConnectionsTotal: 2, idleTimeout: 5)
+                $0.runtimeEventHandler = { events.append($0) }
+                if inspect {
+                    $0.streamingResponseDispositionPolicy = { _, _ in .inspect(maximumBytes: 1_024, failureResponse: replacement) }
+                    $0.streamingResponseInspector = { _, _ in calls.increment(); return nil }
+                }
+            }
+            defer { Task { try? await proxy.stop() } }
+            for _ in 0..<2 {
+                guard let result = curlThroughProxy(proxyPort: proxy.boundPort, url: "http://127.0.0.1:\(port)/image")
+                else { throw XCTSkip("curl unavailable") }
+                XCTAssertEqual(result.code, "200")
+                XCTAssertEqual(result.body, "CLOSE-DELIMITED")
+            }
+            XCTAssertEqual(calls.value, inspect ? 2 : 0)
+            XCTAssertEqual(sink.flows.count, 2)
+            XCTAssertTrue(sink.flows.allSatisfy { $0.state == .completed && $0.response?.body == Data("CLOSE-DELIMITED".utf8) })
+            XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolHit }.count, 0)
+            XCTAssertEqual(events.values.filter { $0.kind == .upstreamPoolMiss }.count, 2)
+        }
+    }
+
     func testTemporaryCompatibilityBypassExpiresAndForceDecryptWins() {
         let engine = InterceptEngine()
         let now = Date()
@@ -321,6 +564,33 @@ final class StreamingProxyTests: XCTestCase {
 
     // MARK: - Helpers
 
+    private func inspectionPlaceholder() -> CapturedResponse {
+        CapturedResponse(statusCode: 200, reasonPhrase: "OK", httpVersion: "HTTP/1.1",
+                         headers: [HeaderPair(name: "Content-Type", value: "image/svg+xml")],
+                         body: Data("SAFE-PLACEHOLDER".utf8), timestamp: Date())
+    }
+
+    private func verifyInterruptedInspection(termination: TestOriginTermination) async throws {
+        let origin = TestOrigin()
+        let port = try origin.start(bodyString: "SENSITIVE-PREFIX", termination: termination)
+        defer { origin.stop() }
+        let calls = LockedCounter()
+        let replacement = inspectionPlaceholder()
+        let (proxy, sink) = try await makeProxy {
+            $0.upstreamIdleTimeout = .seconds(1)
+            $0.streamingResponseDispositionPolicy = { _, _ in .inspect(maximumBytes: 1_024, failureResponse: replacement) }
+            $0.streamingResponseInspector = { _, response in calls.increment(); return response }
+        }
+        defer { Task { try? await proxy.stop() } }
+        guard let result = curlThroughProxy(proxyPort: proxy.boundPort, url: "http://127.0.0.1:\(port)/image", maxTime: 5)
+        else { throw XCTSkip("curl unavailable") }
+        XCTAssertEqual(result.code, "200")
+        XCTAssertEqual(result.body, "SAFE-PLACEHOLDER")
+        XCTAssertEqual(calls.value, 0)
+        let flow = try await waitForFlow(sink)
+        XCTAssertEqual(flow.response?.body, replacement.body)
+    }
+
     private func makeProxy(engine: InterceptEngine = InterceptEngine(),
                            _ configure: (ProxyServer) -> Void = { _ in }) async throws -> (ProxyServer, CollectingSink) {
         let ca = try CertificateAuthority.create()
@@ -341,14 +611,15 @@ final class StreamingProxyTests: XCTestCase {
         throw XCTSkip("No flow recorded within timeout")
     }
 
-    private func curlThroughProxy(proxyPort: Int, url: String, maxTime: Int = 15) -> (code: String, body: String)? {
+    private func curlThroughProxy(proxyPort: Int, url: String, maxTime: Int = 15,
+                                  arguments: [String] = []) -> (code: String, body: String)? {
         let bodyFile = FileManager.default.temporaryDirectory.appendingPathComponent("htrail-curl-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: bodyFile) }
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/curl")
-        process.arguments = ["-sS", "-x", "http://127.0.0.1:\(proxyPort)",
+        process.arguments = ["-sS", "--noproxy", "", "-x", "http://127.0.0.1:\(proxyPort)",
                              "--max-time", "\(maxTime)",
-                             "-o", bodyFile.path, "-w", "%{http_code}", url]
+                             "-o", bodyFile.path, "-w", "%{http_code}"] + arguments + [url]
         let pipe = Pipe()
         process.standardOutput = pipe
         process.standardError = Pipe()
@@ -367,7 +638,7 @@ final class StreamingProxyTests: XCTestCase {
         try? Data(repeating: 0x5a, count: byteCount).write(to: input)
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/curl")
-        process.arguments = ["-sS", "-x", "http://127.0.0.1:\(proxyPort)", "--max-time", "20",
+        process.arguments = ["-sS", "--noproxy", "", "-x", "http://127.0.0.1:\(proxyPort)", "--max-time", "20",
                              "--data-binary", "@\(input.path)", "-o", output.path, "-w", "%{http_code}", url]
         let pipe = Pipe(); process.standardOutput = pipe; process.standardError = Pipe()
         do { try process.run() } catch { return nil }
@@ -379,12 +650,17 @@ final class StreamingProxyTests: XCTestCase {
 
 /// Minimal local HTTP origin for proxy tests: replies with a fixed body, or
 /// accepts the connection and never responds (to exercise upstream timeouts).
+enum TestOriginTermination { case complete, truncate, stall }
+
 final class TestOrigin {
     private let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
     private var channel: Channel?
 
     func start(bodyString: String? = nil, bodyByteCount: Int? = nil,
-               hang: Bool = false, chunked: Bool = false, closeResponse: Bool = false) throws -> Int {
+               hang: Bool = false, chunked: Bool = false, closeResponse: Bool = false,
+               tlsLeaf: CertificateAuthority.LeafMaterial? = nil,
+               termination: TestOriginTermination = .complete,
+               closeDelimited: Bool = false) throws -> Int {
         let body: [UInt8]
         if let bodyString { body = Array(bodyString.utf8) }
         else if let bodyByteCount { body = Array(repeating: UInt8(ascii: "x"), count: bodyByteCount) }
@@ -393,8 +669,18 @@ final class TestOrigin {
         let bootstrap = ServerBootstrap(group: group)
             .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
             .childChannelInitializer { channel in
-                channel.pipeline.configureHTTPServerPipeline().flatMap {
-                    channel.pipeline.addHandler(OriginHandler(body: body, hang: hang, chunked: chunked, closeResponse: closeResponse))
+                do {
+                    let ready: EventLoopFuture<Void>
+                    if let tlsLeaf { ready = channel.pipeline.addHandler(try ProxyTLS.serverHandler(leaf: tlsLeaf)) }
+                    else { ready = channel.eventLoop.makeSucceededFuture(()) }
+                    if closeDelimited {
+                        return ready.flatMap { channel.pipeline.addHandler(CloseDelimitedOriginHandler(body: body)) }
+                    }
+                    return ready.flatMap { channel.pipeline.configureHTTPServerPipeline() }.flatMap {
+                        channel.pipeline.addHandler(OriginHandler(body: body, hang: hang, chunked: chunked, closeResponse: closeResponse, termination: termination))
+                    }
+                } catch {
+                    return channel.eventLoop.makeFailedFuture(error)
                 }
             }
         let ch = try bootstrap.bind(host: "127.0.0.1", port: 0).wait()
@@ -408,6 +694,31 @@ final class TestOrigin {
     }
 }
 
+/// Raw bytes intentionally bypass the HTTP encoder so the origin truly sends
+/// neither Content-Length nor Transfer-Encoding; EOF is its only delimiter.
+private final class CloseDelimitedOriginHandler: ChannelInboundHandler {
+    typealias InboundIn = ByteBuffer
+    typealias OutboundOut = ByteBuffer
+    private let body: [UInt8]
+    private var request = Data()
+    private var responded = false
+
+    init(body: [UInt8]) { self.body = body }
+
+    func channelRead(context: ChannelHandlerContext, data: NIOAny) {
+        guard !responded else { return }
+        let bytes = unwrapInboundIn(data)
+        guard request.count + bytes.readableBytes <= 8_192 else { context.close(promise: nil); return }
+        request.append(contentsOf: bytes.readableBytesView)
+        guard request.range(of: Data("\r\n\r\n".utf8)) != nil else { return }
+        responded = true
+        var response = context.channel.allocator.buffer(capacity: body.count + 100)
+        response.writeString("HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Type: image/jpeg\r\n\r\n")
+        response.writeBytes(body)
+        context.writeAndFlush(wrapOutboundOut(response)).whenComplete { _ in context.close(promise: nil) }
+    }
+}
+
 private final class OriginHandler: ChannelInboundHandler {
     typealias InboundIn = HTTPServerRequestPart
     typealias OutboundOut = HTTPServerResponsePart
@@ -416,23 +727,33 @@ private final class OriginHandler: ChannelInboundHandler {
     private let hang: Bool
     private let chunked: Bool
     private let closeResponse: Bool
-    init(body: [UInt8], hang: Bool, chunked: Bool, closeResponse: Bool) {
+    private let termination: TestOriginTermination
+    private var isHeadRequest = false
+    init(body: [UInt8], hang: Bool, chunked: Bool, closeResponse: Bool, termination: TestOriginTermination) {
         self.body = body; self.hang = hang; self.chunked = chunked; self.closeResponse = closeResponse
+        self.termination = termination
     }
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
-        guard case .end = unwrapInboundIn(data) else { return }
+        let part = unwrapInboundIn(data)
+        if case .head(let head) = part { isHeadRequest = head.method == .HEAD }
+        guard case .end = part else { return }
         if hang { return }   // accept the request, never reply
         var headers = HTTPHeaders()
         if chunked { headers.add(name: "Transfer-Encoding", value: "chunked") }
-        else { headers.add(name: "Content-Length", value: "\(body.count)") }
+        else { headers.add(name: "Content-Length", value: "\(body.count + (termination == .complete ? 0 : 10))") }
         headers.add(name: "Content-Type", value: "text/plain")
         if closeResponse { headers.add(name: "Connection", value: "close") }
         let head = HTTPResponseHead(version: .http1_1, status: .ok, headers: headers)
         context.write(wrapOutboundOut(.head(head)), promise: nil)
         var buffer = context.channel.allocator.buffer(capacity: body.count)
         buffer.writeBytes(body)
-        context.write(wrapOutboundOut(.body(.byteBuffer(buffer))), promise: nil)
+        if !isHeadRequest { context.write(wrapOutboundOut(.body(.byteBuffer(buffer))), promise: nil) }
+        if termination != .complete {
+            context.flush()
+            if termination == .truncate { context.close(promise: nil) }
+            return
+        }
         let end = context.writeAndFlush(wrapOutboundOut(.end(nil)))
         if closeResponse { end.whenComplete { _ in context.close(promise: nil) } }
     }
@@ -482,6 +803,7 @@ private final class UploadOriginHandler: ChannelInboundHandler {
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         switch unwrapInboundIn(data) {
+        case .head: received = 0
         case .body(let buffer): received += buffer.readableBytes
         case .end:
             let response = String(received)

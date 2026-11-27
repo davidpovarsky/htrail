@@ -109,6 +109,7 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
     private let requestInspectionBodyCap: Int
     private let requestCaptureBodyCap: Int
     private let responseInspectionPolicy: StreamingResponseInspectionPolicy?
+    private let responseDispositionPolicy: StreamingResponseDispositionPolicy?
     private let responseInspector: StreamingResponseInspector?
     private let responseObserver: StreamingResponseObserver?
     private let runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)?
@@ -125,6 +126,7 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
          requestInspectionBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
          requestCaptureBodyCap: Int = ProxyTuning.defaultCaptureBodyCap,
          responseInspectionPolicy: StreamingResponseInspectionPolicy? = nil,
+         responseDispositionPolicy: StreamingResponseDispositionPolicy? = nil,
           responseInspector: StreamingResponseInspector? = nil,
           responseObserver: StreamingResponseObserver? = nil,
           runtimeEventHandler: (@Sendable (ProxyRuntimeEvent) -> Void)? = nil,
@@ -141,6 +143,7 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
         self.requestInspectionBodyCap = requestInspectionBodyCap
         self.requestCaptureBodyCap = requestCaptureBodyCap
         self.responseInspectionPolicy = responseInspectionPolicy
+        self.responseDispositionPolicy = responseDispositionPolicy
         self.responseInspector = responseInspector
         self.responseObserver = responseObserver
         self.runtimeEventHandler = runtimeEventHandler
@@ -180,6 +183,7 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
                                           requestInspectionBodyCap: requestInspectionBodyCap,
                                           requestCaptureBodyCap: requestCaptureBodyCap,
                                           responseInspectionPolicy: responseInspectionPolicy,
+                                          responseDispositionPolicy: responseDispositionPolicy,
                                            responseInspector: responseInspector,
                                            responseObserver: responseObserver,
                                            runtimeEventHandler: runtimeEventHandler,
@@ -237,6 +241,7 @@ final class ProxyConnectHandler: ChannelInboundHandler, RemovableChannelHandler 
                         requestInspectionBodyCap: self.requestInspectionBodyCap,
                         requestCaptureBodyCap: self.requestCaptureBodyCap,
                         responseInspectionPolicy: self.responseInspectionPolicy,
+                        responseDispositionPolicy: self.responseDispositionPolicy,
                          responseInspector: self.responseInspector,
                          responseObserver: self.responseObserver,
                          runtimeEventHandler: self.runtimeEventHandler,
