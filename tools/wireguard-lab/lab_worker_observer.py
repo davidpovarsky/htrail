@@ -40,7 +40,9 @@ class PurelineLabWorkerObserver:
 
         async def observed_inspect(content, mime_type, flow):
             request = flow.request
-            target = (request.method, request.scheme, request.host, request.port, request.path) == (
+            # Transparent/WireGuard mode stores the destination IP in host;
+            # pretty_host reads the HTTP Host/:authority view instead.
+            target = (request.method, request.scheme, request.pretty_host, request.port, request.path) == (
                 "GET", "https", "upload.wikimedia.org", 443,
                 "/wikipedia/commons/4/4c/Wikisource-logo.svg")
             if not target:

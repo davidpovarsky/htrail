@@ -26,6 +26,7 @@ def main():
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    from mitmproxy import http, version
     here = Path(__file__).resolve().parent
     driver = load("observer_check_driver", here / "lab_observed_pipeline_worker.py")
     cases = []
@@ -62,6 +63,10 @@ def main():
             returned = subprocess.run(command, input=b"PRIVATE_IMAGE_BYTES", timeout=5)
             check("renderer_result_and_arguments_unchanged",
                   returned is result and received[-1] == ((command,), {"input": b"PRIVATE_IMAGE_BYTES", "timeout": 5}))
+            observed_input = next(event for event in ledger.events if event["stage"] == "svg-render-start")
+            check("renderer_stdin_sha_and_length_recorded",
+                  observed_input["input_bytes"] == len(b"PRIVATE_IMAGE_BYTES") and
+                  observed_input["input_sha256"] == hashlib.sha256(b"PRIVATE_IMAGE_BYTES").hexdigest())
             before = len(ledger.events)
             check("other_subprocess_passthrough", subprocess.run(["/other"]) is result and len(ledger.events) == before)
             failure = subprocess.TimeoutExpired("PRIVATE_COMMAND", 5)
@@ -109,7 +114,8 @@ def main():
                 "/python", str(here / "lab_observed_pipeline_worker.py"),
                 str(package / "downstream/pipeline_worker.py"), "/same-config.toml"])
             flow = SimpleNamespace(request=SimpleNamespace(method="GET", scheme="https",
-                host="upload.wikimedia.org", port=443, path="/wikipedia/commons/4/4c/Wikisource-logo.svg"))
+                host="upload.wikimedia.org", pretty_host="upload.wikimedia.org", port=443,
+                path="/wikipedia/commons/4/4c/Wikisource-logo.svg"))
             content = b"PRIVATE_FIXTURE_BYTES"
             check("parent_result_and_arguments_unchanged", asyncio.run(candidate.inspect(content, "image/svg+xml", flow)) is expected_result
                   and calls[-1] == (content, "image/svg+xml", flow))
@@ -125,10 +131,27 @@ def main():
                   and hashlib.sha256(content).hexdigest() in parent_text)
             candidate.error = None
             flow.request.host = "unrelated.invalid"
+            flow.request.pretty_host = "unrelated.invalid"
             asyncio.run(candidate.inspect(b"PRIVATE_UNRELATED_BYTES", "image/png", flow))
             check("unrelated_flow_not_observed", (directory / "parent.json").read_text() == parent_text)
+            request = http.Request.make("GET",
+                "https://192.0.2.9/wikipedia/commons/4/4c/Wikisource-logo.svg")
+            # Request.make's URL setter writes Host, just as routing changes
+            # preserve an already parsed authority separately from data.host.
+            request.headers["Host"] = "upload.wikimedia.org"
+            actual_flow = SimpleNamespace(request=request)
+            actual_body = b"PRIVATE_TRANSPARENT_FIXTURE"
+            result = asyncio.run(candidate.inspect(actual_body, "image/svg+xml", actual_flow))
+            observations = json.loads((directory / "parent.json").read_text())["events"]
+            latest_input = next(event for event in reversed(observations) if event["stage"] == "parent-svg-input")
+            check("real_mitm_request_transparent_host_authority",
+                  request.host == "192.0.2.9" and request.pretty_host == "upload.wikimedia.org" and
+                  result is expected_result and
+                  latest_input["input_sha256"] == hashlib.sha256(actual_body).hexdigest() and
+                  latest_input["input_bytes"] == len(actual_body))
 
     receipt = {"schema": 1, "passed": True, "tests": cases,
+               "mitmproxy_version": version.VERSION,
                "real_models_run": False, "network_requests": 0, "renderer_processes": 0,
                "source_sha256": {name: hashlib.sha256((here / name).read_bytes()).hexdigest()
                                   for name in ("lab_worker_observer.py", "lab_observed_pipeline_worker.py", "check_lab_worker_observer.py")}}

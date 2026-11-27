@@ -94,7 +94,14 @@ def install_worker_observers(protocol, renderer_path, ledger):
         if not isinstance(command, (list, tuple)) or renderer_path not in command:
             return original_run(*args, **kwargs)
         start = time.monotonic()
-        ledger.record("svg-render-start")
+        # These are the actual decoded SVG bytes supplied by the unchanged
+        # SVGInspectingPipeline. Transparent WireGuard request.host is an IP,
+        # so this identity does not depend on the parent's hostname condition.
+        content = kwargs.get("input")
+        identity = ({"input_bytes": len(content),
+                     "input_sha256": hashlib.sha256(content).hexdigest()}
+                    if isinstance(content, bytes) else {})
+        ledger.record("svg-render-start", **identity)
         try:
             result = original_run(*args, **kwargs)
         except BaseException as error:
