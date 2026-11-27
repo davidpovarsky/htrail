@@ -16,10 +16,25 @@ struct SetupView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section("Remote filtering") {
+                    NavigationLink("WireGuard · remote server") { PurelineWireGuardView() }
+                        .accessibilityIdentifier("pureline.wg.open")
+                }
+                #if PURELINE_REMOTE_BUILD
+                Section {
+                    Label("Pureline Remote", systemImage: "network.badge.shield.half.filled")
+                    Text("Filtering runs on your selected server. Configure its WireGuard profile above and use the certificate supplied by that server.")
+                        .font(.footnote)
+                    Text("On-device capture and local image models are unavailable in this edition. Saved captures and the API tools remain available.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                #else
                 onDeviceCaptureSection
                 rootCASection
                 proxySection
                 otherDevicesSection
+                #endif
                 deviceSection
                 captureSection
                 Section {
@@ -33,7 +48,13 @@ struct SetupView: View {
             .background(Theme.appBackground)
             .tint(Theme.color.accent)
             .preferredColorScheme(.dark)
-            .htScreenChrome("Setup") { LiveStatusPill(active: vpn.isActive) }
+            .htScreenChrome("Setup") {
+                #if PURELINE_REMOTE_BUILD
+                Text("Remote").font(.caption.weight(.semibold))
+                #else
+                LiveStatusPill(active: vpn.isActive)
+                #endif
+            }
             .sheet(item: $shareURL) { url in ShareSheet(items: [url]) }
             .sheet(isPresented: startGateBinding) {
                 if let readiness = startGateReadiness {
@@ -49,7 +70,11 @@ struct SetupView: View {
             }
             .keyboardDismissButton()
             .task { await vpn.reload() }
-            .task { await model.checkCATrust() }
+            .task {
+                #if !PURELINE_REMOTE_BUILD
+                await model.checkCATrust()
+                #endif
+            }
             .onAppear { portText = "\(model.proxyPort)" }
         }
     }

@@ -20,14 +20,34 @@ struct CaptureView: View {
             ZStack {
                 Theme.appBackground
                 VStack(spacing: 0) {
+                    #if PURELINE_REMOTE_BUILD
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Saved captures", systemImage: "tray.full")
+                            .font(.headline)
+                        Text("Remote filtering does not record a local capture. Your saved sessions remain available here.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        NavigationLink("Manage remote filtering") { PurelineWireGuardView() }
+                            .accessibilityIdentifier("pureline.remote.capture-link")
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    #else
                     controlBar
                     if !vpn.isActive { capturePrivacyNotice }
                     discoveredMacsBar
+                    #endif
                     Divider().overlay(Theme.color.hairline)
                     sessionsList
                 }
             }
-            .htScreenChrome("Capture") { LiveStatusPill(active: vpn.isActive) }
+            .htScreenChrome("Capture") {
+                #if PURELINE_REMOTE_BUILD
+                Text("Remote").font(.caption.weight(.semibold))
+                #else
+                LiveStatusPill(active: vpn.isActive)
+                #endif
+            }
             .navigationDestination(for: CaptureSession.self) { session in
                 sessionFlows(session)
             }
@@ -39,7 +59,11 @@ struct CaptureView: View {
                 Button("Save") { if let s = renaming { model.renameSession(s.id, to: renameText) }; renaming = nil }
             }
             .keyboardDismissButton()
-            .onAppear { resumeBrowsingIfDisclosed() }
+            .onAppear {
+                #if !PURELINE_REMOTE_BUILD
+                resumeBrowsingIfDisclosed()
+                #endif
+            }
             .onDisappear { model.stopBonjourBrowsing() }
             .sheet(isPresented: $showLocalNetInfo) {
                 LocalNetworkInfoSheet(onContinue: {
@@ -66,7 +90,11 @@ struct CaptureView: View {
                     )
                 }
             }
-            .safeAreaInset(edge: .top) { captureBanner }
+            .safeAreaInset(edge: .top) {
+                #if !PURELINE_REMOTE_BUILD
+                captureBanner
+                #endif
+            }
         }
     }
 
